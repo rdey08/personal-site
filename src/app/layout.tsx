@@ -17,9 +17,30 @@ const newsreader = Newsreader({
   style: ["normal", "italic"],
 });
 
+const SITE_URL = "https://rupakdey.com";
+const DESCRIPTION =
+  "Rupak Dey — applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).";
+
 export const metadata: Metadata = {
-  title: "Rupak Dey",
-  description: "Personal site of Rupak Dey.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Rupak Dey",
+    template: "%s · Rupak Dey",
+  },
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Rupak Dey",
+    url: SITE_URL,
+    title: "Rupak Dey",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rupak Dey",
+    description: DESCRIPTION,
+  },
 };
 
 // Runs before first paint: applies the saved theme so there is no flash of the

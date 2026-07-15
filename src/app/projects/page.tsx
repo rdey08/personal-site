@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Projects",
   description:
     "Software engineering and projects — ELSA for NASA's Planetary Data System, plus hackathon and coursework projects — and leadership.",
+  alternates: { canonical: "/projects" },
 };
 
 export default function ProjectsPage() {

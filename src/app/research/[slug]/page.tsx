@@ -16,7 +16,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const thread = getResearchThread(slug);
   if (!thread) return {};
-  return { title: thread.meta.title, description: thread.meta.summary };
+  return {
+    title: thread.meta.title,
+    description: thread.meta.summary,
+    alternates: { canonical: `/research/${slug}` },
+  };
 }
 
 export default async function ResearchThreadPage({

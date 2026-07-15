@@ -8,6 +8,7 @@ import { Prose } from "@/components/Prose";
 export const metadata: Metadata = {
   title: "CV",
   description: "Curriculum vitae of Rupak Dey — education, focus, and skills.",
+  alternates: { canonical: "/cv" },
 };
 
 export default function CvPage() {

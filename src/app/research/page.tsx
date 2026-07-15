@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Research",
   description:
     "Applied machine learning research — multi-branch LSTMs for predicting net primary productivity — and academic presentations.",
+  alternates: { canonical: "/research" },
 };
 
 export default function ResearchPage() {
