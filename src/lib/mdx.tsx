@@ -1,10 +1,11 @@
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { mdxComponents } from "@/components/mdx-components";
 
 /**
- * Compiles an MDX body (from src/lib/content.ts) inside a server component
- * at build time. No client-side MDX, no runtime compilation. Custom
- * typographic components are added in Phase 2.5 (mdx-components).
+ * Compiles an MDX body (from src/lib/content.ts) inside a server component at
+ * build time, with our typographic element map. No client-side MDX, no
+ * runtime compilation. Wrap in <Prose> at the call site for measure + color.
  */
 export function Mdx({ source }: { source: string }) {
-  return <MDXRemote source={source} />;
+  return <MDXRemote source={source} components={mdxComponents} />;
 }
