@@ -13,6 +13,7 @@ import { ResearchCard } from "@/components/ResearchCard";
 import { ProjectCard } from "@/components/ProjectCard";
 import { NewsList } from "@/components/NewsList";
 import { ObfuscatedEmail } from "@/components/ObfuscatedEmail";
+import { PersonJsonLd } from "@/components/PersonJsonLd";
 
 export default function Home() {
   const site = getSite();
@@ -25,6 +26,7 @@ export default function Home() {
 
   return (
     <>
+      <PersonJsonLd />
       {/* Hero — entrance stagger + signature accent underline (CSS only) */}
       <Section className="stagger pt-16 pb-4 sm:pt-24">
         <h1 className="inline-block text-4xl font-medium text-ink-strong sm:text-5xl">
