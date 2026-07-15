@@ -1,26 +1,151 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Design tokens (PLAN §5). Editorial/academic: warm near-monochrome ink on
+ * warm paper, one terracotta accent. Both themes are first-class.
+ *
+ * Raw values live on :root and are switched by prefers-color-scheme and the
+ * data-theme attribute (set by ThemeToggle). Semantic tokens are mapped into
+ * Tailwind via `@theme inline` so utilities like `bg-paper`, `text-ink`,
+ * `text-accent` resolve to whichever theme is active.
+ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  /* Warm paper + ink (light) */
+  --paper: #fbfaf7;
+  --paper-raised: #ffffff;
+  --paper-sunken: #f3f1ea;
+  --ink-strong: #1a1815; /* headings */
+  --ink: #34302b; /* body */
+  --ink-muted: #6b6660; /* captions, meta */
+  --ink-faint: #767065; /* least emphasis — AA 4.7:1 */
+  --line: #e2ddd3; /* hairlines, borders */
+  --line-strong: #cfc9bd;
+  --accent: #b4552d; /* terracotta */
+  --accent-strong: #9a441f; /* hover/active */
+  --accent-soft: #f0e2d8; /* tinted fills */
+  --selection: #f3d9c9;
+
+  /* Type scale — sans base 17px, ~1.2 modular */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.6875rem;
+  --text-3xl: 2.0625rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.125rem;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout */
+  --measure: 68ch;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --paper: #131210;
+    --paper-raised: #1b1916;
+    --paper-sunken: #0e0d0b;
+    --ink-strong: #f4f1ea;
+    --ink: #cbc6bc;
+    --ink-muted: #928c83;
+    --ink-faint: #8b847b;
+    --line: #2c2823;
+    --line-strong: #3b362f;
+    --accent: #d97a4e;
+    --accent-strong: #e8946b;
+    --accent-soft: #2a1e16;
+    --selection: #43301f;
+    color-scheme: dark;
   }
 }
 
+:root[data-theme="dark"] {
+  --paper: #131210;
+  --paper-raised: #1b1916;
+  --paper-sunken: #0e0d0b;
+  --ink-strong: #f4f1ea;
+  --ink: #cbc6bc;
+  --ink-muted: #928c83;
+  --ink-faint: #8b847b;
+  --line: #2c2823;
+  --line-strong: #3b362f;
+  --accent: #d97a4e;
+  --accent-strong: #e8946b;
+  --accent-soft: #2a1e16;
+  --selection: #43301f;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-paper-sunken: var(--paper-sunken);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, Cambria, serif;
+
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+  --text-5xl: var(--text-5xl);
+
+  --ease-out-expo: var(--ease-out-expo);
+}
+
+*::selection {
+  background: var(--selection);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  color: var(--ink-strong);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* Respect reduced-motion globally: collapse all animation/transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
