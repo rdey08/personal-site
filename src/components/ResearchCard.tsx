@@ -1,17 +1,7 @@
 import Link from "next/link";
 import type { ResearchThread } from "@/content/schema";
+import { formatPeriod } from "@/lib/format";
 import { MetaChips } from "./MetaChips";
-
-function periodLabel(p: ResearchThread["period"]): string {
-  const fmt = (s: string) =>
-    s === "present"
-      ? "Present"
-      : new Date(`${s}-01`).toLocaleDateString("en-US", {
-          month: "short",
-          year: "numeric",
-        });
-  return `${fmt(p.start)} – ${fmt(p.end)}`;
-}
 
 // Used on home (as the Research flagship card) and the research index.
 export function ResearchCard({
@@ -33,7 +23,7 @@ export function ResearchCard({
       )}
       <h3 className="text-xl font-medium text-ink-strong">{thread.title}</h3>
       <p className="mt-1 text-sm text-ink-muted">
-        {thread.org} · {periodLabel(thread.period)}
+        {thread.org} · {formatPeriod(thread.period)}
       </p>
       <p className="mt-3 leading-relaxed text-ink">{thread.summary}</p>
       <div className="mt-4">
