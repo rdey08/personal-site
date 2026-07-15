@@ -118,6 +118,32 @@
   background: var(--selection);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Paper grain — a barely-there fractal-noise overlay that keeps large flat
+ * areas from feeling like untreated screen. Non-interactive, self-contained
+ * (inline SVG), and cheap: one fixed layer, no animation. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body::after {
+    opacity: 0.05;
+  }
+}
+:root[data-theme="dark"] body::after {
+  opacity: 0.05;
+}
+
 body {
   background: var(--paper);
   color: var(--ink);
@@ -183,6 +209,11 @@ h4 {
 }
 .stagger > *:nth-child(4) {
   animation-delay: 180ms;
+}
+
+/* Small entrance for overlays (mobile nav panel). */
+.panel-rise {
+  animation: rise var(--duration-base) var(--ease-out-expo) both;
 }
 
 /* Signature accent underline that draws in after the hero settles. */

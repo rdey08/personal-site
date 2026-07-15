@@ -15,7 +15,7 @@ export function Section({
   id?: string;
 }) {
   return (
-    <Tag id={id} className={`mx-auto max-w-3xl px-6 ${className}`}>
+    <Tag id={id} className={`mx-auto max-w-4xl px-6 ${className}`}>
       {children}
     </Tag>
   );

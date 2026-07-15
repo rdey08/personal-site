@@ -52,9 +52,9 @@ export function MobileNav() {
         <div
           id="mobile-nav-panel"
           ref={panelRef}
-          className="absolute inset-x-0 top-full z-40 border-b border-line bg-paper-raised"
+          className="panel-rise absolute inset-x-0 top-full z-40 border-b border-line bg-paper-raised"
         >
-          <nav className="mx-auto flex max-w-3xl flex-col px-6 py-2">
+          <nav className="mx-auto flex max-w-4xl flex-col px-6 py-2">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
