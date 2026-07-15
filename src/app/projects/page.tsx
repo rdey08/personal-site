@@ -51,7 +51,7 @@ export default function ProjectsPage() {
 
       {leadership.length > 0 && (
         <Section className="py-8">
-          <h2 className="mb-6 text-2xl font-medium text-ink-strong">
+          <h2 className="mb-6 border-t border-line pt-5 font-serif text-2xl font-medium tracking-tight text-ink-strong">
             Leadership &amp; Community
           </h2>
           <LeadershipList items={leadership} />

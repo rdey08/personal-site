@@ -33,7 +33,7 @@ export default function ResearchPage() {
 
       {publications.length > 0 && (
         <Section className="py-12">
-          <h2 className="mb-6 text-2xl font-medium text-ink-strong">
+          <h2 className="mb-6 border-t border-line pt-5 font-serif text-2xl font-medium tracking-tight text-ink-strong">
             Publications &amp; Presentations
           </h2>
           <PublicationList publications={publications} />

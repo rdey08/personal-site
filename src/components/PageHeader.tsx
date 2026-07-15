@@ -10,7 +10,7 @@ export function PageHeader({
 }) {
   return (
     <Section className="pt-16 pb-8 sm:pt-20">
-      <h1 className="text-3xl font-medium text-ink-strong sm:text-4xl">
+      <h1 className="font-serif text-4xl font-medium tracking-tight text-balance text-ink-strong sm:text-5xl">
         {title}
       </h1>
       {lead && (

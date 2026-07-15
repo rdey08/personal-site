@@ -36,17 +36,19 @@ export default async function ProjectPage({
   if (!project || project.meta.tier !== "flagship") notFound();
 
   const { meta, body } = project;
-  const subtitle = [
-    meta.role,
-    formatPeriod({ start: meta.period.start, end: meta.period.end }),
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const metaRows = [
+    ...(meta.role ? [{ label: "Role", value: meta.role }] : []),
+    {
+      label: "Period",
+      value: formatPeriod({ start: meta.period.start, end: meta.period.end }),
+    },
+  ];
 
   return (
     <DetailArticle
+      eyebrow="Engineering"
       title={meta.title}
-      subtitle={subtitle}
+      meta={metaRows}
       chips={meta.stack}
       chipsLabel="Stack"
       backHref="/projects"

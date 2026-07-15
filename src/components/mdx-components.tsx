@@ -5,7 +5,49 @@
 
 import type { MDXComponents } from "mdx/types";
 import Link from "next/link";
-import type { AnchorHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes, ReactNode } from "react";
+
+// Plain-text extraction + slug for heading anchor ids (no client JS, no deps).
+function textOf(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textOf).join("");
+  if (node && typeof node === "object" && "props" in node) {
+    return textOf((node.props as { children?: ReactNode }).children);
+  }
+  return "";
+}
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+function Heading({
+  as: Tag,
+  className,
+  children,
+}: {
+  as: "h2" | "h3";
+  className: string;
+  children?: ReactNode;
+}) {
+  const id = slugify(textOf(children));
+  return (
+    <Tag id={id} className={`group scroll-mt-24 ${className}`}>
+      {children}
+      <a
+        href={`#${id}`}
+        aria-label="Link to this section"
+        className="ml-2 align-middle font-sans text-[0.8em] text-ink-faint no-underline opacity-0 transition-opacity duration-[--duration-fast] group-hover:opacity-100 hover:text-accent focus-visible:opacity-100"
+      >
+        #
+      </a>
+    </Tag>
+  );
+}
 
 function Anchor({
   href = "",
@@ -30,14 +72,21 @@ function Anchor({
 }
 
 export const mdxComponents: MDXComponents = {
-  h2: (props) => (
-    <h2
-      className="mt-12 mb-3 text-2xl font-medium text-ink-strong"
-      {...props}
-    />
+  h2: ({ children }) => (
+    <Heading
+      as="h2"
+      className="mt-12 mb-3 font-serif text-[1.65rem] font-medium tracking-tight text-ink-strong"
+    >
+      {children}
+    </Heading>
   ),
-  h3: (props) => (
-    <h3 className="mt-8 mb-2 text-xl font-medium text-ink-strong" {...props} />
+  h3: ({ children }) => (
+    <Heading
+      as="h3"
+      className="mt-8 mb-2 font-serif text-xl font-medium tracking-tight text-ink-strong"
+    >
+      {children}
+    </Heading>
   ),
   p: (props) => <p className="my-4 leading-[1.75]" {...props} />,
   a: Anchor,

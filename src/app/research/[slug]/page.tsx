@@ -35,8 +35,13 @@ export default async function ResearchThreadPage({
   const { meta, body } = thread;
   return (
     <DetailArticle
+      eyebrow="Research"
       title={meta.title}
-      subtitle={`${meta.role} · ${meta.org} · ${formatPeriod(meta.period)}`}
+      meta={[
+        { label: "Role", value: meta.role },
+        { label: "Lab", value: meta.org },
+        { label: "Period", value: formatPeriod(meta.period) },
+      ]}
       chips={meta.methods}
       chipsLabel="Methods"
       backHref="/research"
