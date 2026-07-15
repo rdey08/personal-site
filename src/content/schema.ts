@@ -87,6 +87,12 @@ export const projectSchema = z.object({
 });
 export type Project = z.infer<typeof projectSchema>;
 
+// content/cv.mdx — singleton. Body: the HTML CV facts (education, summary).
+export const cvSchema = z.object({
+  updated: z.string().optional(),
+});
+export type Cv = z.infer<typeof cvSchema>;
+
 // content/news/*.md — frontmatter only, sorted by date desc.
 export const newsItemSchema = z.object({
   date: isoDate,

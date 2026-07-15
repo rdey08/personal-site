@@ -3,11 +3,13 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { z } from "zod";
 import {
+  cvSchema,
   newsItemSchema,
   projectSchema,
   publicationSchema,
   researchThreadSchema,
   siteSchema,
+  type Cv,
   type NewsItem,
   type Project,
   type Publication,
@@ -58,6 +60,10 @@ function loadDir<S extends z.ZodType>(
 
 export function getSite(): Entry<Site> {
   return load(siteSchema, "site.mdx");
+}
+
+export function getCv(): Entry<Cv> {
+  return load(cvSchema, "cv.mdx");
 }
 
 export function getResearchThreads(): Entry<ResearchThread>[] {
