@@ -44,7 +44,7 @@ export default function Home() {
           photo-credit caption on its edge, scroll parallax), serif display
           text on the right, entrance stagger + signature accent stroke. */}
       <Section className="pt-16 pb-10 sm:pt-24">
-        <div className="flex flex-col items-start gap-10 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14 lg:gap-20">
+        <div className="flex flex-col items-start gap-8 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14 lg:gap-20">
           {/* Full 3:4 portrait as an editorial print: paper mat, offset
               accent backing, slight tilt that straightens on hover. */}
           <figure className="relative shrink-0 pl-5 sm:pl-6">
@@ -61,7 +61,7 @@ export default function Home() {
                     width={640}
                     height={853}
                     priority
-                    className="h-auto w-36 rounded-[2px] sm:w-52 lg:w-64"
+                    className="h-auto w-44 rounded-[2px] sm:w-52 lg:w-64"
                   />
                 </div>
               </div>
