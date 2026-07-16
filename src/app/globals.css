@@ -421,6 +421,68 @@ h4 {
   }
 }
 
+/*
+ * Print (PLAN §6 spirit: content over chrome). Faculty print CVs and
+ * write-ups: ink on white, no navigation, no motion, honest link targets.
+ */
+@page {
+  margin: 16mm;
+}
+
+@media print {
+  :root {
+    --paper: #ffffff;
+    --paper-raised: #ffffff;
+    --paper-sunken: #ffffff;
+    --ink-strong: #000000;
+    --ink: #111111;
+    --ink-muted: #333333;
+    --ink-faint: #444444;
+    --line: #bbbbbb;
+    --line-strong: #999999;
+    --accent: #000000;
+    --accent-strong: #000000;
+    --accent-soft: #ffffff;
+  }
+
+  /* No chrome: header/footer nav, grain overlay, progress rail. */
+  header,
+  footer,
+  body::before,
+  body::after {
+    display: none !important;
+  }
+
+  /* No motion, no elevation — everything at its resting, visible state. */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+  .reveal.is-hidden {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .place-print,
+  .sd-drift {
+    transform: none !important;
+  }
+
+  /* Links read as text; external targets are printed after the label. */
+  a {
+    color: #000000;
+    text-decoration: none;
+  }
+  #main a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #444444;
+    word-break: break-all;
+  }
+}
+
 /* Respect reduced-motion globally: collapse all animation/transition. */
 @media (prefers-reduced-motion: reduce) {
   *,

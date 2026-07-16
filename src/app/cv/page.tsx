@@ -19,7 +19,7 @@ export default function CvPage() {
     <>
       <PageHeader title="Curriculum Vitae" />
 
-      <Section className="pb-4">
+      <Section className="pb-4 print:hidden">
         <a
           href={site.cvPdf}
           className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2 text-sm font-medium text-paper transition-colors duration-[--duration-fast] hover:bg-accent-strong"
