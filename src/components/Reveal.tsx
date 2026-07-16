@@ -25,6 +25,15 @@ export function Reveal({
     const el = ref.current;
     if (!el) return;
 
+    // If the browser supports CSS scroll-driven animations, the .sd-* classes
+    // in globals.css own scroll motion — this fallback stands down entirely.
+    if (
+      typeof CSS !== "undefined" &&
+      CSS.supports("animation-timeline: view()")
+    ) {
+      return;
+    }
+
     // Arm: now that JS is running, hide the element pre-enter.
     el.classList.add("reveal", "is-hidden");
 

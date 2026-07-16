@@ -7,13 +7,23 @@ export function SectionHeading({
   index,
   title,
   action,
+  rule = true,
 }: {
   index?: string;
   title: string;
   action?: ReactNode;
+  rule?: boolean;
 }) {
   return (
-    <div className="mb-8 flex items-baseline gap-4 border-t border-line pt-5">
+    <div className="relative mb-8 flex items-baseline gap-4 pt-5">
+      {/* Hairline that draws across on scroll (static line when the browser
+          lacks scroll-driven animations — see globals.css). */}
+      {rule && (
+        <span
+          aria-hidden="true"
+          className="rule-draw absolute top-0 left-0 h-px w-full bg-line-strong"
+        />
+      )}
       {index && (
         <span
           aria-hidden="true"

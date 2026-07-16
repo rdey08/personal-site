@@ -39,15 +39,39 @@ export default function Home() {
     <>
       <PersonJsonLd />
 
-      {/* Hero — serif display, entrance stagger, signature accent stroke,
-          portrait joining the choreography */}
-      <Section className="pt-20 pb-10 sm:pt-28">
-        <div className="flex flex-col-reverse items-start gap-8 sm:flex-row sm:items-center sm:justify-between sm:gap-12">
-          <div className="stagger">
-            <p className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
+      {/* Hero — magazine plate: portrait anchors the left column (rotated
+          photo-credit caption on its edge, scroll parallax), serif display
+          text on the right, entrance stagger + signature accent stroke. */}
+      <Section className="pt-16 pb-10 sm:pt-24">
+        <div className="flex flex-col items-start gap-10 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14">
+          {/* Full 3:4 portrait as an editorial print: paper mat, offset
+              accent backing, slight tilt that straightens on hover. */}
+          <figure className="hero-img relative shrink-0 pl-5 sm:pl-6">
+            <div className="sd-drift">
+              <div className="relative -rotate-[1.6deg] transition-transform duration-[--duration-slow] ease-[--ease-out-expo] hover:rotate-0">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 translate-x-2.5 translate-y-2.5 rotate-2 rounded-sm border border-line bg-accent-soft"
+                />
+                <div className="relative rounded-sm border border-line bg-paper-raised p-2 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.35)]">
+                  <Image
+                    src="/images/headshot-640.webp"
+                    alt="Portrait of Rupak Dey"
+                    width={640}
+                    height={853}
+                    priority
+                    className="h-auto w-36 rounded-[2px] sm:w-52"
+                  />
+                </div>
+              </div>
+            </div>
+            <figcaption className="absolute bottom-1 left-0 text-[10px] font-semibold tracking-[0.22em] text-ink-faint uppercase [writing-mode:vertical-rl] rotate-180">
               {site.meta.location}
-            </p>
-            <h1 className="mt-4 font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
+            </figcaption>
+          </figure>
+
+          <div className="stagger">
+            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
               {site.meta.name}
               <span
                 aria-hidden="true"
@@ -76,41 +100,25 @@ export default function Home() {
               </a>
             </div>
           </div>
-          {/* Full 3:4 portrait as an editorial "print": paper mat, offset
-              accent backing, slight tilt that straightens on hover. */}
-          <figure className="hero-img relative shrink-0 rotate-[1.6deg] transition-transform duration-[--duration-slow] ease-[--ease-out-expo] hover:rotate-0">
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 -rotate-2 translate-x-2.5 translate-y-2.5 rounded-sm border border-line bg-accent-soft"
-            />
-            <div className="relative rounded-sm border border-line bg-paper-raised p-2 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.35)]">
-              <Image
-                src="/images/headshot-640.webp"
-                alt="Portrait of Rupak Dey"
-                width={640}
-                height={853}
-                priority
-                className="h-auto w-36 rounded-[2px] sm:w-52"
-              />
-            </div>
-          </figure>
         </div>
       </Section>
 
-      {/* Research interest — the 30-second scan target, set as a serif lead */}
+      {/* Research interest — the 30-second scan target, set as a serif lead.
+          Scroll signature: rises as it enters. */}
       <Reveal>
         <Section className="py-12">
-          <div className="max-w-[38rem] font-serif text-[1.35rem] leading-[1.6] text-ink-strong [&_p]:mb-5 [&_p]:text-pretty last:[&_p]:mb-0">
+          <div className="sd-rise max-w-[38rem] font-serif text-[1.35rem] leading-[1.6] text-ink-strong [&_p]:mb-5 [&_p]:text-pretty last:[&_p]:mb-0">
             <Mdx source={site.body} />
           </div>
         </Section>
       </Reveal>
 
-      {/* Two flagship threads */}
+      {/* Two flagship threads. Scroll signature: rule draws, cards scale in
+          with a staggered beat. */}
       <Reveal>
         <Section className="py-12">
           <SectionHeading index="01" title="Selected work" />
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="sd-cards grid gap-5 sm:grid-cols-2">
             {research && (
               <ResearchCard thread={research.meta} eyebrow="Research" />
             )}
@@ -119,7 +127,7 @@ export default function Home() {
         </Section>
       </Reveal>
 
-      {/* Featured projects strip */}
+      {/* Featured projects strip — same grammar as Selected work. */}
       {featuredProjects.length > 0 && (
         <Reveal>
           <Section className="py-12">
@@ -135,7 +143,7 @@ export default function Home() {
                 </Link>
               }
             />
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sd-cards grid gap-5 sm:grid-cols-2">
               {featuredProjects.map((p) => (
                 <ProjectCard key={p.meta.slug} project={p.meta} />
               ))}
@@ -144,24 +152,30 @@ export default function Home() {
         </Reveal>
       )}
 
-      {/* News — 5 most recent; the rest live at /news */}
+      {/* News — 5 most recent; the rest live at /news. Scroll signature:
+          a recessed full-bleed band, rows rising into it. */}
       {news.length > 0 && (
         <Reveal>
-          <Section className="py-12">
-            <SectionHeading
-              index="03"
-              title="News"
-              action={
-                <Link
-                  href="/news"
-                  className="text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
-                >
-                  All news →
-                </Link>
-              }
-            />
-            <NewsList items={news} limit={5} />
-          </Section>
+          <div className="mt-12 border-y border-line bg-paper-sunken/60">
+            <Section className="py-12">
+              <SectionHeading
+                index="03"
+                title="News"
+                rule={false}
+                action={
+                  <Link
+                    href="/news"
+                    className="text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
+                  >
+                    All news →
+                  </Link>
+                }
+              />
+              <div className="sd-rise">
+                <NewsList items={news} limit={5} />
+              </div>
+            </Section>
+          </div>
         </Reveal>
       )}
     </>
