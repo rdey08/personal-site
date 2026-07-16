@@ -25,11 +25,11 @@ export function FlagshipCard({
   chipsLabel: string;
 }) {
   return (
-    <Link
-      href={href}
-      className="group block rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] hover:bg-paper-raised-hover hover:shadow-[var(--shadow-card-hover)] sm:p-8"
-    >
-      <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-10">
+    // The scroll-driven animation (.sd-cards) scrubs this outer link's
+    // transform; the hover lift lives on the inner surface so the two never
+    // fight over the same property (see the place-print fill-mode incident).
+    <Link href={href} className="group block">
+      <div className="grid gap-5 rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] group-hover:-translate-y-0.5 group-hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] group-hover:bg-paper-raised-hover group-hover:shadow-[var(--shadow-card-hover)] sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-10 sm:p-8">
         <div className="flex flex-col">
           <p className="mb-3 text-xs font-semibold tracking-[0.14em] text-accent uppercase">
             {eyebrow}
