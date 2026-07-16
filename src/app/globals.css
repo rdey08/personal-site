@@ -216,6 +216,12 @@ h4 {
   animation: rise var(--duration-base) var(--ease-out-expo) both;
 }
 
+/* Hero portrait joins the entrance choreography after the text settles. */
+.hero-img {
+  animation: rise var(--duration-base) var(--ease-out-expo) both;
+  animation-delay: 160ms;
+}
+
 /* Signature accent underline that draws in after the hero settles. */
 .draw-underline {
   transform-origin: left center;

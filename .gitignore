@@ -22,6 +22,8 @@
 
 # misc
 .DS_Store
+desktop.ini
+Thumbs.db
 *.pem
 
 # debug
@@ -45,3 +47,7 @@ PLAN.md
 CHECKLIST.md
 CLAUDE.md
 AGENTS.md
+
+# original photos/documents (may contain EXIF/PII) — only the optimized,
+# metadata-stripped copies in public/images are committed
+/assets-src/

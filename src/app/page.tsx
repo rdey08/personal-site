@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   getNews,
@@ -38,38 +39,51 @@ export default function Home() {
     <>
       <PersonJsonLd />
 
-      {/* Hero — serif display, entrance stagger, signature accent stroke */}
-      <Section className="stagger pt-20 pb-10 sm:pt-28">
-        <p className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
-          {site.meta.location}
-        </p>
-        <h1 className="mt-4 font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
-          {site.meta.name}
-          <span
-            aria-hidden="true"
-            className="draw-underline mt-3 block h-[3px] w-24 rounded-full bg-accent"
+      {/* Hero — serif display, entrance stagger, signature accent stroke,
+          portrait joining the choreography */}
+      <Section className="pt-20 pb-10 sm:pt-28">
+        <div className="flex flex-col-reverse items-start gap-8 sm:flex-row sm:items-center sm:justify-between sm:gap-12">
+          <div className="stagger">
+            <p className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
+              {site.meta.location}
+            </p>
+            <h1 className="mt-4 font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
+              {site.meta.name}
+              <span
+                aria-hidden="true"
+                className="draw-underline mt-3 block h-[3px] w-24 rounded-full bg-accent"
+              />
+            </h1>
+            <p className="mt-5 max-w-[52ch] text-lg text-pretty text-ink-muted">
+              {site.meta.tagline}
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <a href={site.meta.links.github} className={heroLink}>
+                <GitHubIcon />
+                GitHub
+              </a>
+              <a href={site.meta.links.linkedin} className={heroLink}>
+                <LinkedInIcon />
+                LinkedIn
+              </a>
+              <ObfuscatedEmail email={site.meta.email} className={heroLink}>
+                <MailIcon />
+                Email
+              </ObfuscatedEmail>
+              <a href={site.meta.cvPdf} className={heroLink}>
+                <FileIcon />
+                CV
+              </a>
+            </div>
+          </div>
+          <Image
+            src="/images/headshot-640.webp"
+            alt="Portrait of Rupak Dey"
+            width={640}
+            height={853}
+            priority
+            className="hero-img h-32 w-32 shrink-0 rounded-md border border-line object-cover object-top sm:h-48 sm:w-48"
           />
-        </h1>
-        <p className="mt-5 max-w-[52ch] text-lg text-pretty text-ink-muted">
-          {site.meta.tagline}
-        </p>
-        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <a href={site.meta.links.github} className={heroLink}>
-            <GitHubIcon />
-            GitHub
-          </a>
-          <a href={site.meta.links.linkedin} className={heroLink}>
-            <LinkedInIcon />
-            LinkedIn
-          </a>
-          <ObfuscatedEmail email={site.meta.email} className={heroLink}>
-            <MailIcon />
-            Email
-          </ObfuscatedEmail>
-          <a href={site.meta.cvPdf} className={heroLink}>
-            <FileIcon />
-            CV
-          </a>
         </div>
       </Section>
 
