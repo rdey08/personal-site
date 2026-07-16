@@ -9,7 +9,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/dev-tokens",
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

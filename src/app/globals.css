@@ -139,6 +139,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* Reserve the scrollbar track so layout doesn't shift between short and
+   * long pages (or when a modal locks scrolling). */
+  scrollbar-gutter: stable;
 }
 
 /* Paper grain — a barely-there fractal-noise overlay that keeps large flat
