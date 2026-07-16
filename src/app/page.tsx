@@ -76,14 +76,24 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <Image
-            src="/images/headshot-640.webp"
-            alt="Portrait of Rupak Dey"
-            width={640}
-            height={853}
-            priority
-            className="hero-img h-32 w-32 shrink-0 rounded-md border border-line object-cover object-top sm:h-48 sm:w-48"
-          />
+          {/* Full 3:4 portrait as an editorial "print": paper mat, offset
+              accent backing, slight tilt that straightens on hover. */}
+          <figure className="hero-img relative shrink-0 rotate-[1.6deg] transition-transform duration-[--duration-slow] ease-[--ease-out-expo] hover:rotate-0">
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 -rotate-2 translate-x-2.5 translate-y-2.5 rounded-sm border border-line bg-accent-soft"
+            />
+            <div className="relative rounded-sm border border-line bg-paper-raised p-2 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.35)]">
+              <Image
+                src="/images/headshot-640.webp"
+                alt="Portrait of Rupak Dey"
+                width={640}
+                height={853}
+                priority
+                className="h-auto w-36 rounded-[2px] sm:w-52"
+              />
+            </div>
+          </figure>
         </div>
       </Section>
 
@@ -134,11 +144,22 @@ export default function Home() {
         </Reveal>
       )}
 
-      {/* News */}
+      {/* News — 5 most recent; the rest live at /news */}
       {news.length > 0 && (
         <Reveal>
           <Section className="py-12">
-            <SectionHeading index="03" title="News" />
+            <SectionHeading
+              index="03"
+              title="News"
+              action={
+                <Link
+                  href="/news"
+                  className="text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
+                >
+                  All news →
+                </Link>
+              }
+            />
             <NewsList items={news} limit={5} />
           </Section>
         </Reveal>
