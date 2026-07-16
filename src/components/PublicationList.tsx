@@ -13,7 +13,9 @@ export function PublicationList({
   return (
     <ol className="space-y-6">
       {publications.map(({ meta }, i) => (
-        <li key={i} className="text-ink">
+        // Academic register: hanging indent — first line flush, wrapped
+        // lines indented (padding-left + negative text-indent).
+        <li key={i} className="pl-6 -indent-6 text-ink">
           <p className="leading-relaxed">
             {meta.authors.map((author, j) => {
               const isSelf = author.startsWith(`${authorSurname},`);
@@ -42,7 +44,7 @@ export function PublicationList({
             )}
             . {meta.venue}, {meta.year}.
           </p>
-          <p className="mt-1 text-sm text-ink-muted capitalize">
+          <p className="mt-1 indent-0 text-sm text-ink-muted capitalize">
             {meta.type} · {meta.status}
           </p>
         </li>
