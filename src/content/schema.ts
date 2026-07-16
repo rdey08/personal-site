@@ -19,6 +19,10 @@ const slug = z
 // content/site.mdx — singleton. Body: research-interest statement (MDX).
 export const siteSchema = z.object({
   name: z.string().min(1),
+  // Small-caps identity line above the name (degree · affiliation).
+  eyebrow: z.string().min(1).optional(),
+  // One-line availability signal (e.g. "Seeking PhD positions — Fall 20XX").
+  availability: z.string().min(1).optional(),
   tagline: z.string().min(1),
   email: z.email(),
   location: z.string().min(1),

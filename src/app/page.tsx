@@ -71,6 +71,11 @@ export default function Home() {
           </figure>
 
           <div className="stagger">
+            {site.meta.eyebrow && (
+              <p className="mb-4 text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
+                {site.meta.eyebrow}
+              </p>
+            )}
             <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
               {site.meta.name}
               <span
@@ -81,6 +86,15 @@ export default function Home() {
             <p className="mt-5 max-w-[52ch] text-lg text-pretty text-ink-muted">
               {site.meta.tagline}
             </p>
+            {site.meta.availability && (
+              <p className="mt-5 flex items-baseline gap-2.5 text-sm font-medium text-ink-strong">
+                <span
+                  aria-hidden="true"
+                  className="h-1.5 w-1.5 shrink-0 self-center rounded-full bg-accent"
+                />
+                {site.meta.availability}
+              </p>
+            )}
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <a
                 href={site.meta.links.github}
