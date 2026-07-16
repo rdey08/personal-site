@@ -4,6 +4,7 @@ import { formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { FlagshipCard } from "@/components/FlagshipCard";
+import { SectionHeading } from "@/components/SectionHeading";
 import { PublicationList } from "@/components/PublicationList";
 
 export const metadata: Metadata = {
@@ -43,9 +44,7 @@ export default function ResearchPage() {
 
       {publications.length > 0 && (
         <Section className="py-12">
-          <h2 className="mb-6 border-t border-line pt-5 font-serif text-2xl font-medium tracking-tight text-ink-strong">
-            Publications &amp; Presentations
-          </h2>
+          <SectionHeading title="Publications & Presentations" />
           <PublicationList publications={publications} />
         </Section>
       )}

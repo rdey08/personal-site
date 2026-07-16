@@ -4,6 +4,7 @@ import { formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { FlagshipCard } from "@/components/FlagshipCard";
+import { SectionHeading } from "@/components/SectionHeading";
 import { ProjectCard } from "@/components/ProjectCard";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default function ProjectsPage() {
 
       {regular.length > 0 && (
         <Section className="py-8">
+          <SectionHeading title="Hackathons & Coursework" />
           <div className="grid gap-5 sm:grid-cols-2">
             {regular.map((p) => (
               <ProjectCard key={p.meta.slug} project={p.meta} />

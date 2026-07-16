@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getNews } from "@/lib/content";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
+import { SectionHeading } from "@/components/SectionHeading";
 import { NewsList } from "@/components/NewsList";
 
 export const metadata: Metadata = {
@@ -27,9 +28,7 @@ export default function NewsPage() {
       <PageHeader title="News" lead="Milestones and updates, newest first." />
       {[...byYear.entries()].map(([year, items]) => (
         <Section key={year} className="py-6">
-          <h2 className="mb-6 border-t border-line pt-5 font-serif text-2xl font-medium tracking-tight text-ink-strong">
-            {year}
-          </h2>
+          <SectionHeading title={year} />
           <NewsList items={items} />
         </Section>
       ))}
