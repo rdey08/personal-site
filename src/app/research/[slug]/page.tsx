@@ -7,6 +7,7 @@ import {
 } from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
+import { ArticleJsonLd } from "@/components/ArticleJsonLd";
 
 export function generateStaticParams() {
   return getResearchThreads().map((t) => ({ slug: t.meta.slug }));
@@ -57,20 +58,29 @@ export default async function ResearchThreadPage({
       : undefined;
 
   return (
-    <DetailArticle
-      eyebrow="Research"
-      title={meta.title}
-      meta={[
-        { label: "Role", value: meta.role },
-        { label: "Lab", value: meta.org },
-        { label: "Period", value: formatPeriod(meta.period) },
-      ]}
-      chips={meta.methods}
-      chipsLabel="Methods"
-      backHref="/research"
-      backLabel="Research"
-      body={body}
-      next={next}
-    />
+    <>
+      <ArticleJsonLd
+        title={meta.title}
+        description={meta.summary}
+        path={`/research/${slug}`}
+        sectionName="Research"
+        sectionPath="/research"
+      />
+      <DetailArticle
+        eyebrow="Research"
+        title={meta.title}
+        meta={[
+          { label: "Role", value: meta.role },
+          { label: "Lab", value: meta.org },
+          { label: "Period", value: formatPeriod(meta.period) },
+        ]}
+        chips={meta.methods}
+        chipsLabel="Methods"
+        backHref="/research"
+        backLabel="Research"
+        body={body}
+        next={next}
+      />
+    </>
   );
 }

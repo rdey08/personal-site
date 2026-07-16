@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getProject, getProjects, getResearchThreads } from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
+import { ArticleJsonLd } from "@/components/ArticleJsonLd";
 
 // Detail pages exist only for flagship-tier projects (PLAN §3).
 export function generateStaticParams() {
@@ -66,16 +67,25 @@ export default async function ProjectPage({
   ];
 
   return (
-    <DetailArticle
-      eyebrow="Engineering"
-      title={meta.title}
-      meta={metaRows}
-      chips={meta.stack}
-      chipsLabel="Stack"
-      backHref="/projects"
-      backLabel="Projects"
-      body={body}
-      next={next}
-    />
+    <>
+      <ArticleJsonLd
+        title={meta.title}
+        description={meta.summary}
+        path={`/projects/${slug}`}
+        sectionName="Projects"
+        sectionPath="/projects"
+      />
+      <DetailArticle
+        eyebrow="Engineering"
+        title={meta.title}
+        meta={metaRows}
+        chips={meta.stack}
+        chipsLabel="Stack"
+        backHref="/projects"
+        backLabel="Projects"
+        body={body}
+        next={next}
+      />
+    </>
   );
 }
