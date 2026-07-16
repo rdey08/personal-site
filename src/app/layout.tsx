@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
@@ -23,6 +23,15 @@ const newsreader = Newsreader({
 const SITE_URL = "https://rupakdey.com";
 const DESCRIPTION =
   "Rupak Dey — applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).";
+
+// Browser-chrome color follows the active scheme (paper light / paper dark).
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#131210" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
