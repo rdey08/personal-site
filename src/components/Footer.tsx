@@ -11,7 +11,7 @@ export function Footer() {
   const site = getSite().meta;
   return (
     <footer className="mt-28 border-t border-line">
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto max-w-4xl px-6 py-12 lg:max-w-5xl lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
           <p className="font-serif text-lg text-ink-strong">{site.name}</p>
           <nav

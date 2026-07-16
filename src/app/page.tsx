@@ -44,7 +44,7 @@ export default function Home() {
           photo-credit caption on its edge, scroll parallax), serif display
           text on the right, entrance stagger + signature accent stroke. */}
       <Section className="pt-16 pb-10 sm:pt-24">
-        <div className="flex flex-col items-start gap-10 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14">
+        <div className="flex flex-col items-start gap-10 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14 lg:gap-20">
           {/* Full 3:4 portrait as an editorial print: paper mat, offset
               accent backing, slight tilt that straightens on hover. */}
           <figure className="relative shrink-0 pl-5 sm:pl-6">
@@ -61,7 +61,7 @@ export default function Home() {
                     width={640}
                     height={853}
                     priority
-                    className="h-auto w-36 rounded-[2px] sm:w-52"
+                    className="h-auto w-36 rounded-[2px] sm:w-52 lg:w-64"
                   />
                 </div>
               </div>
@@ -77,14 +77,14 @@ export default function Home() {
                 {site.meta.eyebrow}
               </p>
             )}
-            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
+            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl lg:text-7xl">
               {site.meta.name}
               <span
                 aria-hidden="true"
                 className="draw-underline mt-3 block h-[3px] w-24 rounded-full bg-accent"
               />
             </h1>
-            <p className="mt-5 max-w-[52ch] text-lg text-pretty text-ink-muted">
+            <p className="mt-5 max-w-[52ch] text-lg text-pretty text-ink-muted lg:text-xl">
               {site.meta.tagline}
             </p>
             {site.meta.availability && (
