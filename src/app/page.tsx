@@ -54,7 +54,7 @@ export default function Home() {
                   aria-hidden="true"
                   className="absolute inset-0 translate-x-2.5 translate-y-2.5 rotate-2 rounded-sm border border-line bg-accent-soft"
                 />
-                <div className="relative rounded-sm border border-line bg-paper-raised p-2 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.35)]">
+                <div className="relative rounded-sm border border-line bg-paper-raised p-2 shadow-[var(--shadow-print)]">
                   <Image
                     src="/images/headshot-640.webp"
                     alt="Portrait of Rupak Dey"

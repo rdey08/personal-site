@@ -27,7 +27,7 @@ export function FlagshipCard({
   return (
     <Link
       href={href}
-      className="group block rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] hover:shadow-[0_12px_32px_-18px_rgba(0,0,0,0.25)] sm:p-8"
+      className="group block rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] hover:bg-paper-raised-hover hover:shadow-[var(--shadow-card-hover)] sm:p-8"
     >
       <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-10">
         <div className="flex flex-col">

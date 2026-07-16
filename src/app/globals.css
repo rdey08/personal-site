@@ -26,6 +26,12 @@
   --accent-soft: #f0e2d8; /* tinted fills */
   --selection: #f3d9c9;
 
+  /* Elevation. Light: soft black shadows. Dark: black-on-black is invisible,
+   * so elevation comes from an inset top highlight + a lifted surface. */
+  --paper-raised-hover: var(--paper-raised);
+  --shadow-card-hover: 0 12px 32px -18px rgb(0 0 0 / 0.25);
+  --shadow-print: 0 16px 40px -24px rgb(0 0 0 / 0.35);
+
   /* Type scale — sans base 17px, ~1.2 modular */
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
@@ -63,6 +69,13 @@
     --accent-strong: #e8946b;
     --accent-soft: #2a1e16;
     --selection: #43301f;
+    --paper-raised-hover: #23201b;
+    --shadow-card-hover:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.05),
+      0 12px 32px -18px rgb(0 0 0 / 0.8);
+    --shadow-print:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.06),
+      0 16px 40px -24px rgb(0 0 0 / 0.9);
     color-scheme: dark;
   }
 }
@@ -81,6 +94,11 @@
   --accent-strong: #e8946b;
   --accent-soft: #2a1e16;
   --selection: #43301f;
+  --paper-raised-hover: #23201b;
+  --shadow-card-hover:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.05), 0 12px 32px -18px rgb(0 0 0 / 0.8);
+  --shadow-print:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.06), 0 16px 40px -24px rgb(0 0 0 / 0.9);
   color-scheme: dark;
 }
 
@@ -97,6 +115,7 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
+  --color-paper-raised-hover: var(--paper-raised-hover);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-newsreader), Georgia, Cambria, serif;
