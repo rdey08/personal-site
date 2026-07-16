@@ -3,6 +3,7 @@ import { getNews } from "@/lib/content";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { SectionHeading } from "@/components/SectionHeading";
+import { Reveal } from "@/components/Reveal";
 import { NewsList } from "@/components/NewsList";
 
 export const metadata: Metadata = {
@@ -27,10 +28,14 @@ export default function NewsPage() {
     <>
       <PageHeader title="News" lead="Milestones and updates, newest first." />
       {[...byYear.entries()].map(([year, items]) => (
-        <Section key={year} className="py-6">
-          <SectionHeading title={year} />
-          <NewsList items={items} />
-        </Section>
+        <Reveal key={year}>
+          <Section className="py-6">
+            <SectionHeading title={year} />
+            <div className="sd-rise">
+              <NewsList items={items} />
+            </div>
+          </Section>
+        </Reveal>
       ))}
     </>
   );

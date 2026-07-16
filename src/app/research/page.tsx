@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { FlagshipCard } from "@/components/FlagshipCard";
 import { SectionHeading } from "@/components/SectionHeading";
+import { Reveal } from "@/components/Reveal";
 import { PublicationList } from "@/components/PublicationList";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default function ResearchPage() {
       />
 
       <Section className="py-4">
-        <div className="grid gap-5">
+        <div className="sd-cards grid gap-5">
           {threads.map((t) => (
             <FlagshipCard
               key={t.meta.slug}
@@ -43,10 +44,14 @@ export default function ResearchPage() {
       </Section>
 
       {publications.length > 0 && (
-        <Section className="py-12">
-          <SectionHeading title="Publications & Presentations" />
-          <PublicationList publications={publications} />
-        </Section>
+        <Reveal>
+          <Section className="py-12">
+            <SectionHeading title="Publications & Presentations" />
+            <div className="sd-rise">
+              <PublicationList publications={publications} />
+            </div>
+          </Section>
+        </Reveal>
       )}
     </>
   );

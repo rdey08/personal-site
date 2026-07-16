@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { FlagshipCard } from "@/components/FlagshipCard";
 import { SectionHeading } from "@/components/SectionHeading";
+import { Reveal } from "@/components/Reveal";
 import { ProjectCard } from "@/components/ProjectCard";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function ProjectsPage() {
 
       {flagship.length > 0 && (
         <Section className="py-4">
-          <div className="grid gap-5">
+          <div className="sd-cards grid gap-5">
             {flagship.map((p) => (
               <FlagshipCard
                 key={p.meta.slug}
@@ -46,14 +47,16 @@ export default function ProjectsPage() {
       )}
 
       {regular.length > 0 && (
-        <Section className="py-8">
-          <SectionHeading title="Hackathons & Coursework" />
-          <div className="grid gap-5 sm:grid-cols-2">
-            {regular.map((p) => (
-              <ProjectCard key={p.meta.slug} project={p.meta} />
-            ))}
-          </div>
-        </Section>
+        <Reveal>
+          <Section className="py-8">
+            <SectionHeading title="Hackathons & Coursework" />
+            <div className="sd-cards grid gap-5 sm:grid-cols-2">
+              {regular.map((p) => (
+                <ProjectCard key={p.meta.slug} project={p.meta} />
+              ))}
+            </div>
+          </Section>
+        </Reveal>
       )}
     </>
   );

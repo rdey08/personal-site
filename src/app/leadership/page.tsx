@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getProjects } from "@/lib/content";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
+import { Reveal } from "@/components/Reveal";
 import { LeadershipList } from "@/components/LeadershipList";
 
 export const metadata: Metadata = {
@@ -20,9 +21,13 @@ export default function LeadershipPage() {
         title="Leadership & Community"
         lead="Building the communities I wanted to be part of — student organizations, a first-of-its-kind hackathon, and mentoring."
       />
-      <Section className="py-4">
-        <LeadershipList items={leadership} />
-      </Section>
+      <Reveal>
+        <Section className="py-4">
+          <div className="sd-rise">
+            <LeadershipList items={leadership} />
+          </div>
+        </Section>
+      </Reveal>
     </>
   );
 }

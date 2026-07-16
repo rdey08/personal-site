@@ -26,7 +26,7 @@ export function DetailArticle({
   body: string;
 }) {
   return (
-    <Section as="article" className="pt-12 pb-8 sm:pt-16">
+    <Section as="article" className="stagger pt-12 pb-8 sm:pt-16">
       <Link
         href={backHref}
         className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
