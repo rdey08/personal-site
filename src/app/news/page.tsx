@@ -1,0 +1,38 @@
+import type { Metadata } from "next";
+import { getNews } from "@/lib/content";
+import { PageHeader } from "@/components/PageHeader";
+import { Section } from "@/components/Section";
+import { NewsList } from "@/components/NewsList";
+
+export const metadata: Metadata = {
+  title: "News",
+  description: "Milestones and updates — research, awards, and events.",
+  alternates: { canonical: "/news" },
+};
+
+export default function NewsPage() {
+  const news = getNews();
+
+  // Group by year, newest first (getNews is already date-desc).
+  const byYear = new Map<string, typeof news>();
+  for (const item of news) {
+    const year = item.meta.date.slice(0, 4);
+    const bucket = byYear.get(year);
+    if (bucket) bucket.push(item);
+    else byYear.set(year, [item]);
+  }
+
+  return (
+    <>
+      <PageHeader title="News" lead="Milestones and updates, newest first." />
+      {[...byYear.entries()].map(([year, items]) => (
+        <Section key={year} className="py-6">
+          <h2 className="mb-6 border-t border-line pt-5 font-serif text-2xl font-medium tracking-tight text-ink-strong">
+            {year}
+          </h2>
+          <NewsList items={items} />
+        </Section>
+      ))}
+    </>
+  );
+}

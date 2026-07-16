@@ -3,12 +3,11 @@ import { getProjects } from "@/lib/content";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { ProjectCard } from "@/components/ProjectCard";
-import { LeadershipList } from "@/components/LeadershipList";
 
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Software engineering and projects — ELSA for NASA's Planetary Data System, plus hackathon and coursework projects — and leadership.",
+    "Software engineering and projects — ELSA for NASA's Planetary Data System, plus hackathon and coursework builds.",
   alternates: { canonical: "/projects" },
 };
 
@@ -16,7 +15,6 @@ export default function ProjectsPage() {
   const projects = getProjects();
   const flagship = projects.filter((p) => p.meta.tier === "flagship");
   const regular = projects.filter((p) => p.meta.tier === "project");
-  const leadership = projects.filter((p) => p.meta.tier === "leadership");
 
   return (
     <>
@@ -46,15 +44,6 @@ export default function ProjectsPage() {
               <ProjectCard key={p.meta.slug} project={p.meta} />
             ))}
           </div>
-        </Section>
-      )}
-
-      {leadership.length > 0 && (
-        <Section className="py-8">
-          <h2 className="mb-6 border-t border-line pt-5 font-serif text-2xl font-medium tracking-tight text-ink-strong">
-            Leadership &amp; Community
-          </h2>
-          <LeadershipList items={leadership} />
         </Section>
       )}
     </>

@@ -6,7 +6,14 @@ const SITE_URL = "https://rupakdey.com";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/research", "/projects", "/cv"];
+  const staticRoutes = [
+    "",
+    "/research",
+    "/projects",
+    "/leadership",
+    "/news",
+    "/cv",
+  ];
   const research = getResearchThreads().map((t) => `/research/${t.meta.slug}`);
   const flagship = getProjects()
     .filter((p) => p.meta.tier === "flagship")
