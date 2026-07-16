@@ -20,14 +20,14 @@ order: 1
 featured: true
 ---
 
-[VERIFY: confirm current status and tense (PLAN §11 Q1) — is the thesis still
+[VERIFY: confirm current status and tense (PLAN §11 Q1): is the thesis still
 in progress, defended, or complete? Everything below is written in the present
 tense to match the resume; adjust once confirmed.]
 
 ## The problem
 
-Net primary productivity (NPP) — how much plant biomass an ecosystem produces
-over time — is a central quantity for managing rangeland and understanding how
+Net primary productivity (NPP), how much plant biomass an ecosystem produces
+over time, is a central quantity for managing rangeland and understanding how
 forage responds to weather and grazing. Estimating it well means combining
 signals that live on completely different footings: what satellites see, how
 much rain falls, where cattle actually graze, and what kind of land cover sits
@@ -38,13 +38,13 @@ and physical meaning, and the interesting behavior is in how they interact.
 
 The work draws on four modalities across **71,000+ pixels**:
 
-- **Satellite** imagery [VERIFY: name the product/index — e.g. MODIS, Landsat,
-  NDVI/EVI — and the spatial/temporal resolution].
+- **Satellite** imagery [VERIFY: name the product/index, e.g. MODIS, Landsat,
+  NDVI/EVI, and the spatial/temporal resolution].
 - **Precipitation** records [VERIFY: source and cadence].
 - **Cattle GPS** tracks, which localize grazing pressure in space and time.
 - **Land cover** classification [VERIFY: source].
 
-[VERIFY: study region and time span — the resume implies rangeland and a
+[VERIFY: study region and time span: the resume implies rangeland and a
 forage-utilization context but does not state the site or years explicitly.]
 
 ## Approach
@@ -57,10 +57,10 @@ versus a grazing-intensity series, and lets the network learn how they combine
 rather than forcing an early, lossy concatenation.
 
 In total, **seven LSTM models** were built and compared across configurations
-[VERIFY: what distinguishes the seven — input combinations, horizons, or
+[VERIFY: what distinguishes the seven: input combinations, horizons, or
 architectural variants?].
 
-<figure data-verify="[VERIFY: figure — confirm this architecture sketch matches the real model (branch count, fusion point, output) before clearing]">
+<figure data-verify="[VERIFY: figure: confirm this architecture sketch matches the real model (branch count, fusion point, output) before clearing]">
   <svg
     viewBox="0 0 680 300"
     role="img"
@@ -282,7 +282,7 @@ architectural variants?].
 - Benchmarked against a multilayer perceptron (MLP) and a random forest (RF),
   the LSTM approach comes out ahead [VERIFY: quantify the margin over MLP/RF].
 - Adding **cattle-GPS** data cut prediction error by **36%** relative to a
-  precipitation-only model — direct evidence that where animals graze carries
+  precipitation-only model, direct evidence that where animals graze carries
   real signal about productivity, not just how much it rains.
 
 ## What this shows / next steps
@@ -290,5 +290,5 @@ architectural variants?].
 The headline finding is methodological as much as ecological: giving each
 modality its own encoder and fusing late beats both classical baselines and a
 naive single-stream network, and the grazing signal matters. [VERIFY: add your
-own framing of contributions and next directions — e.g. transfer to other
-regions, uncertainty estimation, or operational forecasting — in your words.]
+own framing of contributions and next directions, e.g. transfer to other
+regions, uncertainty estimation, or operational forecasting, in your words.]

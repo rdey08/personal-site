@@ -39,7 +39,7 @@ export default async function ProjectPage({
   const { meta, body } = project;
 
   // Onward link: another flagship project if one exists, else the featured
-  // research thread — the reader flows between the two flagships.
+  // research thread; the reader flows between the two flagships.
   const otherFlagship = getProjects().find(
     (p) => p.meta.tier === "flagship" && p.meta.slug !== slug,
   );

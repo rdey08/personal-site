@@ -16,12 +16,12 @@ const slug = z
   .string()
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "expected kebab-case slug");
 
-// content/site.mdx — singleton. Body: research-interest statement (MDX).
+// content/site.mdx, singleton. Body: research-interest statement (MDX).
 export const siteSchema = z.object({
   name: z.string().min(1),
   // Small-caps identity line above the name (degree · affiliation).
   eyebrow: z.string().min(1).optional(),
-  // One-line availability signal (e.g. "Seeking PhD positions — Fall 20XX").
+  // One-line availability signal (e.g. "Seeking PhD positions, Fall 20XX").
   availability: z.string().min(1).optional(),
   tagline: z.string().min(1),
   email: z.email(),
@@ -36,7 +36,7 @@ export const siteSchema = z.object({
 });
 export type Site = z.infer<typeof siteSchema>;
 
-// content/research/*.mdx — body: the deep write-up (MDX).
+// content/research/*.mdx, body: the deep write-up (MDX).
 export const researchThreadSchema = z.object({
   title: z.string().min(1),
   slug,
@@ -53,7 +53,7 @@ export const researchThreadSchema = z.object({
 });
 export type ResearchThread = z.infer<typeof researchThreadSchema>;
 
-// content/publications/*.mdx — frontmatter only.
+// content/publications/*.mdx, frontmatter only.
 export const publicationSchema = z.object({
   authors: z.array(z.string().min(1)).min(1),
   title: z.string().min(1),
@@ -65,7 +65,7 @@ export const publicationSchema = z.object({
 });
 export type Publication = z.infer<typeof publicationSchema>;
 
-// content/projects/*.mdx — body required for flagship tier (deep write-up,
+// content/projects/*.mdx, body required for flagship tier (deep write-up,
 // rendered at /projects/[slug]); optional short paragraphs otherwise.
 export const projectSchema = z.object({
   title: z.string().min(1),
@@ -91,13 +91,13 @@ export const projectSchema = z.object({
 });
 export type Project = z.infer<typeof projectSchema>;
 
-// content/cv.mdx — singleton. Body: the HTML CV facts (education, summary).
+// content/cv.mdx, singleton. Body: the HTML CV facts (education, summary).
 export const cvSchema = z.object({
   updated: z.string().optional(),
 });
 export type Cv = z.infer<typeof cvSchema>;
 
-// content/news/*.md — frontmatter only, sorted by date desc.
+// content/news/*.md, frontmatter only, sorted by date desc.
 export const newsItemSchema = z.object({
   date: isoDate,
   text: z.string().min(1),

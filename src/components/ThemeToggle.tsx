@@ -5,7 +5,7 @@
 // no-flash script in the root layout sets the initial theme before paint.
 //
 // Theme is read with useSyncExternalStore (the React 19 way to read an
-// external store — here the <html data-theme> attribute), which avoids
+// external store, here the <html data-theme> attribute), which avoids
 // setState-in-effect and hydration warnings.
 
 import { useSyncExternalStore } from "react";
@@ -44,7 +44,7 @@ export function ThemeToggle() {
     try {
       localStorage.setItem("theme", next);
     } catch {
-      // storage unavailable — toggle still works for the session
+      // storage unavailable, toggle still works for the session
     }
     window.dispatchEvent(new Event(EVENT));
   }

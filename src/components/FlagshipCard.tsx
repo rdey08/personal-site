@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MetaChips } from "./MetaChips";
 import { ArrowRightIcon } from "./icons";
 
-// Full-width split card for flagship work — the loudest unit in the card
+// Full-width split card for flagship work, the loudest unit in the card
 // system, visually distinct from regular ProjectCards so the importance
 // hierarchy is legible at a glance. Left column: identity (eyebrow, display
 // title, meta line, link affordance). Right column: substance (summary +

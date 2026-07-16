@@ -73,7 +73,7 @@ export function DetailArticle({
         </Prose>
       </div>
 
-      {/* Bottom nav — a way onward after a long read, instead of a dead end. */}
+      {/* Bottom nav: a way onward after a long read, instead of a dead end. */}
       <footer className="mt-14 flex flex-col gap-6 border-t border-line pt-8 sm:flex-row sm:items-end sm:justify-between">
         <Link
           href={backHref}

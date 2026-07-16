@@ -16,13 +16,13 @@ const newsreader = Newsreader({
   display: "swap",
   style: ["normal", "italic"],
   // Ship the optical-size axis so display sizes (hero, titles) render the
-  // true display cut — font-optical-sizing is auto by default.
+  // true display cut; font-optical-sizing is auto by default.
   axes: ["opsz"],
 });
 
 const SITE_URL = "https://rupakdey.com";
 const DESCRIPTION =
-  "Rupak Dey — applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).";
+  "Rupak Dey: applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).";
 
 // Browser-chrome color follows the active scheme (paper light / paper dark).
 export const viewport: Viewport = {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
     types: {
-      "application/rss+xml": [{ url: "/feed.xml", title: "Rupak Dey — News" }],
+      "application/rss+xml": [{ url: "/feed.xml", title: "Rupak Dey · News" }],
     },
   },
   openGraph: {

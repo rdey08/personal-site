@@ -11,7 +11,7 @@ import { PublicationList } from "@/components/PublicationList";
 export const metadata: Metadata = {
   title: "Research",
   description:
-    "Applied machine learning research — multi-branch LSTMs for predicting net primary productivity — and academic presentations.",
+    "Applied machine learning research (multi-branch LSTMs for predicting net primary productivity) and academic presentations.",
   alternates: { canonical: "/research" },
 };
 
@@ -23,7 +23,7 @@ export default function ResearchPage() {
     <>
       <PageHeader
         title="Research"
-        lead="Applied machine learning for scientific problems — fusing messy, multi-modal real-world data into predictions scientists can use."
+        lead="Applied machine learning for scientific problems: fusing messy, multi-modal real-world data into predictions scientists can use."
       />
 
       <Section className="py-4">

@@ -17,7 +17,7 @@ export function SectionHeading({
   return (
     <div className="relative mb-8 flex items-baseline gap-4 pt-5">
       {/* Hairline that draws across on scroll (static line when the browser
-          lacks scroll-driven animations — see globals.css). */}
+          lacks scroll-driven animations, see globals.css). */}
       {rule && (
         <span
           aria-hidden="true"

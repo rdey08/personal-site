@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 // Shared OG-card system: warm paper, hairline print-mat frame, Newsreader
-// display type — the site's brand at link-preview size. Two layouts:
+// display type, the site's brand at link-preview size. Two layouts:
 //   brandCard()             site-wide default (name + tagline)
 //   articleCard({ ... })    per-write-up (eyebrow + title)
 // Fonts are fetched at build time and subset to the glyphs actually used.
@@ -29,7 +29,7 @@ async function loadGoogleFont(family: string, text: string) {
   return res.arrayBuffer();
 }
 
-// Takes explicit top/bottom nodes (not a fragment) — satori flattens
+// Takes explicit top/bottom nodes (not a fragment), satori flattens
 // fragments unpredictably inside flex containers.
 function frame(top: React.ReactNode, bottom: React.ReactNode) {
   return (

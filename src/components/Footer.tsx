@@ -1,4 +1,4 @@
-// Server component. Two-tier editorial footer: contact row, then a colophon —
+// Server component. Two-tier editorial footer: contact row, then a colophon:
 // the quiet craft signal for engineers who scroll to the bottom. Email is
 // entity-obfuscated at render (PLAN §2.5).
 

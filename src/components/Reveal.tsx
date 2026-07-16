@@ -1,12 +1,12 @@
 "use client";
 
 // Client component #3 (PLAN §2.3): an IntersectionObserver that reveals a
-// section as it scrolls into view. Fail-open by construction — the server
+// section as it scrolls into view. Fail-open by construction, the server
 // renders no reveal classes, so a visitor without JS sees everything in its
 // visible resting state. Only after mount (JS active) does the effect add
 // `is-hidden` (pre-enter) and later `is-visible` (animate in).
 //
-// State is applied imperatively via classList — this synchronizes the DOM
+// State is applied imperatively via classList, this synchronizes the DOM
 // with an external system (the viewport), which is what effects are for, and
 // avoids setState-in-effect.
 
@@ -26,7 +26,7 @@ export function Reveal({
     if (!el) return;
 
     // If the browser supports CSS scroll-driven animations, the .sd-* classes
-    // in globals.css own scroll motion — this fallback stands down entirely.
+    // in globals.css own scroll motion, this fallback stands down entirely.
     if (
       typeof CSS !== "undefined" &&
       CSS.supports("animation-timeline: view()")

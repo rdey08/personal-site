@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Rupak Dey",
     short_name: "Rupak Dey",
     description:
-      "Rupak Dey — applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).",
+      "Rupak Dey: applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).",
     start_url: "/",
     display: "browser",
     background_color: "#fbfaf7",

@@ -11,7 +11,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Software engineering and projects — ELSA for NASA's Planetary Data System, plus hackathon and coursework builds.",
+    "Software engineering and projects: ELSA for NASA's Planetary Data System, plus hackathon and coursework builds.",
   alternates: { canonical: "/projects" },
 };
 

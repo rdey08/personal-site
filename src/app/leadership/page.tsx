@@ -8,7 +8,7 @@ import { LeadershipList } from "@/components/LeadershipList";
 export const metadata: Metadata = {
   title: "Leadership",
   description:
-    "Leadership and community — founding the CS Student Association, launching hackNMSU, and service across NMSU.",
+    "Leadership and community: founding the CS Student Association, launching hackNMSU, and service across NMSU.",
   alternates: { canonical: "/leadership" },
 };
 
@@ -19,7 +19,7 @@ export default function LeadershipPage() {
     <>
       <PageHeader
         title="Leadership & Community"
-        lead="Building the communities I wanted to be part of — student organizations, a first-of-its-kind hackathon, and mentoring."
+        lead="Building the communities I wanted to be part of: student organizations, a first-of-its-kind hackathon, and mentoring."
       />
       <Reveal>
         <Section className="py-4">

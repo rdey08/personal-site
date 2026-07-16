@@ -1,7 +1,7 @@
 // Server component. Renders an email as HTML numeric character references in
 // both the mailto href and the visible text (PLAN §2.5). Browsers decode it
 // normally; regex-based address scrapers reading the raw HTML see only
-// entities, not `user@host`. Not encryption — a deliberate, cheap deterrent.
+// entities, not `user@host`. Not encryption, a deliberate, cheap deterrent.
 
 function encode(str: string): string {
   return Array.from(str)

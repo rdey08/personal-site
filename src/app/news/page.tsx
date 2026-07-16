@@ -8,7 +8,7 @@ import { NewsList } from "@/components/NewsList";
 
 export const metadata: Metadata = {
   title: "News",
-  description: "Milestones and updates — research, awards, and events.",
+  description: "Milestones and updates: research, awards, and events.",
   alternates: { canonical: "/news" },
 };
 

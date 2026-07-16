@@ -40,7 +40,7 @@ export default function Home() {
     <>
       <PersonJsonLd />
 
-      {/* Hero — magazine plate: portrait anchors the left column (rotated
+      {/* Hero (magazine plate): portrait anchors the left column (rotated
           photo-credit caption on its edge, scroll parallax), serif display
           text on the right, entrance stagger + signature accent stroke. */}
       <Section className="pt-16 pb-10 sm:pt-24">
@@ -133,7 +133,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Research interest — the 30-second scan target, set as a serif lead.
+      {/* Research interest: the 30-second scan target, set as a serif lead.
           Scroll signature: rises as it enters. Major beat: extra air. */}
       <Reveal>
         <Section className="py-14 sm:py-20">
@@ -143,7 +143,7 @@ export default function Home() {
         </Section>
       </Reveal>
 
-      {/* Two flagships as full-width split cards — the loudest unit on the
+      {/* Two flagships as full-width split cards; the loudest unit on the
           page. Scroll signature: rule draws, cards slide in alternating. */}
       <Reveal>
         <Section className="py-14 sm:py-16">
@@ -175,7 +175,7 @@ export default function Home() {
         </Section>
       </Reveal>
 
-      {/* Featured projects strip — same grammar as Selected work. */}
+      {/* Featured projects strip, same grammar as Selected work. */}
       {featuredProjects.length > 0 && (
         <Reveal>
           <Section className="py-12">
@@ -200,7 +200,7 @@ export default function Home() {
         </Reveal>
       )}
 
-      {/* News — 5 most recent; the rest live at /news. Scroll signature:
+      {/* News: 5 most recent; the rest live at /news. Scroll signature:
           a recessed full-bleed band, rows rising into it. */}
       {news.length > 0 && (
         <Reveal>
@@ -227,15 +227,15 @@ export default function Home() {
         </Reveal>
       )}
 
-      {/* Closing beat — the page ends with a conversion point instead of
+      {/* Closing beat: the page ends with a conversion point instead of
           fading into the footer. Serif invitation + primary/secondary CTAs. */}
       <Reveal>
         <Section className="pt-14 pb-6 sm:pt-20">
           <SectionHeading index="04" title="Get in touch" />
           <div className="sd-rise max-w-[38rem]">
             <p className="font-serif text-[1.35rem] leading-[1.6] text-pretty text-ink-strong">
-              If my research direction fits your group — or my engineering could
-              fit your team — I&rsquo;d love to hear from you.
+              If my research direction fits your group, or my engineering could
+              fit your team, I&rsquo;d love to hear from you.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <ObfuscatedEmail

@@ -19,7 +19,7 @@ import {
 
 /**
  * Build-time content loader. All prose and facts live in /content as
- * Markdown/MDX with YAML frontmatter — never in components. Frontmatter is
+ * Markdown/MDX with YAML frontmatter, never in components. Frontmatter is
  * validated with Zod; an invalid or missing field throws here, which fails
  * `next build` with the offending file and field named.
  */

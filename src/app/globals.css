@@ -18,7 +18,7 @@
   --ink-strong: #1a1815; /* headings */
   --ink: #34302b; /* body */
   --ink-muted: #6b6660; /* captions, meta */
-  --ink-faint: #767065; /* least emphasis — AA 4.7:1 */
+  --ink-faint: #767065; /* least emphasis, AA 4.7:1 */
   --line: #e2ddd3; /* hairlines, borders */
   --line-strong: #cfc9bd;
   --accent: #b4552d; /* terracotta */
@@ -32,7 +32,7 @@
   --shadow-card-hover: 0 12px 32px -18px rgb(0 0 0 / 0.25);
   --shadow-print: 0 16px 40px -24px rgb(0 0 0 / 0.35);
 
-  /* Type scale — sans base 17px, ~1.2 modular */
+  /* Type scale, sans base 17px, ~1.2 modular */
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
   --text-base: 1.0625rem;
@@ -144,7 +144,7 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Paper grain — a barely-there fractal-noise overlay that keeps large flat
+/* Paper grain, a barely-there fractal-noise overlay that keeps large flat
  * areas from feeling like untreated screen. Non-interactive, self-contained
  * (inline SVG), and cheap: one fixed layer, no animation. */
 body::after {
@@ -266,7 +266,7 @@ h4 {
     transform var(--duration-slow) var(--ease-out-expo);
 }
 
-/* Cross-page fade via the View Transitions API — pure progressive
+/* Cross-page fade via the View Transitions API, pure progressive
  * enhancement; browsers/navigations without it just cut instantly. */
 @view-transition {
   navigation: auto;
@@ -274,7 +274,7 @@ h4 {
 
 /*
  * Scroll-driven choreography (home page). Uses CSS scroll-driven animations
- * (animation-timeline) — the scrollbar itself scrubs each animation, forward
+ * (animation-timeline), the scrollbar itself scrubs each animation, forward
  * and backward, with zero JS. Progressive enhancement on three levels:
  *   - supporting browsers: these scrubbed animations run; the JS Reveal
  *     component detects support and stands down (see Reveal.tsx);
@@ -353,7 +353,7 @@ h4 {
     transform: none !important;
   }
 
-  /* Scroll progress rail — accent hairline across the very top, scrubbed by
+  /* Scroll progress rail, accent hairline across the very top, scrubbed by
    * overall page scroll. Gated in @supports so non-supporting browsers never
    * show a stuck full-width bar. */
   body::before {
@@ -403,7 +403,7 @@ h4 {
     animation-range: entry 0% cover 26%;
   }
 
-  /* Hero portrait drifts slower than the page — parallax depth. */
+  /* Hero portrait drifts slower than the page, parallax depth. */
   .sd-drift {
     animation: sd-drift linear both;
     animation-timeline: scroll(root);
@@ -456,7 +456,7 @@ h4 {
     display: none !important;
   }
 
-  /* No motion, no elevation — everything at its resting, visible state. */
+  /* No motion, no elevation, everything at its resting, visible state. */
   *,
   *::before,
   *::after {

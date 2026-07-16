@@ -1,11 +1,11 @@
 "use client";
 
 // Client component #5 (PLAN §2.3 amendment): command palette (⌘K / Ctrl+K).
-// Justification: keyboard-first navigation is runtime-only by nature — there
+// Justification: keyboard-first navigation is runtime-only by nature, there
 // is no static rendering of "listen for a shortcut, filter as I type".
 // Zero dependencies: a native <dialog> provides the focus trap, Escape
 // handling, and backdrop. Command *data* (nav routes, work items, links)
-// comes from the server via props — content never lives in client code.
+// comes from the server via props, content never lives in client code.
 
 import {
   useEffect,
@@ -41,7 +41,7 @@ function applyTheme(theme: "light" | "dark") {
   try {
     localStorage.setItem("theme", theme);
   } catch {
-    // storage unavailable — theme still applies for the session
+    // storage unavailable, theme still applies for the session
   }
   window.dispatchEvent(new Event("themechange"));
 }

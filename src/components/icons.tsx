@@ -1,4 +1,4 @@
-// Minimal 16px stroke icon set, server-rendered inline SVG. Decorative only —
+// Minimal 16px stroke icon set, server-rendered inline SVG. Decorative only:
 // every usage pairs an icon with visible text, so all are aria-hidden.
 
 const base = {

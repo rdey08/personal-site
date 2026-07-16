@@ -13,7 +13,7 @@ export function PublicationList({
   return (
     <ol className="space-y-6">
       {publications.map(({ meta }, i) => (
-        // Academic register: hanging indent — first line flush, wrapped
+        // Academic register: hanging indent, first line flush, wrapped
         // lines indented (padding-left + negative text-indent).
         <li key={i} className="pl-6 -indent-6 text-ink">
           <p className="leading-relaxed">

@@ -1,10 +1,12 @@
-// Fact-integrity and PII gate (PLAN §2.4, §2.5).
+// Fact-integrity, PII, and style gate (PLAN §2.4, §2.5).
 //
 // Scans content/ and src/ for:
-//   1. Unverified-claim markers — "[" + "VERIFY" — every factual claim not
+//   1. Unverified-claim markers ("[" + "VERIFY"): every factual claim not
 //      taken verbatim from the resume carries one until Rupak signs off.
 //   2. PII that must never ship: phone numbers, the 88001 zip code, any
 //      @nmsu.edu email address.
+//   3. Em dashes (U+2014): banned site-wide by rule (2026-07-16). Use a
+//      comma, colon, semicolon, or middot instead; en dash only for ranges.
 //
 // Locally this warns and exits 0 so dev is never blocked. In CI (CI env var
 // set, as on Vercel, or --ci flag) any finding exits 1 and blocks the deploy.
@@ -18,6 +20,9 @@ const EXTENSIONS = new Set([".md", ".mdx", ".ts", ".tsx", ".css", ".json"]);
 // "[" + "VERIFY" is split so this file never flags itself via src scans of
 // sibling tooling; the pattern matches the marker form "[VERIFY: ...]".
 const MARKER = "[" + "VERIFY";
+
+// Written as an escape so this file can never violate the rule it enforces.
+const EM_DASH = "\u2014";
 
 const PII_CHECKS = [
   { name: "phone number", re: /\(?\b\d{3}\)?[ .-]\d{3}[ .-]\d{4}\b/ },
@@ -43,6 +48,9 @@ for (const root of ROOTS) {
       if (line.includes(MARKER)) {
         findings.push({ at, kind: "unverified claim", line: line.trim() });
       }
+      if (line.includes(EM_DASH)) {
+        findings.push({ at, kind: "em dash (banned)", line: line.trim() });
+      }
       for (const check of PII_CHECKS) {
         if (check.re.test(line)) {
           findings.push({ at, kind: `PII: ${check.name}`, line: line.trim() });
@@ -55,11 +63,11 @@ for (const root of ROOTS) {
 const ci = Boolean(process.env.CI) || process.argv.includes("--ci");
 
 if (findings.length === 0) {
-  console.log("check:facts — clean. No unverified claims, no PII.");
+  console.log("check:facts clean: no unverified claims, no PII, no em dashes.");
   process.exit(0);
 }
 
-console.log(`check:facts — ${findings.length} finding(s):\n`);
+console.log(`check:facts: ${findings.length} finding(s):\n`);
 for (const f of findings) {
   console.log(`  [${f.kind}] ${f.at}`);
   console.log(`      ${f.line.slice(0, 120)}\n`);

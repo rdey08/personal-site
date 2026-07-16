@@ -46,9 +46,9 @@ export function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${esc(site.name)} — News</title>
+    <title>${esc(site.name)} · News</title>
     <link>${SITE_URL}/news</link>
-    <description>Milestones and updates from ${esc(site.name)} — research, awards, and events.</description>
+    <description>Milestones and updates from ${esc(site.name)}: research, awards, and events.</description>
     <language>en</language>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
 ${items}

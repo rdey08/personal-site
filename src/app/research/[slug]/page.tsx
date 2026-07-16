@@ -40,7 +40,7 @@ export default async function ResearchThreadPage({
   const { meta, body } = thread;
 
   // Onward link: another research thread if one exists, else the flagship
-  // engineering project — the reader flows between the two flagships.
+  // engineering project; the reader flows between the two flagships.
   const otherThread = getResearchThreads().find((t) => t.meta.slug !== slug);
   const flagshipProject = getProjects().find((p) => p.meta.tier === "flagship");
   const next = otherThread

@@ -1,7 +1,7 @@
 import type { Project } from "@/content/schema";
 import { formatPeriod } from "@/lib/format";
 
-// Compact list for leadership-tier entries — supporting detail, not cards that
+// Compact list for leadership-tier entries, supporting detail, not cards that
 // compete with the technical work for attention.
 export function LeadershipList({ items }: { items: { meta: Project }[] }) {
   if (items.length === 0) return null;

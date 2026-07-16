@@ -1,7 +1,7 @@
 import type { Project } from "@/content/schema";
 import { MetaChips } from "./MetaChips";
 
-// Card for regular (non-flagship) projects — self-contained, with optional
+// Card for regular (non-flagship) projects, self-contained, with optional
 // external links. Flagship work renders as FlagshipCard; leadership entries
 // as LeadershipList.
 export function ProjectCard({
