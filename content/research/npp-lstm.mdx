@@ -60,6 +60,222 @@ In total, **seven LSTM models** were built and compared across configurations
 [VERIFY: what distinguishes the seven — input combinations, horizons, or
 architectural variants?].
 
+<figure data-verify="[VERIFY: figure — confirm this architecture sketch matches the real model (branch count, fusion point, output) before clearing]">
+  <svg
+    viewBox="0 0 680 300"
+    role="img"
+    aria-labelledby="fig-npp-title"
+    style={{ width: "100%", height: "auto" }}
+  >
+    <title id="fig-npp-title">
+      Multi-branch LSTM architecture: four input modalities, one temporal
+      encoder each, fused late into a single NPP prediction.
+    </title>
+    <defs>
+      <marker
+        id="arr-npp"
+        viewBox="0 0 8 8"
+        refX="7"
+        refY="4"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path d="M0 0L8 4L0 8z" fill="var(--ink-faint)" />
+      </marker>
+    </defs>
+    {/* input modalities */}
+    <text x="120" y="49" textAnchor="end" fontSize="14" fill="var(--ink)">
+      Satellite
+    </text>
+    <text x="120" y="119" textAnchor="end" fontSize="14" fill="var(--ink)">
+      Precipitation
+    </text>
+    <text x="120" y="189" textAnchor="end" fontSize="14" fill="var(--ink)">
+      Cattle GPS
+    </text>
+    <text x="120" y="259" textAnchor="end" fontSize="14" fill="var(--ink)">
+      Land cover
+    </text>
+    {/* input → encoder arrows */}
+    <line
+      x1="130"
+      y1="45"
+      x2="162"
+      y2="45"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <line
+      x1="130"
+      y1="115"
+      x2="162"
+      y2="115"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <line
+      x1="130"
+      y1="185"
+      x2="162"
+      y2="185"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <line
+      x1="130"
+      y1="255"
+      x2="162"
+      y2="255"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    {/* per-modality LSTM encoders */}
+    <rect
+      x="170"
+      y="25"
+      width="150"
+      height="40"
+      rx="4"
+      fill="var(--paper-sunken)"
+      stroke="var(--line-strong)"
+    />
+    <rect
+      x="170"
+      y="95"
+      width="150"
+      height="40"
+      rx="4"
+      fill="var(--paper-sunken)"
+      stroke="var(--line-strong)"
+    />
+    <rect
+      x="170"
+      y="165"
+      width="150"
+      height="40"
+      rx="4"
+      fill="var(--paper-sunken)"
+      stroke="var(--line-strong)"
+    />
+    <rect
+      x="170"
+      y="235"
+      width="150"
+      height="40"
+      rx="4"
+      fill="var(--paper-sunken)"
+      stroke="var(--line-strong)"
+    />
+    <text x="245" y="49" textAnchor="middle" fontSize="14" fill="var(--ink)">
+      LSTM encoder
+    </text>
+    <text x="245" y="119" textAnchor="middle" fontSize="14" fill="var(--ink)">
+      LSTM encoder
+    </text>
+    <text x="245" y="189" textAnchor="middle" fontSize="14" fill="var(--ink)">
+      LSTM encoder
+    </text>
+    <text x="245" y="259" textAnchor="middle" fontSize="14" fill="var(--ink)">
+      LSTM encoder
+    </text>
+    {/* encoders → fusion */}
+    <line
+      x1="320"
+      y1="45"
+      x2="392"
+      y2="138"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <line
+      x1="320"
+      y1="115"
+      x2="392"
+      y2="146"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <line
+      x1="320"
+      y1="185"
+      x2="392"
+      y2="154"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <line
+      x1="320"
+      y1="255"
+      x2="392"
+      y2="162"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    {/* late fusion */}
+    <rect
+      x="400"
+      y="125"
+      width="110"
+      height="50"
+      rx="4"
+      fill="var(--paper-raised)"
+      stroke="var(--accent)"
+    />
+    <text
+      x="455"
+      y="154"
+      textAnchor="middle"
+      fontSize="14"
+      fill="var(--ink-strong)"
+    >
+      Late fusion
+    </text>
+    {/* fusion → prediction */}
+    <line
+      x1="510"
+      y1="150"
+      x2="546"
+      y2="150"
+      stroke="var(--ink-faint)"
+      markerEnd="url(#arr-npp)"
+    />
+    <rect
+      x="552"
+      y="125"
+      width="120"
+      height="50"
+      rx="4"
+      fill="var(--accent-soft)"
+      stroke="var(--accent)"
+    />
+    <text
+      x="612"
+      y="147"
+      textAnchor="middle"
+      fontSize="14"
+      fontWeight="600"
+      fill="var(--accent)"
+    >
+      NPP
+    </text>
+    <text
+      x="612"
+      y="165"
+      textAnchor="middle"
+      fontSize="12"
+      fill="var(--accent)"
+    >
+      prediction
+    </text>
+  </svg>
+  <figcaption>
+    Architecture sketch: each modality is read by its own temporal encoder;
+    branches fuse late, so the network learns how the signals combine instead of
+    forcing an early concatenation.
+  </figcaption>
+</figure>
+
 ## Results
 
 - The multi-branch architecture reaches **R² 0.98** on the NPP prediction task.
