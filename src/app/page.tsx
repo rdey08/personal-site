@@ -73,30 +73,30 @@ export default function Home() {
 
           <div className="stagger">
             {site.meta.eyebrow && (
-              <p className="mb-4 text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
+              <p className="mb-3 text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
                 {site.meta.eyebrow}
               </p>
             )}
-            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl lg:text-7xl">
+            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
               {site.meta.name}
               <span
                 aria-hidden="true"
                 className="draw-underline mt-3 block h-[3px] w-24 rounded-full bg-accent"
               />
             </h1>
-            <p className="mt-5 max-w-[52ch] text-lg text-pretty text-ink-muted lg:text-xl">
+            <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-pretty text-ink-muted">
               {site.meta.tagline}
             </p>
             {site.meta.availability && (
-              <p className="mt-5 flex items-baseline gap-2.5 text-sm font-medium text-ink-strong">
+              <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--accent)_35%,var(--line))] bg-accent-soft/60 px-3.5 py-1.5 text-sm font-medium text-accent-strong">
                 <span
                   aria-hidden="true"
-                  className="h-1.5 w-1.5 shrink-0 self-center rounded-full bg-accent"
+                  className="h-2 w-2 shrink-0 rounded-full bg-accent"
                 />
                 {site.meta.availability}
               </p>
             )}
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="mt-8 flex max-w-[52ch] flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6">
               <a
                 href={site.meta.links.github}
                 target="_blank"
