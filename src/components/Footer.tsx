@@ -24,18 +24,24 @@ export function Footer() {
             />
             <a
               href={site.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
             >
               GitHub
             </a>
             <a
               href={site.links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
             >
               LinkedIn
             </a>
             <a
               href={site.cvPdf}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
             >
               CV
@@ -51,6 +57,8 @@ export function Footer() {
             exported ·{" "}
             <a
               href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="underline decoration-line underline-offset-2 transition-colors duration-[--duration-fast] hover:text-accent"
             >
               view source

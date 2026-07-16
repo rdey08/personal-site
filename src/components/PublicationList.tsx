@@ -31,6 +31,8 @@ export function PublicationList({
             {meta.href ? (
               <a
                 href={meta.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-accent underline decoration-1 underline-offset-2 hover:text-accent-strong"
               >
                 {meta.title}

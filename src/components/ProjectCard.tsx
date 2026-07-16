@@ -51,6 +51,8 @@ export function ProjectCard({
             {project.links.github && (
               <a
                 href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
               >
                 GitHub
@@ -59,6 +61,8 @@ export function ProjectCard({
             {project.links.demo && (
               <a
                 href={project.links.demo}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
               >
                 Demo

@@ -181,7 +181,7 @@ h4 {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(16px);
   }
 }
 
@@ -216,12 +216,6 @@ h4 {
   animation: rise var(--duration-base) var(--ease-out-expo) both;
 }
 
-/* Hero portrait joins the entrance choreography after the text settles. */
-.hero-img {
-  animation: rise var(--duration-base) var(--ease-out-expo) both;
-  animation-delay: 160ms;
-}
-
 /* Signature accent underline that draws in after the hero settles. */
 .draw-underline {
   transform-origin: left center;
@@ -234,7 +228,7 @@ h4 {
  * when JS runs, so no-JS visitors see everything statically. */
 .reveal.is-hidden {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(32px);
 }
 .reveal.is-visible {
   opacity: 1;
@@ -264,14 +258,21 @@ h4 {
 @keyframes sd-rise {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(64px);
   }
 }
 
-@keyframes sd-scale {
+@keyframes sd-card-l {
   from {
     opacity: 0;
-    transform: translateY(18px) scale(0.965);
+    transform: translateX(-64px) translateY(24px) scale(0.96);
+  }
+}
+
+@keyframes sd-card-r {
+  from {
+    opacity: 0;
+    transform: translateX(64px) translateY(24px) scale(0.96);
   }
 }
 
@@ -281,10 +282,40 @@ h4 {
   }
 }
 
+@keyframes sd-num {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5em);
+  }
+}
+
 @keyframes sd-drift {
   to {
-    transform: translateY(30px);
+    transform: translateY(52px);
   }
+}
+
+@keyframes sd-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* One-time entrance for the hero portrait: the print is "placed on the
+ * desk". fill-mode backwards (not both) so the hover straighten transition
+ * regains control of transform once the entrance finishes. */
+@keyframes place-print {
+  from {
+    opacity: 0;
+    transform: rotate(-7deg) translateY(24px) scale(0.94);
+  }
+}
+.place-print {
+  animation: place-print var(--duration-slow) var(--ease-out-expo) backwards;
+  animation-delay: 120ms;
 }
 
 @supports (animation-timeline: view()) {
@@ -294,28 +325,54 @@ h4 {
     transform: none !important;
   }
 
+  /* Scroll progress rail — accent hairline across the very top, scrubbed by
+   * overall page scroll. Gated in @supports so non-supporting browsers never
+   * show a stuck full-width bar. */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 60;
+    background: var(--accent);
+    transform-origin: left center;
+    animation: sd-progress linear both;
+    animation-timeline: scroll(root);
+  }
+
   .sd-rise {
     animation: sd-rise linear both;
     animation-timeline: view();
-    animation-range: entry 0% entry 55%;
+    animation-range: entry 0% cover 32%;
   }
 
-  /* Card grids: children scale in individually, alternates offset a beat. */
-  .sd-cards > * {
-    animation: sd-scale linear both;
+  /* Card grids: children slide in from alternating sides, the second a beat
+   * behind the first. */
+  .sd-cards > *:nth-child(odd) {
+    animation: sd-card-l linear both;
     animation-timeline: view();
-    animation-range: entry 0% entry 55%;
+    animation-range: entry 0% cover 30%;
   }
   .sd-cards > *:nth-child(even) {
-    animation-range: entry 12% entry 70%;
+    animation: sd-card-r linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 38%;
   }
 
-  /* Section hairlines draw across as the section enters. */
+  /* Section hairlines draw across as the section enters; the serif index
+   * numeral slides in alongside. */
   .rule-draw {
     transform-origin: left center;
     animation: sd-rule linear both;
     animation-timeline: view();
-    animation-range: entry 0% entry 45%;
+    animation-range: entry 0% cover 22%;
+  }
+  .sd-num {
+    animation: sd-num linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 26%;
   }
 
   /* Hero portrait drifts slower than the page — parallax depth. */
@@ -330,8 +387,12 @@ h4 {
   .sd-rise,
   .sd-cards > *,
   .rule-draw,
+  .sd-num,
   .sd-drift {
     animation: none !important;
+  }
+  body::before {
+    display: none;
   }
 }
 

@@ -46,9 +46,9 @@ export default function Home() {
         <div className="flex flex-col items-start gap-10 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14">
           {/* Full 3:4 portrait as an editorial print: paper mat, offset
               accent backing, slight tilt that straightens on hover. */}
-          <figure className="hero-img relative shrink-0 pl-5 sm:pl-6">
+          <figure className="relative shrink-0 pl-5 sm:pl-6">
             <div className="sd-drift">
-              <div className="relative -rotate-[1.6deg] transition-transform duration-[--duration-slow] ease-[--ease-out-expo] hover:rotate-0">
+              <div className="place-print relative -rotate-[1.6deg] transition-transform duration-[--duration-slow] ease-[--ease-out-expo] hover:rotate-0">
                 <span
                   aria-hidden="true"
                   className="absolute inset-0 translate-x-2.5 translate-y-2.5 rotate-2 rounded-sm border border-line bg-accent-soft"
@@ -82,11 +82,21 @@ export default function Home() {
               {site.meta.tagline}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <a href={site.meta.links.github} className={heroLink}>
+              <a
+                href={site.meta.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={heroLink}
+              >
                 <GitHubIcon />
                 GitHub
               </a>
-              <a href={site.meta.links.linkedin} className={heroLink}>
+              <a
+                href={site.meta.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={heroLink}
+              >
                 <LinkedInIcon />
                 LinkedIn
               </a>
@@ -94,7 +104,12 @@ export default function Home() {
                 <MailIcon />
                 Email
               </ObfuscatedEmail>
-              <a href={site.meta.cvPdf} className={heroLink}>
+              <a
+                href={site.meta.cvPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={heroLink}
+              >
                 <FileIcon />
                 CV
               </a>

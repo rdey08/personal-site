@@ -27,7 +27,7 @@ export function SectionHeading({
       {index && (
         <span
           aria-hidden="true"
-          className="font-serif text-sm text-accent italic tabular-nums"
+          className="sd-num font-serif text-sm text-accent italic tabular-nums"
         >
           {index}
         </span>

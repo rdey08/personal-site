@@ -37,7 +37,12 @@ export function NewsList({
                   {meta.text}
                 </Link>
               ) : (
-                <a href={meta.href} className={linkClass}>
+                <a
+                  href={meta.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
                   {meta.text}
                 </a>
               )
