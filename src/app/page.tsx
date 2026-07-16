@@ -134,9 +134,9 @@ export default function Home() {
       </Section>
 
       {/* Research interest — the 30-second scan target, set as a serif lead.
-          Scroll signature: rises as it enters. */}
+          Scroll signature: rises as it enters. Major beat: extra air. */}
       <Reveal>
-        <Section className="py-12">
+        <Section className="py-14 sm:py-20">
           <div className="sd-rise max-w-[38rem] font-serif text-[1.35rem] leading-[1.6] text-ink-strong [&_p]:mb-5 [&_p]:text-pretty last:[&_p]:mb-0">
             <Mdx source={site.body} />
           </div>
@@ -146,7 +146,7 @@ export default function Home() {
       {/* Two flagships as full-width split cards — the loudest unit on the
           page. Scroll signature: rule draws, cards slide in alternating. */}
       <Reveal>
-        <Section className="py-12">
+        <Section className="py-14 sm:py-16">
           <SectionHeading index="01" title="Selected work" />
           <div className="sd-cards grid gap-5">
             {research && (
@@ -204,7 +204,7 @@ export default function Home() {
           a recessed full-bleed band, rows rising into it. */}
       {news.length > 0 && (
         <Reveal>
-          <div className="mt-12 border-y border-line bg-paper-sunken/60">
+          <div className="mt-14 border-y border-line bg-paper-sunken/60">
             <Section className="py-12">
               <SectionHeading
                 index="03"
@@ -230,7 +230,7 @@ export default function Home() {
       {/* Closing beat — the page ends with a conversion point instead of
           fading into the footer. Serif invitation + primary/secondary CTAs. */}
       <Reveal>
-        <Section className="py-16">
+        <Section className="pt-14 pb-6 sm:pt-20">
           <SectionHeading index="04" title="Get in touch" />
           <div className="sd-rise max-w-[38rem]">
             <p className="font-serif text-[1.35rem] leading-[1.6] text-pretty text-ink-strong">
