@@ -226,6 +226,36 @@ export default function Home() {
           </div>
         </Reveal>
       )}
+
+      {/* Closing beat — the page ends with a conversion point instead of
+          fading into the footer. Serif invitation + primary/secondary CTAs. */}
+      <Reveal>
+        <Section className="py-16">
+          <SectionHeading index="04" title="Get in touch" />
+          <div className="sd-rise max-w-[38rem]">
+            <p className="font-serif text-[1.35rem] leading-[1.6] text-pretty text-ink-strong">
+              If my research direction fits your group — or my engineering could
+              fit your team — I&rsquo;d love to hear from you.
+            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-4">
+              <ObfuscatedEmail
+                email={site.meta.email}
+                className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2 text-sm font-medium text-paper transition-colors duration-[--duration-fast] hover:bg-accent-strong"
+              >
+                <MailIcon />
+                Email me
+              </ObfuscatedEmail>
+              <Link
+                href="/cv"
+                className="inline-flex items-center gap-2 rounded-sm border border-line px-4 py-2 text-sm font-medium text-ink transition-colors duration-[--duration-fast] hover:border-accent hover:text-accent"
+              >
+                <FileIcon />
+                View CV
+              </Link>
+            </div>
+          </div>
+        </Section>
+      </Reveal>
     </>
   );
 }
