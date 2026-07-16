@@ -62,6 +62,13 @@ export function Footer() {
               className="underline decoration-line underline-offset-2 transition-colors duration-[--duration-fast] hover:text-accent"
             >
               view source
+            </a>{" "}
+            ·{" "}
+            <a
+              href="/feed.xml"
+              className="underline decoration-line underline-offset-2 transition-colors duration-[--duration-fast] hover:text-accent"
+            >
+              RSS
             </a>
           </p>
         </div>

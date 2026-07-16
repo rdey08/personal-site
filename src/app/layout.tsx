@@ -31,7 +31,12 @@ export const metadata: Metadata = {
     template: "%s · Rupak Dey",
   },
   description: DESCRIPTION,
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": [{ url: "/feed.xml", title: "Rupak Dey — News" }],
+    },
+  },
   openGraph: {
     type: "website",
     siteName: "Rupak Dey",
