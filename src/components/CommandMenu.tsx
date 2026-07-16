@@ -1,19 +1,13 @@
 "use client";
 
 // Client component #5 (PLAN §2.3 amendment): command palette (⌘K / Ctrl+K).
-// Justification: keyboard-first navigation is runtime-only by nature, there
-// is no static rendering of "listen for a shortcut, filter as I type".
+// Keyboard-only by design: no visible trigger in the chrome (owner's call);
+// the shortcut is the sole entry point, an easter egg for keyboard users.
 // Zero dependencies: a native <dialog> provides the focus trap, Escape
 // handling, and backdrop. Command *data* (nav routes, work items, links)
 // comes from the server via props, content never lives in client code.
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export interface Command {
@@ -24,12 +18,6 @@ export interface Command {
   /** Built-in action instead of a navigation. */
   action?: "theme-light" | "theme-dark";
 }
-
-// Platform never changes at runtime; useSyncExternalStore reads it once,
-// hydration-safe (server assumes non-Mac, client corrects before paint).
-const noopSubscribe = () => () => {};
-const isMacSnapshot = () => /Mac|iPhone|iPad/.test(navigator.platform);
-const isMacServerSnapshot = () => false;
 
 const THEME_COMMANDS: Command[] = [
   { group: "Theme", label: "Switch to light theme", action: "theme-light" },
@@ -52,11 +40,6 @@ export function CommandMenu({ commands }: { commands: Command[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
-  const isMac = useSyncExternalStore(
-    noopSubscribe,
-    isMacSnapshot,
-    isMacServerSnapshot,
-  );
 
   const all = useMemo(() => [...commands, ...THEME_COMMANDS], [commands]);
   const q = query.trim().toLowerCase();
@@ -120,27 +103,6 @@ export function CommandMenu({ commands }: { commands: Command[] }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={open}
-        aria-label="Open command menu"
-        className="hidden h-9 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:bg-paper-sunken hover:text-ink-strong sm:inline-flex"
-      >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          className="h-3.5 w-3.5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
-        <kbd className="font-sans tracking-wide">{isMac ? "⌘K" : "Ctrl K"}</kbd>
-      </button>
-
       <dialog
         ref={dialogRef}
         aria-label="Command menu"
