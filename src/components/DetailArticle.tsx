@@ -6,6 +6,7 @@ import { Prose } from "./Prose";
 
 // Shared layout for research and flagship-project detail pages: eyebrow,
 // serif display title, a definition-list metadata grid, then measured prose.
+// `next` renders a bottom cross-link so long write-ups don't dead-end.
 export function DetailArticle({
   eyebrow,
   title,
@@ -15,6 +16,7 @@ export function DetailArticle({
   backHref,
   backLabel,
   body,
+  next,
 }: {
   eyebrow: string;
   title: string;
@@ -24,6 +26,7 @@ export function DetailArticle({
   backHref: string;
   backLabel: string;
   body: string;
+  next?: { href: string; eyebrow: string; title: string };
 }) {
   return (
     <Section as="article" className="stagger pt-12 pb-8 sm:pt-16">
@@ -69,6 +72,26 @@ export function DetailArticle({
           <Mdx source={body} />
         </Prose>
       </div>
+
+      {/* Bottom nav — a way onward after a long read, instead of a dead end. */}
+      <footer className="mt-14 flex flex-col gap-6 border-t border-line pt-8 sm:flex-row sm:items-end sm:justify-between">
+        <Link
+          href={backHref}
+          className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
+        >
+          ← Back to {backLabel}
+        </Link>
+        {next && (
+          <Link href={next.href} className="group sm:text-right">
+            <p className="text-xs font-semibold tracking-[0.14em] text-ink-faint uppercase">
+              Up next · {next.eyebrow}
+            </p>
+            <p className="mt-1 font-serif text-lg font-medium tracking-tight text-ink-strong transition-colors duration-[--duration-fast] group-hover:text-accent">
+              {next.title} →
+            </p>
+          </Link>
+        )}
+      </footer>
     </Section>
   );
 }

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getResearchThread, getResearchThreads } from "@/lib/content";
+import {
+  getProjects,
+  getResearchThread,
+  getResearchThreads,
+} from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
 
@@ -33,6 +37,25 @@ export default async function ResearchThreadPage({
   if (!thread) notFound();
 
   const { meta, body } = thread;
+
+  // Onward link: another research thread if one exists, else the flagship
+  // engineering project — the reader flows between the two flagships.
+  const otherThread = getResearchThreads().find((t) => t.meta.slug !== slug);
+  const flagshipProject = getProjects().find((p) => p.meta.tier === "flagship");
+  const next = otherThread
+    ? {
+        href: `/research/${otherThread.meta.slug}`,
+        eyebrow: "Research",
+        title: otherThread.meta.title,
+      }
+    : flagshipProject
+      ? {
+          href: `/projects/${flagshipProject.meta.slug}`,
+          eyebrow: "Engineering",
+          title: flagshipProject.meta.title,
+        }
+      : undefined;
+
   return (
     <DetailArticle
       eyebrow="Research"
@@ -47,6 +70,7 @@ export default async function ResearchThreadPage({
       backHref="/research"
       backLabel="Research"
       body={body}
+      next={next}
     />
   );
 }
