@@ -19,24 +19,13 @@ export function GET() {
   const site = getSite().meta;
   const items = getNews()
     .map(({ meta }) => {
-      const link = meta.href
-        ? meta.href.startsWith("/")
-          ? `${SITE_URL}${meta.href}`
-          : meta.href
-        : `${SITE_URL}/news`;
-      // Stable identity per item: date + a slug of the text.
-      const guid = `${SITE_URL}/news#${meta.date}-${meta.text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, "")
-        .trim()
-        .split(/\s+/)
-        .slice(0, 6)
-        .join("-")}`;
+      // Every item has its own page; the permalink doubles as the guid.
+      const link = `${SITE_URL}/news/${meta.slug}`;
       return [
         "    <item>",
         `      <title>${esc(meta.text)}</title>`,
         `      <link>${esc(link)}</link>`,
-        `      <guid isPermaLink="false">${esc(guid)}</guid>`,
+        `      <guid isPermaLink="true">${esc(link)}</guid>`,
         `      <pubDate>${new Date(`${meta.date}T12:00:00Z`).toUTCString()}</pubDate>`,
         "    </item>",
       ].join("\n");

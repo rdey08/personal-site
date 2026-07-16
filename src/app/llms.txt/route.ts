@@ -68,7 +68,10 @@ export function GET() {
     "",
     "## News",
     "",
-    ...news.map(({ meta }) => `- ${meta.date}: ${meta.text}`),
+    ...news.map(
+      ({ meta }) =>
+        `- ${meta.date}: [${meta.text}](${SITE_URL}/news/${meta.slug})`,
+    ),
     "",
     "## Contact",
     "",

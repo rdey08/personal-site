@@ -119,7 +119,19 @@ export function getProject(slug: string): Entry<Project> | undefined {
 }
 
 export function getNews(): Entry<NewsItem>[] {
-  return loadDir(newsItemSchema, "news").sort((a, b) =>
+  const items = loadDir(newsItemSchema, "news").sort((a, b) =>
     b.meta.date.localeCompare(a.meta.date),
   );
+  const seen = new Set<string>();
+  for (const { meta } of items) {
+    if (seen.has(meta.slug)) {
+      throw new Error(`Duplicate news slug: ${meta.slug}`);
+    }
+    seen.add(meta.slug);
+  }
+  return items;
+}
+
+export function getNewsItem(slug: string): Entry<NewsItem> | undefined {
+  return getNews().find((n) => n.meta.slug === slug);
 }

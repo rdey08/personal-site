@@ -97,10 +97,14 @@ export const cvSchema = z.object({
 });
 export type Cv = z.infer<typeof cvSchema>;
 
-// content/news/*.md, frontmatter only, sorted by date desc.
+// content/news/*.md, one item per file, sorted by date desc. The body
+// (optional) is the story shown on the item's own page at /news/[slug];
+// href points at related work and renders there as a "Related" link.
 export const newsItemSchema = z.object({
   date: isoDate,
+  slug,
   text: z.string().min(1),
-  href: z.string().min(1).optional(), // internal path or external URL
+  href: z.string().min(1).optional(), // related resource: internal path or external URL
+  linkLabel: z.string().min(1).optional(), // label for the related link
 });
 export type NewsItem = z.infer<typeof newsItemSchema>;
