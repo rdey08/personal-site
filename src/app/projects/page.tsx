@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getProjects } from "@/lib/content";
+import { formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
+import { FlagshipCard } from "@/components/FlagshipCard";
 import { ProjectCard } from "@/components/ProjectCard";
 
 export const metadata: Metadata = {
@@ -27,10 +29,15 @@ export default function ProjectsPage() {
         <Section className="py-4">
           <div className="grid gap-5">
             {flagship.map((p) => (
-              <ProjectCard
+              <FlagshipCard
                 key={p.meta.slug}
-                project={p.meta}
+                href={`/projects/${p.meta.slug}`}
                 eyebrow="Flagship"
+                title={p.meta.title}
+                metaLine={`${p.meta.role ?? "Software"} · ${formatPeriod(p.meta.period)}`}
+                summary={p.meta.summary}
+                chips={p.meta.stack}
+                chipsLabel="Stack"
               />
             ))}
           </div>

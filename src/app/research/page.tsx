@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getPublications, getResearchThreads } from "@/lib/content";
+import { formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
-import { ResearchCard } from "@/components/ResearchCard";
+import { FlagshipCard } from "@/components/FlagshipCard";
 import { PublicationList } from "@/components/PublicationList";
 
 export const metadata: Metadata = {
@@ -26,7 +27,16 @@ export default function ResearchPage() {
       <Section className="py-4">
         <div className="grid gap-5">
           {threads.map((t) => (
-            <ResearchCard key={t.meta.slug} thread={t.meta} />
+            <FlagshipCard
+              key={t.meta.slug}
+              href={`/research/${t.meta.slug}`}
+              eyebrow="Research"
+              title={t.meta.title}
+              metaLine={`${t.meta.org} · ${formatPeriod(t.meta.period)}`}
+              summary={t.meta.summary}
+              chips={t.meta.methods}
+              chipsLabel="Methods"
+            />
           ))}
         </div>
       </Section>

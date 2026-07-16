@@ -8,10 +8,11 @@ import {
   getSite,
 } from "@/lib/content";
 import { Mdx } from "@/lib/mdx";
+import { formatPeriod } from "@/lib/format";
 import { Section } from "@/components/Section";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
-import { ResearchCard } from "@/components/ResearchCard";
+import { FlagshipCard } from "@/components/FlagshipCard";
 import { ProjectCard } from "@/components/ProjectCard";
 import { NewsList } from "@/components/NewsList";
 import { ObfuscatedEmail } from "@/components/ObfuscatedEmail";
@@ -142,16 +143,34 @@ export default function Home() {
         </Section>
       </Reveal>
 
-      {/* Two flagship threads. Scroll signature: rule draws, cards scale in
-          with a staggered beat. */}
+      {/* Two flagships as full-width split cards — the loudest unit on the
+          page. Scroll signature: rule draws, cards slide in alternating. */}
       <Reveal>
         <Section className="py-12">
           <SectionHeading index="01" title="Selected work" />
-          <div className="sd-cards grid gap-5 sm:grid-cols-2">
+          <div className="sd-cards grid gap-5">
             {research && (
-              <ResearchCard thread={research.meta} eyebrow="Research" />
+              <FlagshipCard
+                href={`/research/${research.meta.slug}`}
+                eyebrow="Research"
+                title={research.meta.title}
+                metaLine={`${research.meta.org} · ${formatPeriod(research.meta.period)}`}
+                summary={research.meta.summary}
+                chips={research.meta.methods}
+                chipsLabel="Methods"
+              />
             )}
-            {elsa && <ProjectCard project={elsa.meta} eyebrow="Engineering" />}
+            {elsa && (
+              <FlagshipCard
+                href={`/projects/${elsa.meta.slug}`}
+                eyebrow="Engineering"
+                title={elsa.meta.title}
+                metaLine={`${elsa.meta.role ?? "Software"} · ${formatPeriod(elsa.meta.period)}`}
+                summary={elsa.meta.summary}
+                chips={elsa.meta.stack}
+                chipsLabel="Stack"
+              />
+            )}
           </div>
         </Section>
       </Reveal>
