@@ -2,6 +2,7 @@
 // the quiet craft signal for engineers who scroll to the bottom. Email is
 // entity-obfuscated at render (PLAN §2.5).
 
+import Link from "next/link";
 import { getSite } from "@/lib/content";
 import { ObfuscatedEmail } from "./ObfuscatedEmail";
 
@@ -38,14 +39,12 @@ export function Footer() {
             >
               LinkedIn
             </a>
-            <a
-              href={site.cvPdf}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/cv"
               className="text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
             >
               CV
-            </a>
+            </Link>
           </nav>
         </div>
         <div className="mt-8 flex flex-col gap-2 border-t border-line pt-6 text-xs text-ink-faint sm:flex-row sm:items-baseline sm:justify-between">

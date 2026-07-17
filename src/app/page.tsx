@@ -119,15 +119,10 @@ export default function Home() {
                 <MailIcon />
                 Email
               </ObfuscatedEmail>
-              <a
-                href={site.meta.cvPdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={heroLink}
-              >
+              <Link href="/cv" className={heroLink}>
                 <FileIcon />
                 CV
-              </a>
+              </Link>
             </div>
           </div>
         </div>
