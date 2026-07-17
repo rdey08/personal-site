@@ -51,3 +51,6 @@ AGENTS.md
 # original photos/documents (may contain EXIF/PII) — only the optimized,
 # metadata-stripped copies in public/images are committed
 /assets-src/
+
+# belt-and-braces: never commit a stray PDF dropped in the repo root
+/*.pdf
