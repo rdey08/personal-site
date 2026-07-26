@@ -11,7 +11,7 @@ export function PublicationList({
 }) {
   if (publications.length === 0) return null;
   return (
-    <ol className="space-y-6">
+    <ol data-animate="rows" className="space-y-6">
       {publications.map(({ meta }, i) => (
         // Academic register: hanging indent, first line flush, wrapped
         // lines indented (padding-left + negative text-indent).

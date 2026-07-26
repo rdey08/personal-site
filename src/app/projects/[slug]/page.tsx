@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { pageMetadata } from "@/lib/site";
 import { getProject, getProjects, getResearchThreads } from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
@@ -20,11 +21,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = getProject(slug);
   if (!project) return {};
-  return {
+  return pageMetadata({
     title: project.meta.title,
     description: project.meta.summary,
-    alternates: { canonical: `/projects/${slug}` },
-  };
+    path: `/projects/${slug}`,
+    publishedTime: `${project.meta.period.start}-01`,
+  });
 }
 
 export default async function ProjectPage({

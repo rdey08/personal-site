@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
+import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SiteAnimations } from "@/components/SiteAnimations";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,10 +22,6 @@ const newsreader = Newsreader({
   axes: ["opsz"],
 });
 
-const SITE_URL = "https://rupakdey.com";
-const DESCRIPTION =
-  "Rupak Dey: applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).";
-
 // Browser-chrome color follows the active scheme (paper light / paper dark).
 export const viewport: Viewport = {
   colorScheme: "light dark",
@@ -39,7 +37,9 @@ export const metadata: Metadata = {
     default: "Rupak Dey",
     template: "%s · Rupak Dey",
   },
-  description: DESCRIPTION,
+  description: SITE_DESCRIPTION,
+  authors: [{ name: "Rupak Dey", url: SITE_URL }],
+  creator: "Rupak Dey",
   alternates: {
     canonical: "/",
     types: {
@@ -51,19 +51,31 @@ export const metadata: Metadata = {
     siteName: "Rupak Dey",
     url: SITE_URL,
     title: "Rupak Dey",
-    description: DESCRIPTION,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
     title: "Rupak Dey",
-    description: DESCRIPTION,
+    description: SITE_DESCRIPTION,
   },
 };
 
-// Runs before first paint: applies the saved theme so there is no flash of the
-// wrong theme on reload. When no preference is saved, CSS prefers-color-scheme
-// handles it. Kept tiny and inlined into <head>.
-const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`;
+// Runs before first paint: applies the theme so there is no flash of the wrong
+// one on reload. Mirrors readMode + resolveMode in src/lib/theme.ts (an inline
+// script cannot import), including the default "auto" mode: an explicit OS dark
+// preference wins, otherwise the device clock decides (dark 18:00-06:00). When
+// JS is off, data-theme stays unset and CSS prefers-color-scheme takes over.
+const themeScript = `(function(){try{var m=localStorage.getItem('theme');if(m!=='light'&&m!=='dark'){m='auto';}var r=m;if(m==='auto'){var h=new Date().getHours();var night=h<6||h>=18;var osDark=matchMedia('(prefers-color-scheme: dark)').matches;r=(osDark||night)?'dark':'light';}var d=document.documentElement;d.setAttribute('data-theme',r);d.setAttribute('data-theme-mode',m);}catch(e){}})();`;
+
+// First-visit intro veil (home page, once per session). Armed before first
+// paint so the plain paper cover (globals.css, html.intro-veil::before) hides
+// the page from the very first frame; it fades itself away after 3s as a
+// failsafe if the JS bundle never arrives. Once hydrated, SiteAnimations
+// (reading __introVeilAt) swaps the cover for the staged intro: name rises,
+// accent stroke draws, paper slats lift. No-JS visitors never run this,
+// reduced motion skips it, and a throwing sessionStorage (private modes)
+// skips it rather than replay every load.
+const introScript = `(function(){try{if(location.pathname!=='/'||sessionStorage.getItem('intro-veil')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;sessionStorage.setItem('intro-veil','1');document.documentElement.classList.add('intro-veil');window.__introVeilAt=Date.now();}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -78,8 +90,12 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
       </head>
-      <body className="flex min-h-full flex-col">
+      {/* suppressHydrationWarning: extensions (Grammarly et al.) inject
+          attributes onto <body> before hydration; one-element-deep suppress
+          keeps that dev noise out without hiding child mismatches. */}
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <a
           href="#main"
           className="sr-only rounded-sm bg-accent px-4 py-2 text-paper focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
@@ -87,9 +103,10 @@ export default function RootLayout({
           Skip to content
         </a>
         <Header />
-        <div id="main" className="flex-1">
+        <SiteAnimations />
+        <main id="main" className="flex-1">
           {children}
-        </div>
+        </main>
         <Footer />
       </body>
     </html>

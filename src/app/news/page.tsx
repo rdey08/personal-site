@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { getNews } from "@/lib/content";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
@@ -6,11 +7,11 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
 import { NewsList } from "@/components/NewsList";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "News",
   description: "Milestones and updates: research, awards, and events.",
-  alternates: { canonical: "/news" },
-};
+  path: "/news",
+});
 
 export default function NewsPage() {
   const news = getNews();

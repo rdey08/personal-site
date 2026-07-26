@@ -2,20 +2,16 @@ import { getSite } from "@/lib/content";
 import { SITE_URL, absoluteUrl } from "@/lib/site";
 import { JsonLd } from "./JsonLd";
 
-// schema.org TechArticle + BreadcrumbList for the flagship write-ups, so
-// search engines understand both the article and where it sits in the site.
-export function ArticleJsonLd({
-  title,
-  description,
+// schema.org NewsArticle + BreadcrumbList for /news/[slug] permalinks, the
+// same treatment the flagship write-ups get from ArticleJsonLd.
+export function NewsJsonLd({
+  headline,
+  date,
   path,
-  sectionName,
-  sectionPath,
 }: {
-  title: string;
-  description: string;
+  headline: string;
+  date: string;
   path: string;
-  sectionName: string;
-  sectionPath: string;
 }) {
   const site = getSite().meta;
   const url = absoluteUrl(path);
@@ -23,9 +19,9 @@ export function ArticleJsonLd({
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "TechArticle",
-        headline: title,
-        description,
+        "@type": "NewsArticle",
+        headline,
+        datePublished: date,
         url,
         mainEntityOfPage: url,
         author: {
@@ -41,10 +37,10 @@ export function ArticleJsonLd({
           {
             "@type": "ListItem",
             position: 2,
-            name: sectionName,
-            item: absoluteUrl(sectionPath),
+            name: "News",
+            item: absoluteUrl("/news"),
           },
-          { "@type": "ListItem", position: 3, name: title },
+          { "@type": "ListItem", position: 3, name: headline },
         ],
       },
     ],

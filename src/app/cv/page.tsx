@@ -1,17 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { getCv, getSite } from "@/lib/content";
 import { Mdx } from "@/lib/mdx";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { Prose } from "@/components/Prose";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "CV",
   description: "Curriculum vitae of Rupak Dey, viewable and downloadable.",
-  alternates: { canonical: "/cv" },
-};
+  path: "/cv",
+});
 
 export default function CvPage() {
   const cv = getCv();

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { pageMetadata } from "@/lib/site";
 import {
   getProjects,
   getResearchThread,
@@ -21,11 +22,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const thread = getResearchThread(slug);
   if (!thread) return {};
-  return {
+  return pageMetadata({
     title: thread.meta.title,
     description: thread.meta.summary,
-    alternates: { canonical: `/research/${slug}` },
-  };
+    path: `/research/${slug}`,
+    publishedTime: `${thread.meta.period.start}-01`,
+  });
 }
 
 export default async function ResearchThreadPage({

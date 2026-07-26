@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { getPublications, getResearchThreads } from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
@@ -8,12 +9,12 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
 import { PublicationList } from "@/components/PublicationList";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Research",
   description:
     "Applied machine learning research (multi-branch LSTMs for predicting net primary productivity) and academic presentations.",
-  alternates: { canonical: "/research" },
-};
+  path: "/research",
+});
 
 export default function ResearchPage() {
   const threads = getResearchThreads();

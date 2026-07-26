@@ -51,6 +51,9 @@
 
   /* Layout */
   --measure: 68ch;
+  /* Lead blocks (hero tagline, homepage statement): one shared cap so their
+   * left-aligned text edges actually align. */
+  --measure-lead: 38rem;
   color-scheme: light;
 }
 
@@ -346,6 +349,93 @@ h4 {
   animation-delay: 120ms;
 }
 
+/*
+ * First-visit intro (home page, once per session). Two layers:
+ *
+ *  1. Pre-paint cover. The inline script in layout.tsx adds .intro-veil to
+ *     <html> before first paint, so this plain paper panel hides the page
+ *     from the very first frame. Failsafe: if the JS bundle never arrives,
+ *     it fades itself away after 3s so content can never stay hidden.
+ *  2. GSAP stage. Once hydrated (and fonts are ready), SiteAnimations
+ *     replaces the cover with .intro-stage: the name rises through a mask,
+ *     the accent stroke draws, then the paper splits into vertical slats
+ *     that lift to reveal the hero mid-entrance.
+ *
+ * Gated on prefers-reduced-motion twice (script + media query); no-JS
+ * visitors never get the class at all.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html.intro-veil::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: var(--paper);
+    animation: veil-failsafe 0.6s ease 3s both;
+  }
+}
+
+@keyframes veil-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* GSAP intro stage (elements injected by SiteAnimations, JS-only). */
+.intro-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+.intro-stage-slat {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--paper);
+}
+.intro-stage-name {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  color: var(--ink-strong);
+  /* Type metrics must exactly mirror the hero h1 (font, weight, tracking,
+   * line-height): the card's name FLIP-morphs onto the hero span, and any
+   * metric drift would show as a jump at the swap frame. */
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+.intro-stage-rule {
+  display: block;
+  height: 3px;
+  width: 6rem;
+  border-radius: calc(infinity * 1px);
+  background: var(--accent);
+}
+
+/* GSAP handoff (site-wide). SiteAnimations (root layout) tags <html> with
+ * .gsap-active on mount; every CSS-owned animation below stands down so the
+ * two systems never fight over the same properties. No-JS and reduced-motion
+ * visitors never get the class, so the CSS layers above keep working
+ * unchanged. */
+html.gsap-active .stagger > *,
+html.gsap-active .place-print,
+html.gsap-active .draw-underline,
+html.gsap-active .sd-rise,
+html.gsap-active .sd-cards > *,
+html.gsap-active .rule-draw,
+html.gsap-active .sd-num,
+html.gsap-active .sd-drift {
+  animation: none !important;
+}
+
 @supports (animation-timeline: view()) {
   /* CSS owns scroll motion here; neutralize the JS reveal path if it fires. */
   .reveal.is-hidden {
@@ -411,12 +501,27 @@ h4 {
   }
 }
 
+@supports (animation-timeline: view()) {
+  /* Footer hairline draws across as the footer scrolls into view. A
+   * footer-owned class, deliberately outside the .gsap-active standdown
+   * list: the GSAP scan is scoped to #main, so this must stay CSS-driven
+   * for everyone. Range ends early (cover 20%) so it always completes even
+   * when the page bottom stops the footer partway up the viewport. */
+  .footer-rule {
+    transform-origin: left center;
+    animation: sd-rule linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 20%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sd-rise,
   .sd-cards > *,
   .rule-draw,
   .sd-num,
-  .sd-drift {
+  .sd-drift,
+  .footer-rule {
     animation: none !important;
   }
   body::before {
@@ -448,11 +553,13 @@ h4 {
     --accent-soft: #ffffff;
   }
 
-  /* No chrome: header/footer nav, grain overlay, progress rail. */
+  /* No chrome: header/footer nav, grain overlay, progress rail, veil. */
   header,
   footer,
   body::before,
-  body::after {
+  body::after,
+  html.intro-veil::before,
+  .intro-stage {
     display: none !important;
   }
 

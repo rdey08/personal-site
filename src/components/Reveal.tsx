@@ -25,6 +25,12 @@ export function Reveal({
     const el = ref.current;
     if (!el) return;
 
+    // If GSAP owns the site's motion (SiteAnimations adds .gsap-active in a
+    // layout effect, which runs before this passive effect), stand down.
+    if (document.documentElement.classList.contains("gsap-active")) {
+      return;
+    }
+
     // If the browser supports CSS scroll-driven animations, the .sd-* classes
     // in globals.css own scroll motion, this fallback stands down entirely.
     if (

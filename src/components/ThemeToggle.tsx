@@ -1,63 +1,96 @@
 "use client";
 
-// Client component #1 (PLAN §2.3): the only reason for client JS here is
-// reading/writing localStorage and toggling the data-theme attribute. The
-// no-flash script in the root layout sets the initial theme before paint.
+// Client component #1 (PLAN §2.3): a three-state theme control that cycles
+// Auto -> Light -> Dark -> Auto. Auto (the default) follows the device clock
+// and OS setting; see src/lib/theme.ts. The no-flash script in the root layout
+// applies the initial theme before paint.
 //
-// Theme is read with useSyncExternalStore (the React 19 way to read an
-// external store, here the <html data-theme> attribute), which avoids
-// setState-in-effect and hydration warnings.
+// The chosen mode is read with useSyncExternalStore from the <html
+// data-theme-mode> attribute (the React 19 way to read an external store),
+// which avoids setState-in-effect and hydration warnings.
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import {
+  applyMode,
+  readMode,
+  readModeAttr,
+  setThemeMode,
+  THEME_EVENT,
+  type ThemeMode,
+} from "@/lib/theme";
 
-type Theme = "light" | "dark";
+const NEXT: Record<ThemeMode, ThemeMode> = {
+  auto: "light",
+  light: "dark",
+  dark: "auto",
+};
 
-const EVENT = "themechange";
+const LABEL: Record<ThemeMode, string> = {
+  auto: "auto (matches time of day)",
+  light: "light",
+  dark: "dark",
+};
 
 function subscribe(onChange: () => void) {
-  window.addEventListener(EVENT, onChange);
-  window.addEventListener("storage", onChange);
+  const onCustom = () => onChange();
+  // Cross-tab: another tab changed the stored mode. Reflect it here, then
+  // notify (attributes are per-document, so this tab must re-apply).
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === "theme") {
+      applyMode(readMode());
+      onChange();
+    }
+  };
+  window.addEventListener(THEME_EVENT, onCustom);
+  window.addEventListener("storage", onStorage);
   return () => {
-    window.removeEventListener(EVENT, onChange);
-    window.removeEventListener("storage", onChange);
+    window.removeEventListener(THEME_EVENT, onCustom);
+    window.removeEventListener("storage", onStorage);
   };
 }
 
-function getSnapshot(): Theme {
-  const attr = document.documentElement.getAttribute("data-theme");
-  if (attr === "light" || attr === "dark") return attr;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-// Server + first client render before hydration: assume light (the CSS default
-// / no-flash script has already painted the real theme independently).
-const getServerSnapshot = (): Theme => "light";
+// Server + first client render before hydration: assume auto (the default; the
+// no-flash script has already applied the real resolved theme independently).
+const getServerSnapshot = (): ThemeMode => "auto";
 
 export function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mode = useSyncExternalStore(subscribe, readModeAttr, getServerSnapshot);
 
-  function toggle() {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    try {
-      localStorage.setItem("theme", next);
-    } catch {
-      // storage unavailable, toggle still works for the session
-    }
-    window.dispatchEvent(new Event(EVENT));
-  }
+  // While in auto, re-resolve if the OS preference flips live. (The 06/18
+  // clock boundary is left alone: a rare case not worth a timer.)
+  useEffect(() => {
+    if (mode !== "auto") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyMode("auto");
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [mode]);
+
+  const next = NEXT[mode];
 
   return (
     <button
       type="button"
-      onClick={toggle}
-      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+      onClick={() => setThemeMode(next)}
+      aria-label={`Theme: ${LABEL[mode]}. Switch to ${LABEL[next]}.`}
+      title={`Theme: ${LABEL[mode]}`}
       className="inline-flex h-9 w-9 items-center justify-center rounded-sm text-ink-muted transition-colors duration-[--duration-fast] hover:bg-paper-sunken hover:text-ink-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
-      {/* Show a sun in dark theme (click → light), a moon in light theme. */}
-      {theme === "dark" ? (
+      {mode === "auto" ? (
+        // Auto: a half-filled circle (the common "adaptive/contrast" glyph).
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none" />
+        </svg>
+      ) : mode === "light" ? (
+        // Light: sun.
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
@@ -71,6 +104,7 @@ export function ThemeToggle() {
           <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
         </svg>
       ) : (
+        // Dark: moon.
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"

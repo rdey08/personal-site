@@ -9,6 +9,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { setThemeMode } from "@/lib/theme";
 
 export interface Command {
   group: string;
@@ -16,23 +17,14 @@ export interface Command {
   /** Internal path or external URL (externals open in a new tab). */
   href?: string;
   /** Built-in action instead of a navigation. */
-  action?: "theme-light" | "theme-dark";
+  action?: "theme-auto" | "theme-light" | "theme-dark";
 }
 
 const THEME_COMMANDS: Command[] = [
-  { group: "Theme", label: "Switch to light theme", action: "theme-light" },
-  { group: "Theme", label: "Switch to dark theme", action: "theme-dark" },
+  { group: "Theme", label: "Theme: auto (time of day)", action: "theme-auto" },
+  { group: "Theme", label: "Theme: light", action: "theme-light" },
+  { group: "Theme", label: "Theme: dark", action: "theme-dark" },
 ];
-
-function applyTheme(theme: "light" | "dark") {
-  document.documentElement.setAttribute("data-theme", theme);
-  try {
-    localStorage.setItem("theme", theme);
-  } catch {
-    // storage unavailable, theme still applies for the session
-  }
-  window.dispatchEvent(new Event("themechange"));
-}
 
 export function CommandMenu({ commands }: { commands: Command[] }) {
   const router = useRouter();
@@ -72,8 +64,9 @@ export function CommandMenu({ commands }: { commands: Command[] }) {
 
   function run(cmd: Command) {
     close();
-    if (cmd.action === "theme-light") applyTheme("light");
-    else if (cmd.action === "theme-dark") applyTheme("dark");
+    if (cmd.action === "theme-auto") setThemeMode("auto");
+    else if (cmd.action === "theme-light") setThemeMode("light");
+    else if (cmd.action === "theme-dark") setThemeMode("dark");
     else if (cmd.href) {
       // App routes go through the client router; files (/feed.xml) and
       // external URLs open in a new tab.
@@ -83,13 +76,24 @@ export function CommandMenu({ commands }: { commands: Command[] }) {
     }
   }
 
+  // Keep the active row visible as arrow keys move it through the overflow.
+  function moveActive(next: (a: number) => number) {
+    setActive((a) => {
+      const i = next(a);
+      document
+        .getElementById(`command-option-${i}`)
+        ?.scrollIntoView({ block: "nearest" });
+      return i;
+    });
+  }
+
   function onInputKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActive((a) => Math.min(a + 1, filtered.length - 1));
+      moveActive((a) => Math.min(a + 1, filtered.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActive((a) => Math.max(a - 1, 0));
+      moveActive((a) => Math.max(a - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
       const cmd = filtered[Math.min(active, filtered.length - 1)];
@@ -124,10 +128,24 @@ export function CommandMenu({ commands }: { commands: Command[] }) {
             onKeyDown={onInputKeyDown}
             placeholder="Type to search…"
             aria-label="Search commands"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="command-menu-list"
+            aria-activedescendant={
+              filtered.length > 0
+                ? `command-option-${Math.min(active, filtered.length - 1)}`
+                : undefined
+            }
+            aria-autocomplete="list"
             className="w-full bg-transparent py-3.5 text-base text-ink-strong outline-none placeholder:text-ink-faint"
           />
         </div>
-        <div className="max-h-[50vh] overflow-y-auto p-2" role="listbox">
+        <div
+          id="command-menu-list"
+          aria-label="Commands"
+          className="max-h-[50vh] overflow-y-auto p-2"
+          role="listbox"
+        >
           {filtered.length === 0 && (
             <p className="px-3 py-6 text-center text-sm text-ink-faint">
               No matches.
@@ -146,6 +164,7 @@ export function CommandMenu({ commands }: { commands: Command[] }) {
                   return (
                     <button
                       key={`${cmd.group}-${cmd.label}`}
+                      id={`command-option-${i}`}
                       type="button"
                       role="option"
                       aria-selected={i === active}

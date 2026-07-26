@@ -6,7 +6,7 @@ import { formatPeriod } from "@/lib/format";
 export function LeadershipList({ items }: { items: { meta: Project }[] }) {
   if (items.length === 0) return null;
   return (
-    <ul className="divide-y divide-line">
+    <ul data-animate="rows" className="divide-y divide-line">
       {items.map(({ meta }) => (
         <li key={meta.slug} className="py-6 first:pt-0">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

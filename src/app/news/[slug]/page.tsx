@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { pageMetadata } from "@/lib/site";
 import { getNews, getNewsItem } from "@/lib/content";
+import { NewsJsonLd } from "@/components/NewsJsonLd";
 import { Mdx } from "@/lib/mdx";
 import { Section } from "@/components/Section";
 import { Prose } from "@/components/Prose";
@@ -19,11 +21,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const item = getNewsItem(slug);
   if (!item) return {};
-  return {
+  return pageMetadata({
     title: item.meta.text,
     description: item.meta.text,
-    alternates: { canonical: `/news/${slug}` },
-  };
+    path: `/news/${slug}`,
+    publishedTime: item.meta.date,
+  });
 }
 
 function fullDate(iso: string): string {
@@ -50,6 +53,11 @@ export default async function NewsItemPage({
 
   return (
     <Section as="article" className="stagger pt-12 pb-8 sm:pt-16">
+      <NewsJsonLd
+        headline={meta.text}
+        date={meta.date}
+        path={`/news/${slug}`}
+      />
       <Link
         href="/news"
         className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"

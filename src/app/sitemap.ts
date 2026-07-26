@@ -1,28 +1,43 @@
 import type { MetadataRoute } from "next";
 import { getNews, getProjects, getResearchThreads } from "@/lib/content";
-
-const SITE_URL = "https://rupakdey.com";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = [
-    "",
-    "/research",
-    "/projects",
-    "/leadership",
-    "/news",
-    "/cv",
-  ];
-  const research = getResearchThreads().map((t) => `/research/${t.meta.slug}`);
-  const flagship = getProjects()
-    .filter((p) => p.meta.tier === "flagship")
-    .map((p) => `/projects/${p.meta.slug}`);
-  const news = getNews().map((n) => `/news/${n.meta.slug}`);
+  const buildDate = new Date();
+  const news = getNews();
+  // Newest item's date stands in for the pages that change when news does.
+  const latestNews = news.length
+    ? new Date(`${news[0].meta.date}T12:00:00Z`)
+    : buildDate;
 
-  const now = new Date();
-  return [...staticRoutes, ...research, ...flagship, ...news].map((path) => ({
-    url: `${SITE_URL}${path}`,
-    lastModified: now,
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${SITE_URL}`, lastModified: latestNews },
+    { url: `${SITE_URL}/research`, lastModified: buildDate },
+    { url: `${SITE_URL}/projects`, lastModified: buildDate },
+    { url: `${SITE_URL}/leadership`, lastModified: buildDate },
+    { url: `${SITE_URL}/news`, lastModified: latestNews },
+    { url: `${SITE_URL}/cv`, lastModified: buildDate },
+  ];
+
+  const research: MetadataRoute.Sitemap = getResearchThreads().map((t) => ({
+    url: `${SITE_URL}/research/${t.meta.slug}`,
+    lastModified: buildDate,
   }));
+
+  const flagship: MetadataRoute.Sitemap = getProjects()
+    .filter((p) => p.meta.tier === "flagship")
+    .map((p) => ({
+      url: `${SITE_URL}/projects/${p.meta.slug}`,
+      lastModified: buildDate,
+    }));
+
+  // News permalinks carry their true publication date.
+  const newsRoutes: MetadataRoute.Sitemap = news.map((n) => ({
+    url: `${SITE_URL}/news/${n.meta.slug}`,
+    lastModified: new Date(`${n.meta.date}T12:00:00Z`),
+  }));
+
+  return [...staticRoutes, ...research, ...flagship, ...newsRoutes];
 }

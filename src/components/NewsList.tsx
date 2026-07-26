@@ -23,7 +23,7 @@ export function NewsList({
   const shown = limit ? items.slice(0, limit) : items;
   if (shown.length === 0) return null;
   return (
-    <ul className="divide-y divide-line">
+    <ul data-animate="rows" className="divide-y divide-line">
       {shown.map(({ meta }) => (
         <li key={meta.slug} className="flex gap-6 py-4 first:pt-0 last:pb-0">
           <time

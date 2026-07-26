@@ -45,50 +45,63 @@ export default function Home() {
           text on the right, entrance stagger + signature accent stroke. */}
       <Section className="pt-16 pb-10 sm:pt-24">
         <div className="flex flex-col items-start gap-8 sm:grid sm:grid-cols-[auto_1fr] sm:items-center sm:gap-14 lg:gap-20">
-          {/* Full 3:4 portrait as an editorial print: paper mat, offset
-              accent backing, slight tilt that straightens on hover. */}
+          {/* Editorial portrait plate (replaced the arch crop 2026-07): a
+              straight 4:5 print on a hairline mat, which is what the rest of
+              the print language already assumes (place-print, --shadow-print,
+              the matted frame in og-card.tsx). The arch's radius was half the
+              frame width, so its curve cut into the head's silhouette. Color
+              is graded rather than stripped: the old grayscale bloomed to
+              full color on hover only, so touch visitors never saw it. */}
           <figure className="relative shrink-0 pl-5 sm:pl-6">
             <div className="sd-drift">
-              <div className="place-print relative -rotate-[1.6deg] transition-transform duration-[--duration-slow] ease-[--ease-out-expo] hover:rotate-0">
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 translate-x-2.5 translate-y-2.5 rotate-2 rounded-sm border border-line bg-accent-soft"
+              <div className="place-print relative w-56 rounded-[6px] border border-line-strong bg-paper-raised p-2.5 shadow-[var(--shadow-print)] sm:w-64 lg:w-72 xl:w-80">
+                <Image
+                  src="/images/headshot-1280.webp"
+                  alt="Portrait of Rupak Dey"
+                  width={1280}
+                  height={1707}
+                  priority
+                  className="aspect-[4/5] w-full rounded-[2px] object-cover object-[50%_18%] [filter:saturate(0.9)_contrast(1.03)]"
                 />
-                <div className="relative rounded-sm border border-line bg-paper-raised p-2 shadow-[var(--shadow-print)]">
-                  <Image
-                    src="/images/headshot-640.webp"
-                    alt="Portrait of Rupak Dey"
-                    width={640}
-                    height={853}
-                    priority
-                    className="h-auto w-44 rounded-[2px] sm:w-52 lg:w-64"
-                  />
-                </div>
               </div>
             </div>
-            <figcaption className="absolute bottom-1 left-0 text-[10px] font-semibold tracking-[0.22em] text-ink-faint uppercase [writing-mode:vertical-rl] rotate-180">
+            <figcaption
+              data-gsap="caption"
+              className="absolute bottom-1 left-0 text-[10px] font-semibold tracking-[0.22em] text-ink-faint uppercase [writing-mode:vertical-rl] rotate-180"
+            >
               {site.meta.location}
             </figcaption>
           </figure>
 
           <div className="stagger">
             {site.meta.eyebrow && (
-              <p className="mb-3 text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">
+              <p
+                data-gsap="eyebrow"
+                className="mb-3 text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase"
+              >
                 {site.meta.eyebrow}
               </p>
             )}
-            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl">
-              {site.meta.name}
+            <h1 className="font-serif text-5xl font-medium tracking-tight text-balance text-ink-strong sm:text-6xl lg:text-7xl">
+              <span data-gsap="name" className="inline-block">
+                {site.meta.name}
+              </span>
               <span
                 aria-hidden="true"
                 className="draw-underline mt-3 block h-[3px] w-24 rounded-full bg-accent"
               />
             </h1>
-            <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-pretty text-ink-muted">
+            <p
+              data-gsap="tagline"
+              className="mt-5 max-w-[var(--measure-lead)] text-lg leading-relaxed text-pretty text-ink-muted"
+            >
               {site.meta.tagline}
             </p>
             {site.meta.availability && (
-              <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--accent)_35%,var(--line))] bg-accent-soft/60 px-3.5 py-1.5 text-sm font-medium text-accent-strong">
+              <p
+                data-gsap="pill"
+                className="mt-6 inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--accent)_35%,var(--line))] bg-accent-soft/60 px-3.5 py-1.5 text-sm font-medium text-accent-strong"
+              >
                 <span
                   aria-hidden="true"
                   className="h-2 w-2 shrink-0 rounded-full bg-accent"
@@ -96,11 +109,14 @@ export default function Home() {
                 {site.meta.availability}
               </p>
             )}
-            <div className="mt-8 flex max-w-[52ch] flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6">
+            <div
+              data-gsap="links"
+              className="mt-8 flex max-w-[var(--measure-lead)] flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6"
+            >
               <a
                 href={site.meta.links.github}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="me noopener noreferrer"
                 className={heroLink}
               >
                 <GitHubIcon />
@@ -109,7 +125,7 @@ export default function Home() {
               <a
                 href={site.meta.links.linkedin}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="me noopener noreferrer"
                 className={heroLink}
               >
                 <LinkedInIcon />
@@ -132,7 +148,10 @@ export default function Home() {
           Scroll signature: rises as it enters. Major beat: extra air. */}
       <Reveal>
         <Section className="py-14 sm:py-20">
-          <div className="sd-rise max-w-[38rem] font-serif text-[1.35rem] leading-[1.6] text-ink-strong [&_p]:mb-5 [&_p]:text-pretty last:[&_p]:mb-0">
+          <div
+            data-gsap="lead"
+            className="sd-rise max-w-[var(--measure-lead)] font-serif text-[1.35rem] leading-[1.6] text-ink-strong [&_p]:mb-5 [&_p]:text-pretty last:[&_p]:mb-0"
+          >
             <Mdx source={site.body} />
           </div>
         </Section>
@@ -196,10 +215,16 @@ export default function Home() {
       )}
 
       {/* News: 5 most recent; the rest live at /news. Scroll signature:
-          a recessed full-bleed band, rows rising into it. */}
+          a recessed full-bleed band, rows rising into it. Deliberately the
+          last section: this is a showcase site, so the page closes on recent
+          activity, not a pitch; contact lives in the hero and the footer,
+          and the hero availability pill is the only "seeking" signal. */}
       {news.length > 0 && (
         <Reveal>
-          <div className="mt-14 border-y border-line bg-paper-sunken/60">
+          {/* -mb-28 cancels the footer's global mt-28 so the recessed band
+              runs flush into the footer hairline; the footer's border-t is
+              the band's bottom edge (no empty paper strip between them). */}
+          <div className="mt-14 -mb-28 border-t border-line bg-paper-sunken/60">
             <Section className="py-12">
               <SectionHeading
                 index="03"
@@ -221,36 +246,6 @@ export default function Home() {
           </div>
         </Reveal>
       )}
-
-      {/* Closing beat: the page ends with a conversion point instead of
-          fading into the footer. Serif invitation + primary/secondary CTAs. */}
-      <Reveal>
-        <Section className="pt-14 pb-6 sm:pt-20">
-          <SectionHeading index="04" title="Get in touch" />
-          <div className="sd-rise max-w-[38rem]">
-            <p className="font-serif text-[1.35rem] leading-[1.6] text-pretty text-ink-strong">
-              If my research direction fits your group, or my engineering could
-              fit your team, I&rsquo;d love to hear from you.
-            </p>
-            <div className="mt-7 flex flex-wrap items-center gap-4">
-              <ObfuscatedEmail
-                email={site.meta.email}
-                className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2 text-sm font-medium text-paper transition-colors duration-[--duration-fast] hover:bg-accent-strong"
-              >
-                <MailIcon />
-                Email me
-              </ObfuscatedEmail>
-              <Link
-                href="/cv"
-                className="inline-flex items-center gap-2 rounded-sm border border-line px-4 py-2 text-sm font-medium text-ink transition-colors duration-[--duration-fast] hover:border-accent hover:text-accent"
-              >
-                <FileIcon />
-                View CV
-              </Link>
-            </div>
-          </div>
-        </Section>
-      </Reveal>
     </>
   );
 }

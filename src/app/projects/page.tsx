@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { getProjects } from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
@@ -8,12 +9,12 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
 import { ProjectCard } from "@/components/ProjectCard";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Projects",
   description:
     "Software engineering and projects: ELSA for NASA's Planetary Data System, plus hackathon and coursework builds.",
-  alternates: { canonical: "/projects" },
-};
+  path: "/projects",
+});
 
 export default function ProjectsPage() {
   const projects = getProjects();

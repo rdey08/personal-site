@@ -54,7 +54,10 @@ export function MobileNav() {
           ref={panelRef}
           className="panel-rise absolute inset-x-0 top-full z-40 border-b border-line bg-paper-raised"
         >
-          <nav className="mx-auto flex max-w-4xl flex-col px-6 py-2">
+          <nav
+            aria-label="Primary, mobile"
+            className="mx-auto flex max-w-4xl flex-col px-6 py-2"
+          >
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}

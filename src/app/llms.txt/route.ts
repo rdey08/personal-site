@@ -5,14 +5,13 @@ import {
   getResearchThreads,
   getSite,
 } from "@/lib/content";
+import { SITE_URL } from "@/lib/site";
 
 // /llms.txt, agent-readable site summary per the llmstxt.org convention.
 // Generated from the content layer at build time so it can never drift from
 // the pages (PLAN: content lives in /content, never in code).
 
 export const dynamic = "force-static";
-
-const SITE_URL = "https://rupakdey.com";
 
 export function GET() {
   const site = getSite();
