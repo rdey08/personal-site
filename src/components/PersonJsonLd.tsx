@@ -11,7 +11,6 @@ export function PersonJsonLd() {
     "@type": "Person",
     name: site.name,
     url: SITE_URL,
-    jobTitle: "Machine Learning Researcher and Software Engineer",
     description: site.tagline,
     image: absoluteUrl("/images/headshot-1280.webp"),
     alumniOf: {
