@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Rupak Dey",
+    default: "Rupak Dey · Researcher & Engineer",
     template: "%s · Rupak Dey",
   },
   description: SITE_DESCRIPTION,
@@ -50,12 +50,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Rupak Dey",
     url: SITE_URL,
-    title: "Rupak Dey",
+    title: "Rupak Dey · Researcher & Engineer",
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rupak Dey",
+    title: "Rupak Dey · Researcher & Engineer",
     description: SITE_DESCRIPTION,
   },
 };
