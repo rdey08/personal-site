@@ -1,4 +1,4 @@
-// Renders the "R" monogram (brand serif on terracotta) to the PNG icon set:
+﻿// Renders the "R" monogram (brand serif on terracotta) to the PNG icon set:
 //   public/icons/icon-192.png, public/icons/icon-512.png  (web app manifest)
 //   src/app/apple-icon.png                                 (apple-touch-icon)
 //   src/app/favicon.ico                                    (48px, PNG-in-ICO)
@@ -45,11 +45,14 @@ function monogram(size) {
         color: PAPER,
         fontFamily: "Newsreader",
         fontWeight: 600,
-        fontSize: size * 0.62,
+        // Two-letter monogram: smaller em with tight tracking so the pair
+        // still reads at 16px tab size.
+        fontSize: size * 0.44,
+        letterSpacing: `-${size * 0.02}px`,
         // Optical centering: serif caps sit a touch low in the em box.
         paddingBottom: size * 0.02,
       },
-      children: "R",
+      children: "RD",
     },
   };
 }
@@ -92,7 +95,7 @@ function pngToIco(png, size) {
   return Buffer.concat([header, png]);
 }
 
-const font = await loadGoogleFont("Newsreader:wght@600", "R");
+const font = await loadGoogleFont("Newsreader:wght@600", "RD");
 await render(font, 192, "public/icons/icon-192.png");
 await render(font, 512, "public/icons/icon-512.png");
 await render(font, 180, "src/app/apple-icon.png");
