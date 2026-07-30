@@ -5,9 +5,10 @@ role: Machine Learning Research Assistant (Senior Thesis)
 org: KDD Lab, New Mexico State University
 period: { start: "2025-09", end: "present" }
 summary:
-  A multi-branch LSTM that fuses satellite, precipitation, cattle-GPS, and
-  land-cover data to predict net primary productivity across 71,000+ pixels,
-  reaching R² 0.98.
+  Multi-branch LSTMs, one temporal encoder per data source, that fuse
+  satellite, precipitation, cattle-GPS, and land-cover data over 1.3 million
+  records to predict NPP and biomass change, raising biomass-change R² from
+  0.36 to 0.93.
 methods:
   [
     LSTM,
@@ -32,7 +33,7 @@ and physical meaning, and the interesting behavior is in how they interact.
 
 ## Data
 
-The work draws on four modalities across **71,000+ pixels**:
+The work draws on four modalities, **1.3 million records** in all:
 
 - **Satellite** imagery.
 - **Precipitation** records.
@@ -48,7 +49,8 @@ This preserves the distinct temporal structure of, say, a precipitation series
 versus a grazing-intensity series, and lets the network learn how they combine
 rather than forcing an early, lossy concatenation.
 
-In total, **seven LSTM models** were built and compared across configurations.
+In total, **ten LSTM models** were built and compared, predicting both NPP
+and biomass change.
 
 <figure>
   <NppArchitectureDiagram />
@@ -61,15 +63,16 @@ In total, **seven LSTM models** were built and compared across configurations.
 
 ## Results
 
-- The multi-branch architecture reaches **R² 0.98** on the NPP prediction task.
-- Benchmarked against a multilayer perceptron (MLP) and a random forest (RF),
-  the LSTM approach comes out ahead.
-- Adding **cattle-GPS** data cut prediction error by **36%** relative to a
-  precipitation-only model, direct evidence that where animals graze carries
-  real signal about productivity, not just how much it rains.
+- The multi-branch design raised biomass-change **R² from 0.36 to 0.93**.
+- An ablation across input combinations showed that **rainfall and land
+  cover** drive nearly all of the predictive skill, while **cattle GPS added
+  none**, a result validated against MLP and random-forest baselines.
 
-## What this shows / next steps
+## What this shows
 
 The headline finding is methodological as much as ecological: giving each
-modality its own encoder and fusing late beats both classical baselines and a
-naive single-stream network, and the grazing signal matters.
+modality its own temporal encoder and fusing late is what moved
+biomass-change R² from 0.36 to 0.93. The ablation matters just as much for
+what it rules out: grazing-location data, for all its intuitive appeal,
+carried no predictive signal that rainfall and land cover had not already
+explained, and the same pattern held for the MLP and random-forest baselines.

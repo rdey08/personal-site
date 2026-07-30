@@ -52,5 +52,7 @@ AGENTS.md
 # metadata-stripped copies in public/images are committed
 /assets-src/
 
-# belt-and-braces: never commit a stray PDF dropped in the repo root
+# belt-and-braces: never commit a stray PDF or Word source dropped in the
+# repo root (the docx carries author/revision metadata)
 /*.pdf
+/*.docx
