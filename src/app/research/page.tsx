@@ -12,7 +12,7 @@ import { PublicationList } from "@/components/PublicationList";
 export const metadata: Metadata = pageMetadata({
   title: "Research",
   description:
-    "Applied machine learning research (multi-branch LSTMs for predicting net primary productivity) and academic presentations.",
+    "Applied machine learning research (multi-branch LSTMs for predicting rangeland herbaceous biomass) and academic presentations.",
   path: "/research",
 });
 

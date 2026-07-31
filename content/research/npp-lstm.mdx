@@ -1,14 +1,14 @@
 ---
-title: Predicting Net Primary Productivity with Multi-Branch LSTMs
+title: Predicting Rangeland Herbaceous Biomass with Multi-Branch LSTMs
 slug: npp-lstm
 role: Machine Learning Research Assistant (Senior Thesis)
 org: KDD Lab, New Mexico State University
 period: { start: "2025-09", end: "present" }
 summary:
-  Multi-branch LSTMs, one temporal encoder per data source, that fuse
-  satellite, precipitation, cattle-GPS, and land-cover data over 1.3 million
-  records to predict NPP and biomass change, raising biomass-change R² from
-  0.36 to 0.93.
+  Multi-branch LSTMs that fuse satellite biomass history, on-ranch rainfall,
+  collar-derived grazing pressure, and static land cover to predict herbaceous
+  biomass and its period-over-period change on two grazed pastures, raising
+  biomass-change R² from 0.36 to 0.93.
 methods:
   [
     LSTM,
@@ -23,56 +23,87 @@ featured: true
 
 ## The problem
 
-Net primary productivity (NPP), how much plant biomass an ecosystem produces
-over time, is a central quantity for managing rangeland and understanding how
-forage responds to weather and grazing. Estimating it well means combining
-signals that live on completely different footings: what satellites see, how
-much rain falls, where cattle actually graze, and what kind of land cover sits
-underneath. Each of these is a time series with its own cadence, noise profile,
-and physical meaning, and the interesting behavior is in how they interact.
+How much forage a rangeland is carrying, and whether that stock is growing or
+shrinking, is the quantity a rancher and a land manager actually act on.
+Estimating it well means combining signals that live on completely different
+footings: what satellites see every sixteen days, how much rain fell each day,
+where cattle actually grazed, and what kind of vegetation sits underneath. Each
+is a time series with its own cadence, noise profile, and physical meaning, and
+the interesting behavior is in how they interact.
+
+Two targets are modeled: the **standing herbaceous biomass** in a given period,
+and the **change in that biomass** from the previous period. The second is the
+harder and the more useful of the two, and it is the one reported here.
 
 ## Data
 
-The work draws on four modalities, **1.3 million records** in all:
+Two grazed pastures on a ranch near Animas, New Mexico, across the 2025 season.
+Four input groups feed the model:
 
-- **Satellite** imagery.
-- **Precipitation** records.
-- **Cattle GPS** tracks, which localize grazing pressure in space and time.
-- **Land cover** classification.
+- **Satellite biomass history**, from 16-day RAP herbaceous above-ground
+  biomass composites.
+- **Precipitation**, a daily on-ranch weather station series, supplied as the
+  32-day window ending the day before each prediction.
+- **Grazing pressure**, derived from GPS collars combined with collar behavior
+  classification, as animal grazing-days per pixel over the same 32-day window.
+- **Land cover**, six static fractional-cover bands per pixel.
+
+The full pixel-by-period grid is **1.27 million records**, one record being a
+single roughly 30 m pixel on a single 16-day date. Because most of that grid is
+ground that never saw an animal, models are trained and evaluated on the
+**74,374 records with grazing activity** in their trailing window. Every number
+below is on that filtered set.
 
 ## Approach
 
 Rather than flattening every input into one feature vector, the model uses a
-**multi-branch LSTM**: a separate temporal encoder per modality, so each data
-source is read on its own terms before the branches are fused for prediction.
-This preserves the distinct temporal structure of, say, a precipitation series
-versus a grazing-intensity series, and lets the network learn how they combine
-rather than forcing an early, lossy concatenation.
-
-In total, **ten LSTM models** were built and compared, predicting both NPP
-and biomass change.
+**multi-branch design**: the three sequence inputs each get their own LSTM
+encoder, so a rainfall series and a grazing-intensity series are read on their
+own terms instead of being concatenated early and lossily. Land cover is static
+per pixel, so it carries no temporal structure to encode and is passed straight
+into the fusion step. The branches meet late, at a two-layer head, which is
+where the network learns how the signals combine.
 
 <figure>
   <NppArchitectureDiagram />
   <figcaption>
-    Architecture sketch: each modality is read by its own temporal encoder;
-    branches fuse late, so the network learns how the signals combine instead of
-    forcing an early concatenation.
+    Three sequence inputs are read by their own LSTM encoder; static land cover
+    bypasses the recurrent path entirely. The branches fuse late, so the network
+    learns how the signals combine instead of forcing an early concatenation.
   </figcaption>
 </figure>
 
+Ten models in all: five input combinations, each trained against both targets,
+forming a ladder where each rung adds one input group.
+
 ## Results
 
-- The multi-branch design raised biomass-change **R² from 0.36 to 0.93**.
-- An ablation across input combinations showed that **rainfall and land
-  cover** drive nearly all of the predictive skill, while **cattle GPS added
-  none**, a result validated against MLP and random-forest baselines.
+On a held-out test split of 14,747 records, for the biomass-change target:
+
+<NppResultsTable />
+
+Reading the ladder:
+
+- **Rainfall does most of the work.** Adding it to a history-only model moves
+  R² from 0.364 to 0.888, by far the largest single jump.
+- **Land cover is the surprise.** It is the second most valuable input despite
+  being the one input with no encoder at all, lifting R² a further 0.044.
+- **Grazing pressure adds no measurable improvement.** The best model, at
+  **R² 0.932**, is the one without the collar-derived branch; adding it back
+  moves R² to 0.921, a difference small enough to sit inside run-to-run noise.
 
 ## What this shows
 
-The headline finding is methodological as much as ecological: giving each
-modality its own temporal encoder and fusing late is what moved
-biomass-change R² from 0.36 to 0.93. The ablation matters just as much for
-what it rules out: grazing-location data, for all its intuitive appeal,
-carried no predictive signal that rainfall and land cover had not already
-explained, and the same pattern held for the MLP and random-forest baselines.
+The headline is methodological as much as ecological. Giving each sequence
+input its own temporal encoder and fusing late is what moved biomass-change R²
+from 0.36 to 0.93. But the two most interesting findings both cut against
+intuition: the input that needed no temporal encoder at all turned out to be
+the second most valuable, and cattle-location data, for all its obvious appeal
+in a grazing study, carried no signal that rainfall and land cover had not
+already explained.
+
+Two caveats worth stating plainly. The test split is random by pixel within a
+single 2025 season, so every date appears in both training and test data; the
+results speak to spatial generalization, not to an unseen year. And the
+grazing-pressure finding rests on a difference of about 0.011 R² from a single
+training run, which makes it suggestive rather than settled.

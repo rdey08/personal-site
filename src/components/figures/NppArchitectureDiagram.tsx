@@ -6,11 +6,16 @@
 // entirely by the MDX pipeline. Plain TSX has neither problem, is
 // typechecked, and prettier formats it without changing its meaning.
 
+// Three of the four input groups get an LSTM encoder. Land cover is static
+// per pixel (a 6-dim fractional-cover vector), so it bypasses the recurrent
+// path entirely and is concatenated straight into the fusion block. That
+// asymmetry is the point of the figure: an earlier version drew four
+// identical encoders, which is not what the model does.
 const INPUTS = [
-  { label: "Satellite", y: 45 },
-  { label: "Precipitation", y: 115 },
-  { label: "Cattle GPS", y: 185 },
-  { label: "Land cover", y: 255 },
+  { label: "Biomass history", detail: "2 steps", encoder: true, y: 45 },
+  { label: "Precipitation", detail: "32 days", encoder: true, y: 115 },
+  { label: "Grazing pressure", detail: "32 days", encoder: true, y: 185 },
+  { label: "Land cover", detail: "static, 6-dim", encoder: false, y: 255 },
 ];
 
 // Encoder outputs converge on the fusion block's left edge.
@@ -25,8 +30,9 @@ export function NppArchitectureDiagram() {
       style={{ width: "100%", height: "auto" }}
     >
       <title id="fig-npp-title">
-        Multi-branch LSTM architecture: four input modalities, one temporal
-        encoder each, fused late into a single NPP prediction.
+        Multi-branch LSTM architecture: three sequence inputs each read by their
+        own LSTM encoder, plus a static land-cover vector that bypasses the
+        encoders, fused late into one biomass prediction.
       </title>
       <defs>
         <marker
@@ -42,55 +48,90 @@ export function NppArchitectureDiagram() {
         </marker>
       </defs>
 
-      {INPUTS.map(({ label, y }, i) => (
+      {INPUTS.map(({ label, detail, encoder, y }, i) => (
         <g key={label}>
-          {/* input modality */}
+          {/* input group */}
           <text
             x="120"
-            y={y + 4}
+            y={encoder ? y + 4 : y}
             textAnchor="end"
             fontSize="14"
             fill="var(--ink)"
           >
             {label}
           </text>
-          {/* input → encoder */}
-          <line
-            x1="130"
-            y1={y}
-            x2="162"
-            y2={y}
-            stroke="var(--ink-faint)"
-            markerEnd="url(#arr-npp)"
-          />
-          {/* per-modality LSTM encoder */}
-          <rect
-            x="170"
-            y={y - 20}
-            width="150"
-            height="40"
-            rx="4"
-            fill="var(--paper-sunken)"
-            stroke="var(--line-strong)"
-          />
           <text
-            x="245"
-            y={y + 4}
-            textAnchor="middle"
-            fontSize="14"
-            fill="var(--ink)"
+            x="120"
+            y={encoder ? y + 20 : y + 16}
+            textAnchor="end"
+            fontSize="11"
+            fill="var(--ink-faint)"
           >
-            LSTM encoder
+            {detail}
           </text>
-          {/* encoder → fusion */}
-          <line
-            x1="320"
-            y1={y}
-            x2="392"
-            y2={FUSION_Y[i]}
-            stroke="var(--ink-faint)"
-            markerEnd="url(#arr-npp)"
-          />
+          {encoder ? (
+            <>
+              {/* input → encoder */}
+              <line
+                x1="130"
+                y1={y}
+                x2="162"
+                y2={y}
+                stroke="var(--ink-faint)"
+                markerEnd="url(#arr-npp)"
+              />
+              <rect
+                x="170"
+                y={y - 20}
+                width="150"
+                height="40"
+                rx="4"
+                fill="var(--paper-sunken)"
+                stroke="var(--line-strong)"
+              />
+              <text
+                x="245"
+                y={y + 4}
+                textAnchor="middle"
+                fontSize="14"
+                fill="var(--ink)"
+              >
+                LSTM encoder
+              </text>
+              {/* encoder → fusion */}
+              <line
+                x1="320"
+                y1={y}
+                x2="392"
+                y2={FUSION_Y[i]}
+                stroke="var(--ink-faint)"
+                markerEnd="url(#arr-npp)"
+              />
+            </>
+          ) : (
+            /* Static input: no encoder, straight into the fusion block. */
+            <>
+              <line
+                x1="130"
+                y1={y}
+                x2="392"
+                y2={FUSION_Y[i]}
+                stroke="var(--ink-faint)"
+                strokeDasharray="4 3"
+                markerEnd="url(#arr-npp)"
+              />
+              <text
+                x="245"
+                y={y - 8}
+                textAnchor="middle"
+                fontSize="11"
+                fontStyle="italic"
+                fill="var(--ink-faint)"
+              >
+                no encoder
+              </text>
+            </>
+          )}
         </g>
       ))}
 
@@ -140,7 +181,7 @@ export function NppArchitectureDiagram() {
         fontWeight="600"
         fill="var(--accent)"
       >
-        NPP
+        Biomass
       </text>
       <text
         x="612"
@@ -149,7 +190,7 @@ export function NppArchitectureDiagram() {
         fontSize="12"
         fill="var(--accent)"
       >
-        prediction
+        or its change
       </text>
     </svg>
   );

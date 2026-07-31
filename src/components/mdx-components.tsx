@@ -7,6 +7,7 @@ import type { MDXComponents } from "mdx/types";
 import Link from "next/link";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { NppArchitectureDiagram } from "./figures/NppArchitectureDiagram";
+import { NppResultsTable } from "./figures/NppResultsTable";
 
 // Plain-text extraction + slug for heading anchor ids (no client JS, no deps).
 function textOf(node: ReactNode): string {
@@ -130,4 +131,5 @@ export const mdxComponents: MDXComponents = {
   // Content figures (see figures/): complex JSX lives in typechecked TSX,
   // not inline MDX, so markdown parsing can never corrupt it.
   NppArchitectureDiagram,
+  NppResultsTable,
 };
