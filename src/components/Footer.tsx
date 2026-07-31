@@ -17,15 +17,12 @@ const REPO_URL = "https://github.com/rdey08/personal-site";
 const footerLink =
   "text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent";
 
-// Hidden until the link is hovered or keyboard-focused, then it slides
-// up-and-right into place. Space is reserved at all times (opacity, not
-// display), so the reveal never reflows the row.
+// Hidden until the link is hovered or keyboard-focused, then it flies into
+// place from below-left. Motion lives in globals.css (.link-arrow), keyed off
+// the .link-external parent.
 function ExternalArrow() {
   return (
-    <span
-      aria-hidden="true"
-      className="ml-1 inline-block translate-y-0.5 -translate-x-0.5 text-accent opacity-0 transition-[opacity,transform] duration-[--duration-fast] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
-    >
+    <span aria-hidden="true" className="link-arrow ml-1 text-accent">
       ↗
     </span>
   );
@@ -55,7 +52,7 @@ export function Footer() {
               href={site.links.github}
               target="_blank"
               rel="me noopener noreferrer"
-              className={`group ${footerLink}`}
+              className={`link-external ${footerLink}`}
             >
               GitHub
               <ExternalArrow />
@@ -64,7 +61,7 @@ export function Footer() {
               href={site.links.linkedin}
               target="_blank"
               rel="me noopener noreferrer"
-              className={`group ${footerLink}`}
+              className={`link-external ${footerLink}`}
             >
               LinkedIn
               <ExternalArrow />
@@ -73,7 +70,7 @@ export function Footer() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className={`group ${footerLink}`}
+              className={`link-external ${footerLink}`}
             >
               Source
               <ExternalArrow />

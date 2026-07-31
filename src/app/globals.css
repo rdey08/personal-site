@@ -254,6 +254,33 @@ h4 {
   animation-delay: 260ms;
 }
 
+/* External-link arrow (Footer contact set). Parked out of sight below-left of
+ * its slot and shrunk; hovering or keyboard-focusing the enclosing
+ * .link-external launches it diagonally up into place on the site's expo
+ * curve, so the arrow reads as motion rather than a glyph blinking on. The
+ * slot stays reserved at all times (opacity, never display), so the reveal
+ * never reflows the contact row. Reduced motion keeps the fade, drops the
+ * travel. */
+.link-arrow {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(-0.45em, 0.45em) scale(0.6);
+  transition:
+    opacity var(--duration-slow) var(--ease-out-expo),
+    transform var(--duration-slow) var(--ease-out-expo);
+}
+.link-external:hover .link-arrow,
+.link-external:focus-visible .link-arrow {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-arrow {
+    transform: none;
+    transition: opacity var(--duration-fast) linear;
+  }
+}
+
 /* Scroll reveal (Reveal client component). Base state is visible; the
  * component adds .reveal (hidden pre-enter) + .is-visible (animate in) only
  * when JS runs, so no-JS visitors see everything statically. */
