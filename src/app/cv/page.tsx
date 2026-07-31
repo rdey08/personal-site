@@ -7,6 +7,7 @@ import { Mdx } from "@/lib/mdx";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { Prose } from "@/components/Prose";
+import { Reveal } from "@/components/Reveal";
 
 export const metadata: Metadata = pageMetadata({
   title: "CV",
@@ -34,31 +35,68 @@ export default function CvPage() {
       />
 
       {pdfExists ? (
-        <>
-          <Section className="pb-5 print:hidden">
-            <a
-              href={site.cvPdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2 text-sm font-medium text-paper transition-colors duration-[--duration-fast] hover:bg-accent-strong"
-            >
-              Download PDF ↓
-            </a>
+        <Reveal>
+          <Section className="pb-20">
+            {/* The CV is presented as a print on a mat, the same plate idiom the
+              hero portrait and og-card use, rather than as a browser PDF
+              widget dropped into the page. The column is capped at the true
+              width of a Letter page (52rem, about 812px inside the mat), so
+              the sheet renders near 1:1 instead of being blown up to the full
+              measure of the site. */}
+            <div className="sd-rise mx-auto max-w-[52rem]">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 pb-4 print:hidden">
+                <p className="text-xs text-ink-faint">
+                  One page · PDF · Letter
+                </p>
+                <div className="flex items-baseline gap-6 text-sm">
+                  <a
+                    href={site.cvPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-external text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
+                  >
+                    Open in new tab
+                    <span
+                      aria-hidden="true"
+                      className="link-arrow ml-1 text-accent"
+                    >
+                      ↗
+                    </span>
+                  </a>
+                  <a
+                    href={site.cvPdf}
+                    download
+                    className="inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2 font-medium text-paper transition-colors duration-[--duration-fast] hover:bg-accent-strong"
+                  >
+                    Download PDF ↓
+                  </a>
+                </div>
+              </div>
+
+              {/* Aspect ratio comes from the page's own MediaBox (612x792pt), so
+                the whole CV is visible at once rather than clipped inside a
+                scrolling frame. toolbar=0 drops the viewer's grey chrome,
+                which the two actions above already replace. */}
+              <div className="rounded-[6px] border border-line-strong bg-paper-raised p-2.5 shadow-[var(--shadow-print)]">
+                <iframe
+                  src={`${site.cvPdf}#toolbar=0&navpanes=0&view=Fit`}
+                  title="Rupak Dey's CV (PDF)"
+                  className="aspect-[612/792] w-full rounded-[2px] border-0 bg-paper-raised"
+                />
+              </div>
+            </div>
           </Section>
-          <Section className="pb-16">
-            <iframe
-              src={site.cvPdf}
-              title="Rupak Dey's CV (PDF)"
-              className="h-[85vh] w-full rounded-md border border-line bg-paper-raised"
-            />
-          </Section>
-        </>
+        </Reveal>
       ) : (
-        <Section className="py-8">
-          <Prose>
-            <Mdx source={cv.body} />
-          </Prose>
-        </Section>
+        <Reveal>
+          <Section className="py-8">
+            <div className="sd-rise">
+              <Prose>
+                <Mdx source={cv.body} />
+              </Prose>
+            </div>
+          </Section>
+        </Reveal>
       )}
     </>
   );
