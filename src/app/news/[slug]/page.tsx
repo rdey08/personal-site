@@ -58,11 +58,19 @@ export default async function NewsItemPage({
         date={meta.date}
         path={`/news/${slug}`}
       />
+      {/* The back arrow stays visible (it reads as one unit with the label)
+          but pulls left on hover, the mirror of the forward slide above. */}
       <Link
         href="/news"
-        className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
+        className="group text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
       >
-        ← News
+        <span
+          aria-hidden="true"
+          className="inline-block transition-transform duration-[--duration-base] ease-[--ease-out-expo] group-hover:-translate-x-1"
+        >
+          ←
+        </span>{" "}
+        News
       </Link>
 
       <header className="mt-8">
@@ -88,27 +96,65 @@ export default async function NewsItemPage({
         </div>
       )}
 
+      {/* Press coverage is its own block ahead of "Related", not a trailing
+          sentence in the prose. Each outlet is a named link, so the coverage
+          is scannable and reads as a record rather than an aside. */}
+      {meta.coverage.length > 0 && (
+        <aside className="mt-10 max-w-[var(--measure)] rounded-md border border-line bg-paper-raised p-5 sm:p-6">
+          <p className="text-xs font-semibold tracking-[0.14em] text-accent uppercase">
+            Press coverage
+          </p>
+          <ul className="mt-3 divide-y divide-line">
+            {meta.coverage.map((c) => (
+              <li key={c.href} className="py-2 first:pt-0 last:pb-0">
+                <a
+                  href={c.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-external text-sm font-medium text-ink transition-colors duration-[--duration-fast] hover:text-accent"
+                >
+                  {c.outlet}
+                  <span
+                    aria-hidden="true"
+                    className="link-arrow ml-1 text-accent"
+                  >
+                    ↗
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
       {related && (
         <aside className="mt-10 max-w-[var(--measure)] rounded-md border border-line bg-paper-raised p-5 sm:p-6">
           <p className="text-xs font-semibold tracking-[0.14em] text-ink-faint uppercase">
             Related
           </p>
+          {/* Two arrow idioms, deliberately: an internal destination keeps a
+              visible arrow that slides forward (the FlagshipCard pattern),
+              while an external one uses the reveal shared with the footer,
+              press list and CV. */}
           {relatedInternal ? (
             <Link
               href={related}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
+              className="group mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
             >
               {relatedLabel}
-              <ArrowRightIcon className="h-3.5 w-3.5" />
+              <ArrowRightIcon className="h-3.5 w-3.5 transition-transform duration-[--duration-base] ease-[--ease-out-expo] group-hover:translate-x-1" />
             </Link>
           ) : (
             <a
               href={related}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
+              className="link-external mt-2 inline-flex items-baseline text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
             >
-              {relatedLabel} ↗
+              {relatedLabel}
+              <span aria-hidden="true" className="link-arrow ml-1">
+                ↗
+              </span>
             </a>
           )}
         </aside>
@@ -117,9 +163,15 @@ export default async function NewsItemPage({
       <footer className="mt-14 border-t border-line pt-8">
         <Link
           href="/news"
-          className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
+          className="group text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
         >
-          ← Back to News
+          <span
+            aria-hidden="true"
+            className="inline-block transition-transform duration-[--duration-base] ease-[--ease-out-expo] group-hover:-translate-x-1"
+          >
+            ←
+          </span>{" "}
+          Back to News
         </Link>
       </footer>
     </Section>

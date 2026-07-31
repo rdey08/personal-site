@@ -32,11 +32,25 @@ export function NewsList({
           >
             {dateLabel(meta.date)}
           </time>
-          <p className="leading-relaxed text-pretty text-ink">
-            <Link href={`/news/${meta.slug}`} className={linkClass}>
-              {meta.text}
-            </Link>
-          </p>
+          <div>
+            <p className="leading-relaxed text-pretty text-ink">
+              <Link href={`/news/${meta.slug}`} className={linkClass}>
+                {meta.text}
+              </Link>
+            </p>
+            {/* Press sits on the row itself, not just on the item page: the
+                outlets are the part a visitor scanning the list would most
+                want to see, and they were previously invisible until you
+                clicked through. Outlet names only, so the row stays a row. */}
+            {meta.coverage.length > 0 && (
+              <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-xs text-ink-faint">
+                <span className="font-semibold tracking-[0.14em] text-accent uppercase">
+                  Press
+                </span>
+                <span>{meta.coverage.map((c) => c.outlet).join(" · ")}</span>
+              </p>
+            )}
+          </div>
         </li>
       ))}
     </ul>

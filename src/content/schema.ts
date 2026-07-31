@@ -106,5 +106,16 @@ export const newsItemSchema = z.object({
   text: z.string().min(1),
   href: z.string().min(1).optional(), // related resource: internal path or external URL
   linkLabel: z.string().min(1).optional(), // label for the related link
+  // Press that covered the item. Structured rather than prose so the outlets
+  // can surface on the list row and as their own block on the item page,
+  // instead of hiding in a trailing sentence only click-through readers see.
+  coverage: z
+    .array(
+      z.object({
+        outlet: z.string().min(1),
+        href: z.url(),
+      }),
+    )
+    .default([]),
 });
 export type NewsItem = z.infer<typeof newsItemSchema>;
