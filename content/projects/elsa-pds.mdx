@@ -39,55 +39,9 @@ from netCDF model output, including per-variable attributes and dimensions and
 per-coordinate boundaries and units, and generates PDS4 labels against the
 published Annex data dictionary.
 
-<ScreenshotFigure
-  src="elsa-bundle-hub"
-  alt="ELSA's bundle hub: a search field, a type filter, and a row of bundle cards, each showing its name, its PDS logical identifier, an In Progress status badge, and a last-updated date."
-  caption="The bundle hub, where a scientist's work is organized: search, filter by bundle type, and per-bundle status."
-  width="1280"
-  height="629"
-/>
-
-## What I built
-
-- **Atmospheric Modeling Annex (frontend lead).** Led the frontend for a new
-  PDS service for planetary **model output**, building most of the
-  bundle-building interface and co-authoring the netCDF metadata extraction
-  pipeline behind it.
-- **AI Assistant (beta) and Guided Bundle Creation.** Built ELSA's in-app
-  **AI Assistant**: a retrieval layer over a curated PDS4 knowledge base, a
-  multi-model fallback chain, streaming responses, an evaluation suite, and a
-  CI gate that fails the build when ELSA's code drifts ahead of the
-  documentation the assistant answers from. Also built ELSA's **Guided Bundle
-  Creation** flow.
-- **Authentication.** Implemented **email-based two-factor authentication**
-  for sign-in, and integrated **reCAPTCHA** on public forms.
-- **Interface rebuild.** Rebuilt ELSA's primary bundle-building and bundle-hub
-  interfaces on **Bootstrap 5**, adding responsive layouts, client-side search
-  and filtering, and bundle status tracking.
-
-<ScreenshotFigure
-  src="elsa-ama-netcdf"
-  alt="An Annex bundle in ELSA: a model output collection with a netCDF upload panel, and an uploaded file marked Processed after ELSA extracted its metadata."
-  caption="An Annex bundle's model-output collection. Uploaded netCDF files are marked Processed once ELSA has read their variables, dimensions, and coordinate boundaries into the PDS4 label."
-  width="1280"
-  height="629"
-/>
-
-<ScreenshotFigure
-  src="elsa-assistant"
-  alt="ELSA's in-app AI Assistant answering a question about what belongs in PDS4 Citation Information, with a structured breakdown of author list, editor list, publication year, DOI, keywords, description, and funding acknowledgement."
-  caption="The in-app assistant, answering from a curated PDS4 knowledge base rather than from the model's general training."
-  width="1280"
-  height="628"
-/>
-
-ELSA is built by a team at the PDS Atmospheres Node. The Annex netCDF pipeline
-was co-authored with Said Ajo-Montaño, and the Annex walkthrough was extended
-by Nicholas Miller.
-
-<figure>
+<figure className="figure-wide my-10">
   <ElsaPipelineDiagram />
-  <figcaption>
+  <figcaption className="mt-3 max-w-[var(--measure)] text-sm text-ink-muted">
     Pipeline sketch: ELSA sits between scientists&rsquo; datasets and the
     archive, turning data that would need hand-written metadata into
     submission-ready PDS4 labels, now including atmospheric models via the
@@ -97,8 +51,63 @@ by Nicholas Miller.
   </figcaption>
 </figure>
 
+## What I built
+
+### Interface rebuild
+
+Rebuilt ELSA's primary bundle-building and bundle-hub interfaces on
+**Bootstrap 5**, adding responsive layouts, client-side search and filtering,
+and bundle status tracking.
+
+<ScreenshotFigure
+  src="elsa-pds/bundle-hub"
+  alt="ELSA's bundle hub: a search field, a type filter, and a row of bundle cards, each showing its name, its PDS logical identifier, an In Progress status badge, and a last-updated date."
+  caption="The bundle hub, where a scientist's work is organized: search, filter by bundle type, and per-bundle status."
+  width="1280"
+  height="629"
+/>
+
+### Atmospheric Modeling Annex (frontend lead)
+
+Led the frontend for a new PDS service for planetary **model output**, building
+most of the bundle-building interface and co-authoring the netCDF metadata
+extraction pipeline behind it.
+
+<ScreenshotFigure
+  src="elsa-pds/ama-netcdf"
+  alt="An Annex bundle in ELSA: a model output collection with a netCDF upload panel, and an uploaded file marked Processed after ELSA extracted its metadata."
+  caption="An Annex bundle's model-output collection. Uploaded netCDF files are marked Processed once ELSA has read their variables, dimensions, and coordinate boundaries into the PDS4 label."
+  width="1280"
+  height="629"
+/>
+
+### AI Assistant (beta) and Guided Bundle Creation
+
+Built ELSA's in-app **AI Assistant**: a retrieval layer over a curated PDS4
+knowledge base, a multi-model fallback chain, streaming responses, an
+evaluation suite, and a CI gate that fails the build when ELSA's code drifts
+ahead of the documentation the assistant answers from. Also built ELSA's
+**Guided Bundle Creation** flow.
+
+<ScreenshotFigure
+  src="elsa-pds/assistant"
+  alt="ELSA's in-app AI Assistant answering a question about what belongs in PDS4 Citation Information, with a structured breakdown of author list, editor list, publication year, DOI, keywords, description, and funding acknowledgement."
+  caption="The in-app assistant, answering from a curated PDS4 knowledge base rather than from the model's general training."
+  width="1280"
+  height="628"
+/>
+
+### Authentication
+
+Implemented **email-based two-factor authentication** for sign-in, and
+integrated **reCAPTCHA** on public forms.
+
 ## Impact
 
 ELSA lets scientists produce submission-ready PDS4 metadata for large datasets
 that would otherwise be prohibitively tedious to prepare, and the Atmospheric
 Modeling Annex extends the node's archive to a new data type.
+
+ELSA is built by a team at the PDS Atmospheres Node. The Annex netCDF pipeline
+was co-authored with Said Ajo-Montaño, and the Annex walkthrough was extended
+by Nicholas Miller.
