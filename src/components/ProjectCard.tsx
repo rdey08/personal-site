@@ -22,7 +22,7 @@ export function ProjectCard({
 
   return (
     <div
-      className={`relative rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] sm:p-7 ${
+      className={`relative flex flex-col rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] sm:p-7 ${
         href
           ? "group hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] hover:bg-paper-raised-hover hover:shadow-[var(--shadow-card-hover)]"
           : ""
@@ -35,8 +35,10 @@ export function ProjectCard({
       )}
       {/* Two groups, so a full-width card can lay them side by side (see
           .card-grid in globals.css). In a normal two-up cell .card-split is a
-          plain block and this is the same vertical stack as before. */}
-      <div className="card-split">
+          column that absorbs the row's spare height; the spotlight rule
+          overrides display to grid, where flex-1 still applies but the
+          bottom-anchoring below goes inert because the columns are centred. */}
+      <div className="card-split flex flex-1 flex-col">
         <div>
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <h3 className="font-serif text-2xl font-medium tracking-tight text-balance text-ink-strong">
@@ -68,14 +70,20 @@ export function ProjectCard({
             <p className="mt-1 text-sm text-ink-faint">{project.context}</p>
           )}
         </div>
-        <div>
+        <div className="flex flex-1 flex-col">
           {/* Capped so a wide card keeps a readable line length instead of
               stretching edge to edge. No effect in a two-up cell, which is
               already narrower than this. */}
           <p className="mt-3 max-w-[var(--measure)] leading-relaxed text-pretty text-ink">
             {project.summary}
           </p>
-          <div className="mt-5">
+          {/* Anchored to the bottom rather than trailing the summary. Cards in
+              a row are stretched to the tallest, so a shorter one used to end
+              its content early and leave the remainder blank. Sending the
+              slack above the chips instead lines the footers up across the
+              row. mt-auto collapses to zero when there is no slack, so pt-5
+              carries the spacing that mt-5 used to. */}
+          <div className="mt-auto pt-5">
             <MetaChips items={project.stack} label="Stack" />
           </div>
         </div>
@@ -109,7 +117,7 @@ export function ProjectCard({
           title's stretched ::after already covers the card, and a second
           anchor to the same page would just add a duplicate tab stop. */}
       {href && (
-        <p className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+        <p className="mt-5 inline-flex items-center gap-1.5 self-start text-sm font-medium text-accent">
           Read the write-up
           <ArrowRightIcon className="h-3.5 w-3.5 transition-transform duration-[--duration-fast] group-hover:translate-x-0.5" />
         </p>
