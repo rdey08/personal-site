@@ -3,17 +3,100 @@ title: pantry.ai
 slug: pantry-ai
 period: { start: "2026-04", end: "2026-04" }
 summary:
-  PWA using Gemini Vision to identify pantry items, estimate expiry dates,
-  and suggest recipes before items expire.
-stack: [Next.js, TypeScript, SQLite, Google Gemini API]
+  Installable PWA that reads a pantry from a photograph, tracks what is about
+  to expire, and plans meals around it. Team build; I owned meal planning and
+  the shopping list engine.
+stack:
+  [Next.js, TypeScript, SQLite, "Drizzle ORM", "Google Gemini API", "ZXing"]
 award: 1st Place, Desert Dev Lab Hackathon
-context: Built at a hackathon
+role: Meal planning and shopping list; co-built the kitchen wall UI
+context: Built at a hackathon, with Christopher Meraz and Antonio Luna
+links: { github: "https://github.com/christufur/PantryAI" }
+detail: true
 tier: project
 order: 1
 featured: true
 ---
 
-Built at the Desert Dev Lab hackathon: a progressive web app that uses Gemini
-Vision to identify pantry items, estimate expiry dates, and suggest recipes
-before food goes to waste. It promotes local produce, generates personalized
-meal plans, and tracks food waste to encourage sustainability.
+## Context
+
+Food gets thrown out because nobody remembers what is at the back of the
+fridge. **pantry.ai** reads a pantry from a photograph, works out what is
+closest to expiring, and plans meals around what needs using first.
+
+It was built over a weekend at the Desert Dev Lab Hackathon with Christopher
+Meraz and Antonio Luna, and took first place out of 27 teams statewide: about
+twelve thousand lines across thirteen screens and sixteen API routes, in
+roughly forty-eight hours. That constraint shaped every decision below.
+
+Two design choices are worth naming because they resist the obvious approach.
+Expiry dates are **hybrid**: the vision model reads a printed use-by date when
+it can find one, and otherwise the app falls back to a fifty-nine row
+shelf-life table keyed by category and storage location. The model is used
+only where it beats a lookup. And the local-produce feature is backed by real
+data rather than a placeholder, seventy-seven curated New Mexico producer
+swaps across forty-three producers, which Christopher built.
+
+<ScreenshotFigure
+  src="pantry-ai/expiry-column"
+  alt="The expiry column: eleven pantry items plotted by days remaining, from an expired bag of spinach and green chile at two days, down through eggs at thirteen days to dry beans at three hundred and sixty-four and rice at five hundred and thirty-nine."
+  caption="Everything in the pantry ranked by days left. The short end comes from dates the vision model read off packaging; the long tail is the shelf-life table doing the work no photograph could."
+  width="1280"
+  height="889"
+/>
+
+## What I built
+
+I owned meal planning and the shopping list, and co-built the kitchen wall,
+the app's main screen. The vision pipeline, barcode scanning, recipe
+generation and the impact dashboard were my teammates' work.
+
+### Meal planning
+
+The planner takes what is in the pantry, weights it toward whatever is about
+to expire, and generates a plan against a stored profile, so the suggestions
+respond to the person as well as to the shelf. I wrote the planner prompts and
+the routes behind them, about seventy percent of that subsystem.
+
+<ScreenshotFigure
+  src="pantry-ai/week-plan"
+  alt="A generated seven-day meal plan. Two items are flagged as expiring soon, spinach and hatch green chile, and both recur through the week's meals: a spinach and bean salad bowl, green chile egg scramble, and green chile bolita bean stew."
+  caption="A generated week. The two items flagged as expiring, spinach and hatch green chile, are the ones the plan keeps reaching for."
+  width="1280"
+  height="791"
+/>
+
+### The shopping list reconciler
+
+This is the part I would point at. The planner prompt asks Gemini to subtract
+what the pantry already holds before listing what to buy. It does not reliably
+do that, so the shopping list is reconciled again in plain code: strip the
+twenty-eight cosmetic words that stop two ingredients matching ("fresh",
+"organic", "boneless"), singularize, compare head nouns, subtract what is
+already on the shelf.
+
+The detail that matters is what it refuses to do. It only subtracts when the
+units match exactly, and leaves a mismatch alone rather than guessing that
+ounces convert cleanly into pounds. Under-correcting is recoverable; a
+confidently wrong quantity sends someone to the shop for something they
+already have.
+
+<ScreenshotFigure
+  src="pantry-ai/shopping-list"
+  alt="The generated shopping list, grouped into produce, pantry and other, with a quantity beside each item: four cups of vegetable broth, two count of cucumber, a quarter cup of soy sauce."
+  caption="What survives reconciliation: eleven items, each with a unit. Those units are the whole problem, since cups and counts and cans do not subtract from one another."
+  width="1280"
+  height="844"
+/>
+
+## What this shows
+
+The reconciler is the whole argument in miniature: a language model is good at
+proposing a plan and unreliable at arithmetic, so let it draft and then check
+the parts that have a right answer. The same instinct shows up in the hybrid
+expiry design, where the model is used for the one thing a lookup table cannot
+do, and nowhere else.
+
+Worth stating plainly: the vision step was never benchmarked. There is no
+accuracy figure here because nobody measured one in forty-eight hours, and
+inventing one would be worse than leaving it out.

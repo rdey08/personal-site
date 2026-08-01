@@ -19,5 +19,5 @@ coverage:
 pantry.ai took 1st place among 27 teams statewide at the 2026 Desert Dev Lab
 Hackathon in Albuquerque, held April 18-19. Our team, Crimson Devs (with
 Christopher Meraz and Antonio Luna), built an AI application that photographs
-a pantry, identifies items with Gemini Vision, estimates expiration dates,
-and pairs alerts with recipe suggestions to cut household food waste.
+a pantry, identifies items with Gemini Vision, works out what is closest to
+expiring, and plans meals around it to cut household food waste.

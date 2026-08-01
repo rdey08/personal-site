@@ -2,15 +2,82 @@
 title: Airbnb Price Prediction & Feature Analysis
 slug: airbnb-knn
 period: { start: "2025-08", end: "2025-11" }
-summary: KNN regression for Airbnb price prediction, with Decision-Tree feature
-  selection identifying the ten most predictive features.
-stack: [Python, Pandas, Scikit-learn]
-context: Class project
+summary: Five regressors compared on 232,000 US Airbnb listings, with
+  decision-tree feature selection cutting 1,475 columns down to the ten that
+  carry 83% of the signal.
+stack: [Python, Pandas, Scikit-learn, Matplotlib]
+context: Team project, Introduction to Data Mining
+detail: true
 tier: project
 order: 2
 featured: true
 ---
 
-Optimized a KNN regression model by using a Decision Tree to identify and
-select the top ten predictive features. Applied StandardScaler to normalize
-inputs and validated the final model using MAE and R² scores.
+## Context
+
+Nightly price is a continuous target, so this is a regression problem rather
+than the classification the course spent most of its time on. The data is a
+2023 snapshot of US Airbnb listings: 232,147 rows carrying location, room type,
+review history and availability. The listing title is the only free text in it,
+and it was dropped as an identifier, so nothing in the feature set describes the
+property itself beyond its room type and its coordinates. That fact turns out
+to set the ceiling on everything below.
+
+Cleaning cost 19,509 rows. Prices sit in a long right tail, and an
+interquartile-range filter cut everything more than 1.5 IQR outside the
+quartiles, about 8% of the listings. Worth being clear about the trade: it
+stops a handful of thousand-dollar listings dominating the error term, and it
+means the models are trained on ordinary listings and say nothing about the
+luxury end, which is the segment where a price prediction would be worth the
+most money.
+
+## Selecting features
+
+One-hot encoding every categorical column turned twelve predictors into 1,475,
+almost all of them neighbourhood and city indicators. A decision-tree regressor
+fit on the training split then ranked them by importance.
+
+<AirbnbFeatureImportance />
+
+The shape of that ranking is worth reading. Room type is the single strongest
+predictor, but latitude and longitude together outweigh it. Everything after
+that is host behaviour rather than property: how much of the year the place is
+available, how fast reviews accumulate, how many other listings the same host
+runs.
+
+There is a trade buried in it. Location clearly matters, yet the columns that
+encode location precisely, the neighbourhood indicators, each score close to
+zero, because the signal is spread across roughly 1,460 sparse columns that
+individually cover a handful of listings. Keeping the top ten therefore keeps
+location as two raw coordinates and throws the fine-grained version away. That
+is a plausible reading of where the ceiling comes from, not a measured one: the
+ablation that would settle it was not run.
+
+## Comparing models
+
+Five regressors, the same held-out split, the same ten features.
+
+<AirbnbModelTable />
+
+The random forest wins on both metrics, which is the expected result once you
+know latitude and longitude are doing the heavy lifting, since an ensemble of
+trees can carve a map into regions and a single tree at depth 10 cannot.
+K-nearest neighbours, standard-scaled because a distance metric over raw
+coordinates and review counts is meaningless, lands third.
+
+Linear regression is last, and its training and test scores are almost
+identical, 0.216 against 0.214. That gap matters more than the value: the model
+is not overfitting, it is underfitting, and a straight line is simply the wrong
+shape for this data. Support vector regression is the more interesting failure.
+It posts a better MAE than KNN but a worse R², so it is more accurate on
+typical listings and worse on the extremes, which is what an RBF kernel does
+when it smooths toward the mean.
+
+## What this shows
+
+The best model explains 44% of the variance in nightly price. That is a real
+result rather than a disappointing one, and the reason sits in the data rather
+than in the models: what a listing costs depends on the property, and the only
+columns describing the property are room type and a pair of coordinates.
+Square footage, amenities, photographs and review text carry the rest, and none
+of them are in this dataset. Trying a sixth algorithm would not have moved it.
