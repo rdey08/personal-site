@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { pageMetadata } from "@/lib/site";
-import { getProject, getProjects, getResearchThreads } from "@/lib/content";
+import {
+  getProject,
+  getProjectsWithPages,
+  getResearchThreads,
+  projectHasPage,
+} from "@/lib/content";
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
 import { ArticleJsonLd } from "@/components/ArticleJsonLd";
 
-// Detail pages exist only for flagship-tier projects (PLAN §3).
+// Detail pages exist for flagship work and for any project that has opted in
+// (see projectHasPage). Gated on the content being worth the click, not on
+// tier, so pages appear as each project's write-up is finished.
 export function generateStaticParams() {
-  return getProjects()
-    .filter((p) => p.meta.tier === "flagship")
-    .map((p) => ({ slug: p.meta.slug }));
+  return getProjectsWithPages().map((p) => ({ slug: p.meta.slug }));
 }
 
 export async function generateMetadata({
@@ -29,6 +34,29 @@ export async function generateMetadata({
   });
 }
 
+/** A metadata row pointing off-site, or nothing when there is no such link. */
+function externalRow(label: string, url?: string) {
+  if (!url) return [];
+  return [
+    {
+      label,
+      value: (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="link-external text-ink transition-colors duration-[--duration-fast] hover:text-accent"
+        >
+          {url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+          <span aria-hidden="true" className="link-arrow ml-1 text-accent">
+            ↗
+          </span>
+        </a>
+      ),
+    },
+  ];
+}
+
 export default async function ProjectPage({
   params,
 }: {
@@ -36,21 +64,23 @@ export default async function ProjectPage({
 }) {
   const { slug } = await params;
   const project = getProject(slug);
-  if (!project || project.meta.tier !== "flagship") notFound();
+  if (!project || !projectHasPage(project.meta)) notFound();
 
   const { meta, body } = project;
 
-  // Onward link: another flagship project if one exists, else the featured
-  // research thread; the reader flows between the two flagships.
-  const otherFlagship = getProjects().find(
-    (p) => p.meta.tier === "flagship" && p.meta.slug !== slug,
-  );
+  // Onward link: the next project that has a page, wrapping at the end, so a
+  // reader can walk the whole set instead of dead-ending. Falls back to the
+  // featured research thread when this is the only project page.
+  const withPages = getProjectsWithPages();
+  const here = withPages.findIndex((p) => p.meta.slug === slug);
+  const following =
+    withPages.length > 1 ? withPages[(here + 1) % withPages.length] : undefined;
   const featuredThread = getResearchThreads().find((t) => t.meta.featured);
-  const next = otherFlagship
+  const next = following
     ? {
-        href: `/projects/${otherFlagship.meta.slug}`,
-        eyebrow: "Engineering",
-        title: otherFlagship.meta.title,
+        href: `/projects/${following.meta.slug}`,
+        eyebrow: following.meta.tier === "flagship" ? "Engineering" : "Project",
+        title: following.meta.title,
       }
     : featuredThread
       ? {
@@ -66,32 +96,14 @@ export default async function ProjectPage({
       label: "Period",
       value: formatPeriod({ start: meta.period.start, end: meta.period.end }),
     },
-    // The running application, when there is one to point at. Shown as the
-    // host and path rather than the bare URL, and it reuses the site-wide
-    // external-link arrow.
-    ...(meta.links?.demo
-      ? [
-          {
-            label: "Live site",
-            value: (
-              <a
-                href={meta.links.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-external text-ink transition-colors duration-[--duration-fast] hover:text-accent"
-              >
-                {meta.links.demo.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                <span
-                  aria-hidden="true"
-                  className="link-arrow ml-1 text-accent"
-                >
-                  ↗
-                </span>
-              </a>
-            ),
-          },
-        ]
-      : []),
+    // The award was rendering on the card but not here, so the page dedicated
+    // to a project was the one place its headline credential was missing.
+    ...(meta.award ? [{ label: "Award", value: meta.award }] : []),
+    // External destinations. Shown as host and path rather than a bare URL,
+    // reusing the site-wide external-link arrow. The repository was reachable
+    // from the card but not from the page, which is backwards.
+    ...externalRow("Live site", meta.links?.demo),
+    ...externalRow("Repository", meta.links?.github),
   ];
 
   return (

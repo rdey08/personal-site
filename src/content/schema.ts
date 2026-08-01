@@ -88,6 +88,12 @@ export const projectSchema = z.object({
   tier: z.enum(["flagship", "project", "leadership"]),
   order: z.number().int().nonnegative(),
   featured: z.boolean(),
+  // Opt a project into its own page at /projects/<slug>. Flagship work always
+  // has one; every other project gets one as soon as its body is worth the
+  // click. Left false while the body is still a couple of sentences, because
+  // a page that says less than the card is worse than no link at all. Set it
+  // in the same change that writes the real body.
+  detail: z.boolean().default(false),
 });
 export type Project = z.infer<typeof projectSchema>;
 

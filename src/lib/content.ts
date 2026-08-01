@@ -118,6 +118,24 @@ export function getProject(slug: string): Entry<Project> | undefined {
   return getProjects().find((p) => p.meta.slug === slug);
 }
 
+/**
+ * Whether a project has its own page at /projects/<slug>. Single source of
+ * truth: the route, its OG image, the sitemap and every card that decides
+ * whether to link all ask this, so a project can never be linked to a page
+ * that was not generated (or generated without being linked).
+ *
+ * Leadership entries never get one; they live as rows on /leadership.
+ */
+export function projectHasPage(meta: Project): boolean {
+  if (meta.tier === "leadership") return false;
+  return meta.tier === "flagship" || meta.detail;
+}
+
+/** Projects with their own page, in display order. */
+export function getProjectsWithPages(): Entry<Project>[] {
+  return getProjects().filter((p) => projectHasPage(p.meta));
+}
+
 export function getNews(): Entry<NewsItem>[] {
   const items = loadDir(newsItemSchema, "news").sort((a, b) =>
     b.meta.date.localeCompare(a.meta.date),

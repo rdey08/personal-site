@@ -281,6 +281,71 @@ h4 {
   }
 }
 
+/* Two-column card grids with an odd number of cards leave a hole on the last
+ * row, which reads as a layout bug rather than as breathing room. The FIRST
+ * card takes the full row instead, and the even remainder fills the rows
+ * below it: the hole disappears and the weight lands on the lead item rather
+ * than on whatever happened to sort last. Cards are ordered by the `order`
+ * field, so the spotlight is editorial, not accidental.
+ *
+ * nth-last-child(odd) on the first child is the parity test: it matches only
+ * when the total count is odd, which is exactly when a hole would appear. At
+ * an even count nothing spans, because nothing needs to.
+ *
+ * A wide card gets a 2fr/3fr internal split (the FlagshipCard rhythm) so the
+ * extra width carries a layout instead of stretching one column of text. */
+@media (min-width: 640px) {
+  .card-grid > *:first-child:nth-last-child(odd) {
+    grid-column: 1 / -1;
+    /* Two columns halve the card's height, which would leave the spotlight as
+     * the SHORTEST card in the section and invert the hierarchy it exists to
+     * create. These projects carry a two-line summary, so the height has to
+     * come from type and spacing rather than from content. */
+    padding: 2.25rem;
+  }
+  .card-grid > *:first-child:nth-last-child(odd) h3 {
+    font-size: var(--text-3xl);
+  }
+  .card-grid > *:first-child:nth-last-child(odd) .card-split {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 2.5rem;
+    align-items: center;
+  }
+  .card-grid
+    > *:first-child:nth-last-child(odd)
+    .card-split
+    > *
+    > :first-child {
+    margin-top: 0;
+  }
+}
+@media (min-width: 1024px) {
+  .card-grid > *:first-child:nth-last-child(odd) {
+    padding: 2.75rem;
+  }
+}
+
+/* Figures break out of the prose measure. Body text stays at 68ch because
+ * that is what reads well, but a 1280px interface capture squeezed into that
+ * column is unreadable. Prose sits left-aligned inside a wider Section, so a
+ * figure can take the slack on the right without overflowing the page; the
+ * min() against the viewport keeps it inside the Section's padding at every
+ * width. Captions stay at the measure, since they are prose. */
+.figure-wide {
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .figure-wide {
+    width: min(52rem, calc(100vw - 3rem));
+  }
+}
+@media (min-width: 1024px) {
+  .figure-wide {
+    width: min(60rem, calc(100vw - 4rem));
+  }
+}
+
 /* UI screenshots (ScreenshotFigure). The captured interfaces are light-only,
  * so an unmodified capture glares against the dark theme. Knocking back
  * brightness and contrast a little settles it into the page; hovering returns

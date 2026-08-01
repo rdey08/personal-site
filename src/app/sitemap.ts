@@ -1,5 +1,9 @@
 import type { MetadataRoute } from "next";
-import { getNews, getProjects, getResearchThreads } from "@/lib/content";
+import {
+  getNews,
+  getProjectsWithPages,
+  getResearchThreads,
+} from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -26,12 +30,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: buildDate,
   }));
 
-  const flagship: MetadataRoute.Sitemap = getProjects()
-    .filter((p) => p.meta.tier === "flagship")
-    .map((p) => ({
+  const projectPages: MetadataRoute.Sitemap = getProjectsWithPages().map(
+    (p) => ({
       url: `${SITE_URL}/projects/${p.meta.slug}`,
       lastModified: buildDate,
-    }));
+    }),
+  );
 
   // News permalinks carry their true publication date.
   const newsRoutes: MetadataRoute.Sitemap = news.map((n) => ({
@@ -39,5 +43,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(`${n.meta.date}T12:00:00Z`),
   }));
 
-  return [...staticRoutes, ...research, ...flagship, ...newsRoutes];
+  return [...staticRoutes, ...research, ...projectPages, ...newsRoutes];
 }

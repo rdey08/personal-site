@@ -49,7 +49,7 @@ export function ScreenshotFigure({
   }
   const wide = `/images/${src}-1920.webp`;
   return (
-    <figure className="my-8">
+    <figure className="figure-wide my-10">
       {/* Opens the full-resolution capture in a new tab: readable detail with
           no lightbox, no JavaScript, and it degrades to a plain link. */}
       <a
@@ -75,7 +75,7 @@ export function ScreenshotFigure({
         />
       </a>
       {caption && (
-        <figcaption className="mt-2 text-sm text-ink-muted">
+        <figcaption className="mt-3 max-w-[var(--measure)] text-sm text-ink-muted">
           {caption}
         </figcaption>
       )}

@@ -205,7 +205,7 @@ export default function Home() {
                 </Link>
               }
             />
-            <div className="sd-cards grid gap-5 sm:grid-cols-2">
+            <div className="sd-cards card-grid grid gap-5 sm:grid-cols-2">
               {featuredProjects.map((p) => (
                 <ProjectCard key={p.meta.slug} project={p.meta} />
               ))}

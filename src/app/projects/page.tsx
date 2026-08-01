@@ -51,7 +51,7 @@ export default function ProjectsPage() {
         <Reveal>
           <Section className="py-8">
             <SectionHeading title="Hackathons & Coursework" />
-            <div className="sd-cards grid gap-5 sm:grid-cols-2">
+            <div className="sd-cards card-grid grid gap-5 sm:grid-cols-2">
               {regular.map((p) => (
                 <ProjectCard key={p.meta.slug} project={p.meta} />
               ))}

@@ -10,6 +10,10 @@ export function formatPeriod(p: {
   start: string;
   end?: string | "present";
 }): string {
+  const start = formatMonth(p.start);
   const end = p.end ? formatMonth(p.end) : "Present";
-  return `${formatMonth(p.start)} – ${end}`;
+  // Work that began and ended in one month is a month, not a range: a
+  // hackathon build should read "Apr 2026", not "Apr 2026 - Apr 2026".
+  if (start === end) return start;
+  return `${start} – ${end}`;
 }
