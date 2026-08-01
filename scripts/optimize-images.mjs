@@ -6,14 +6,22 @@
 // <basename>-640.webp / <basename>-1280.webp. sharp strips metadata by
 // default, so the committed copies are EXIF-free. Existing outputs are
 // skipped; delete them to regenerate.
+//
+// UI screenshots go in assets-src/screenshots/ instead, and are rendered at
+// 1280w and 1920w: 640 is useless for reading interface detail, and a
+// screenshot shown at the full measure needs the 2x variant to stay crisp.
+// Same destination and naming, so <ScreenshotFigure> can build its srcset
+// from the basename alone.
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
 const SRC = "assets-src";
+const SHOTS = path.join(SRC, "screenshots");
 const OUT = path.join("public", "images");
-const WIDTHS = [640, 1280];
+const PHOTO_WIDTHS = [640, 1280];
+const SCREENSHOT_WIDTHS = [1280, 1920];
 const EXTS = new Set([".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]);
 
 if (!fs.existsSync(SRC)) {
@@ -23,31 +31,46 @@ if (!fs.existsSync(SRC)) {
 fs.mkdirSync(OUT, { recursive: true });
 
 let made = 0;
-for (const file of fs.readdirSync(SRC)) {
-  const ext = path.extname(file).toLowerCase();
-  if (!EXTS.has(ext)) continue;
-  const base = path.basename(file, path.extname(file));
-  for (const w of WIDTHS) {
-    const out = path.join(OUT, `${base}-${w}.webp`);
-    if (fs.existsSync(out)) {
-      console.log(`skip   ${out} (exists)`);
-      continue;
+
+const posix = (p) => p.split(path.sep).join("/");
+
+function render(dir, widths) {
+  if (!fs.existsSync(dir)) return;
+  for (const file of fs.readdirSync(dir)) {
+    const full = path.join(dir, file);
+    if (fs.statSync(full).isDirectory()) continue;
+    const ext = path.extname(file).toLowerCase();
+    if (!EXTS.has(ext)) continue;
+    const base = path.basename(file, path.extname(file));
+    for (const w of widths) {
+      const out = path.join(OUT, `${base}-${w}.webp`);
+      if (fs.existsSync(out)) {
+        console.log(`skip   ${out} (exists)`);
+        continue;
+      }
+      // sharp-cli reads --input as a glob, where a backslash is an escape
+      // character, so Windows separators silently match nothing ("No input
+      // files"). Hand it POSIX separators on every platform.
+      execFileSync(
+        "npx",
+        [
+          "--yes",
+          "sharp-cli",
+          "--input",
+          posix(full),
+          "--output",
+          posix(out),
+          "resize",
+          String(w),
+        ],
+        { stdio: "inherit", shell: process.platform === "win32" },
+      );
+      made++;
     }
-    execFileSync(
-      "npx",
-      [
-        "--yes",
-        "sharp-cli",
-        "--input",
-        path.join(SRC, file),
-        "--output",
-        out,
-        "resize",
-        String(w),
-      ],
-      { stdio: "inherit", shell: process.platform === "win32" },
-    );
-    made++;
   }
 }
+
+render(SRC, PHOTO_WIDTHS);
+render(SHOTS, SCREENSHOT_WIDTHS);
+
 console.log(made ? `done — ${made} file(s) written.` : "done — nothing new.");

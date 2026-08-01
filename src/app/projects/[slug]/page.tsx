@@ -66,6 +66,32 @@ export default async function ProjectPage({
       label: "Period",
       value: formatPeriod({ start: meta.period.start, end: meta.period.end }),
     },
+    // The running application, when there is one to point at. Shown as the
+    // host and path rather than the bare URL, and it reuses the site-wide
+    // external-link arrow.
+    ...(meta.links?.demo
+      ? [
+          {
+            label: "Live site",
+            value: (
+              <a
+                href={meta.links.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-external text-ink transition-colors duration-[--duration-fast] hover:text-accent"
+              >
+                {meta.links.demo.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                <span
+                  aria-hidden="true"
+                  className="link-arrow ml-1 text-accent"
+                >
+                  ↗
+                </span>
+              </a>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (

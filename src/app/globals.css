@@ -281,6 +281,26 @@ h4 {
   }
 }
 
+/* UI screenshots (ScreenshotFigure). The captured interfaces are light-only,
+ * so an unmodified capture glares against the dark theme. Knocking back
+ * brightness and contrast a little settles it into the page; hovering returns
+ * the true colors, so nothing is permanently misrepresented. Light theme is
+ * left untouched. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ui-shot img {
+    filter: brightness(0.86) contrast(0.96);
+  }
+}
+:root[data-theme="dark"] .ui-shot img {
+  filter: brightness(0.86) contrast(0.96);
+}
+.ui-shot img {
+  transition: filter var(--duration-base) var(--ease-out-expo);
+}
+.ui-shot:hover img {
+  filter: none;
+}
+
 /* Scroll reveal (Reveal client component). Base state is visible; the
  * component adds .reveal (hidden pre-enter) + .is-visible (animate in) only
  * when JS runs, so no-JS visitors see everything statically. */

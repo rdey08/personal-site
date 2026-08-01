@@ -8,6 +8,8 @@ import Link from "next/link";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { NppArchitectureDiagram } from "./figures/NppArchitectureDiagram";
 import { NppResultsTable } from "./figures/NppResultsTable";
+import { ElsaPipelineDiagram } from "./figures/ElsaPipelineDiagram";
+import { ScreenshotFigure } from "./figures/ScreenshotFigure";
 
 // Plain-text extraction + slug for heading anchor ids (no client JS, no deps).
 function textOf(node: ReactNode): string {
@@ -132,4 +134,6 @@ export const mdxComponents: MDXComponents = {
   // not inline MDX, so markdown parsing can never corrupt it.
   NppArchitectureDiagram,
   NppResultsTable,
+  ElsaPipelineDiagram,
+  ScreenshotFigure,
 };

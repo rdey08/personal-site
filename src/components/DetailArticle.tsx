@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Mdx } from "@/lib/mdx";
 import { Section } from "./Section";
 import { MetaChips } from "./MetaChips";
@@ -20,7 +21,9 @@ export function DetailArticle({
 }: {
   eyebrow: string;
   title: string;
-  meta: { label: string; value: string }[];
+  // `value` takes a node, not just a string, so a row can carry a link (the
+  // live-site row on a project) without needing a second prop.
+  meta: { label: string; value: ReactNode }[];
   chips?: readonly string[];
   chipsLabel?: string;
   backHref: string;
