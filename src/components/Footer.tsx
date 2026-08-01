@@ -66,6 +66,17 @@ export function Footer() {
               LinkedIn
               <ExternalArrow />
             </a>
+            {site.links.orcid && (
+              <a
+                href={site.links.orcid}
+                target="_blank"
+                rel="me noopener noreferrer"
+                className={`link-external ${footerLink}`}
+              >
+                ORCID
+                <ExternalArrow />
+              </a>
+            )}
             <a
               href={REPO_URL}
               target="_blank"

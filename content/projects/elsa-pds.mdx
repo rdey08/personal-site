@@ -3,10 +3,20 @@ title: "ELSA: Metadata Tooling for NASA's Planetary Data System"
 slug: elsa-pds
 role: Research Assistant / Software Engineer
 period: { start: "2024-05", end: "present" }
-summary: A web application that lets planetary scientists generate and archive
-  metadata for large datasets at NASA's PDS Atmospheres Node, including a new
-  service for archiving atmospheric model data.
-stack: [ELSA, Bootstrap 5, "2FA", reCAPTCHA]
+summary: A web application that walks planetary scientists through generating
+  PDS4 metadata for large scientific datasets and preparing it for submission to
+  NASA's PDS Atmospheres Node, including a new service for planetary model
+  output.
+stack:
+  [
+    "Python 3.11",
+    "Django 4.2",
+    MariaDB,
+    "xarray / netCDF4",
+    "Bootstrap 5",
+    "Gemini API",
+  ]
+links: { demo: "https://atmos.nmsu.edu/elsa/" }
 tier: flagship
 order: 0
 featured: true
@@ -18,194 +28,77 @@ NASA's **Planetary Data System (PDS)** is the long-term archive for data from
 planetary missions; its **Atmospheres Node** curates atmospheric datasets.
 Archiving to PDS is only useful if the metadata is correct and complete, and
 producing that metadata by hand for large datasets is slow and error-prone.
-**ELSA**, the Educational Labeling System at Atmospheres, is the web
+**ELSA**, the Educational Labeling System for Atmospheres, is the web
 application that makes this tractable: it walks planetary scientists through
-generating and archiving metadata for large datasets so the data becomes
-searchable and reusable. For the Atmospheric Modeling Annex, ELSA harvests
-metadata directly from netCDF model output, variables, coordinates, and
-simulation configuration, so archived models stay searchable.
+generating PDS4 metadata for large datasets and preparing it for submission to
+the node, so the data becomes searchable and reusable.
+
+The **Atmospheric Modeling Annex** is a new PDS service for archiving planetary
+atmospheric model output. For Annex bundles, ELSA harvests metadata directly
+from netCDF model output, including per-variable attributes and dimensions and
+per-coordinate boundaries and units, and generates PDS4 labels against the
+published Annex data dictionary.
+
+<ScreenshotFigure
+  src="elsa-bundle-hub"
+  alt="ELSA's bundle hub: a search field, a type filter, and a row of bundle cards, each showing its name, its PDS logical identifier, an In Progress status badge, and a last-updated date."
+  caption="The bundle hub, where a scientist's work is organized: search, filter by bundle type, and per-bundle status."
+  width="1280"
+  height="629"
+/>
 
 ## What I built
 
-- **Atmospheric Modeling Annex (frontend lead).** I led the frontend for a new
-  PDS service that archives planetary **atmospheric model** data, a new class
-  of archive for the node.
-- **AI Assistant and Guided Bundle Creation.** Deployed ELSA's in-app
-  **AI Assistant** and its **Guided Bundle Creation** flow.
-- **Security features.** Added **two-factor authentication (2FA)** and
-  **reCAPTCHA**, hardening access to the tool.
-- **UI modernization.** Rebuilt ELSA's interface on **Bootstrap 5** for
-  responsive, usable layouts across devices.
+- **Atmospheric Modeling Annex (frontend lead).** Led the frontend for a new
+  PDS service for planetary **model output**, building most of the
+  bundle-building interface and co-authoring the netCDF metadata extraction
+  pipeline behind it.
+- **AI Assistant (beta) and Guided Bundle Creation.** Built ELSA's in-app
+  **AI Assistant**: a retrieval layer over a curated PDS4 knowledge base, a
+  multi-model fallback chain, streaming responses, an evaluation suite, and a
+  CI gate that fails the build when ELSA's code drifts ahead of the
+  documentation the assistant answers from. Also built ELSA's **Guided Bundle
+  Creation** flow.
+- **Authentication.** Implemented **email-based two-factor authentication**
+  for sign-in, and integrated **reCAPTCHA** on public forms.
+- **Interface rebuild.** Rebuilt ELSA's primary bundle-building and bundle-hub
+  interfaces on **Bootstrap 5**, adding responsive layouts, client-side search
+  and filtering, and bundle status tracking.
+
+<ScreenshotFigure
+  src="elsa-ama-netcdf"
+  alt="An Annex bundle in ELSA: a model output collection with a netCDF upload panel, and an uploaded file marked Processed after ELSA extracted its metadata."
+  caption="An Annex bundle's model-output collection. Uploaded netCDF files are marked Processed once ELSA has read their variables, dimensions, and coordinate boundaries into the PDS4 label."
+  width="1280"
+  height="629"
+/>
+
+<ScreenshotFigure
+  src="elsa-assistant"
+  alt="ELSA's in-app AI Assistant answering a question about what belongs in PDS4 Citation Information, with a structured breakdown of author list, editor list, publication year, DOI, keywords, description, and funding acknowledgement."
+  caption="The in-app assistant, answering from a curated PDS4 knowledge base rather than from the model's general training."
+  width="1280"
+  height="628"
+/>
+
+ELSA is built by a team at the PDS Atmospheres Node. The Annex netCDF pipeline
+was co-authored with Said Ajo-Montaño, and the Annex walkthrough was extended
+by Nicholas Miller.
 
 <figure>
-  <svg
-    viewBox="0 0 680 240"
-    role="img"
-    aria-labelledby="fig-elsa-title"
-    style={{ width: "100%", height: "auto" }}
-  >
-    <title id="fig-elsa-title">
-      ELSA pipeline: mission and atmospheric-model data flow through ELSA's
-      guided metadata generation into the PDS Atmospheres archive.
-    </title>
-    <defs>
-      <marker
-        id="arr-elsa"
-        viewBox="0 0 8 8"
-        refX="7"
-        refY="4"
-        markerWidth="7"
-        markerHeight="7"
-        orient="auto-start-reverse"
-      >
-        <path d="M0 0L8 4L0 8z" fill="var(--ink-faint)" />
-      </marker>
-    </defs>
-    {/* data sources */}
-    <rect
-      x="10"
-      y="48"
-      width="180"
-      height="44"
-      rx="4"
-      fill="var(--paper-sunken)"
-      stroke="var(--line-strong)"
-    />
-    <text x="100" y="74" textAnchor="middle" fontSize="14" fill="var(--ink)">
-      Mission &amp; instrument data
-    </text>
-    <rect
-      x="10"
-      y="148"
-      width="180"
-      height="44"
-      rx="4"
-      fill="var(--paper-sunken)"
-      stroke="var(--line-strong)"
-    />
-    <text x="100" y="167" textAnchor="middle" fontSize="14" fill="var(--ink)">
-      Atmospheric model data
-    </text>
-    <text
-      x="100"
-      y="184"
-      textAnchor="middle"
-      fontSize="12"
-      fill="var(--ink-muted)"
-    >
-      (Annex: new archive class)
-    </text>
-    {/* sources → ELSA */}
-    <line
-      x1="190"
-      y1="70"
-      x2="244"
-      y2="102"
-      stroke="var(--ink-faint)"
-      markerEnd="url(#arr-elsa)"
-    />
-    <line
-      x1="190"
-      y1="170"
-      x2="244"
-      y2="138"
-      stroke="var(--ink-faint)"
-      markerEnd="url(#arr-elsa)"
-    />
-    {/* ELSA */}
-    <rect
-      x="250"
-      y="73"
-      width="170"
-      height="94"
-      rx="4"
-      fill="var(--paper-raised)"
-      stroke="var(--accent)"
-    />
-    <text
-      x="335"
-      y="103"
-      textAnchor="middle"
-      fontSize="16"
-      fontWeight="600"
-      fill="var(--ink-strong)"
-    >
-      ELSA
-    </text>
-    <text
-      x="335"
-      y="124"
-      textAnchor="middle"
-      fontSize="12"
-      fill="var(--ink-muted)"
-    >
-      guided metadata generation
-    </text>
-    <text
-      x="335"
-      y="141"
-      textAnchor="middle"
-      fontSize="12"
-      fill="var(--ink-muted)"
-    >
-      validation &amp; review
-    </text>
-    <text
-      x="335"
-      y="188"
-      textAnchor="middle"
-      fontSize="12"
-      fill="var(--ink-faint)"
-    >
-      Access: 2FA · reCAPTCHA
-    </text>
-    {/* ELSA → archive */}
-    <line
-      x1="420"
-      y1="120"
-      x2="474"
-      y2="120"
-      stroke="var(--ink-faint)"
-      markerEnd="url(#arr-elsa)"
-    />
-    <rect
-      x="480"
-      y="86"
-      width="190"
-      height="68"
-      rx="4"
-      fill="var(--accent-soft)"
-      stroke="var(--accent)"
-    />
-    <text
-      x="575"
-      y="114"
-      textAnchor="middle"
-      fontSize="14"
-      fontWeight="600"
-      fill="var(--accent)"
-    >
-      PDS Atmospheres archive
-    </text>
-    <text
-      x="575"
-      y="134"
-      textAnchor="middle"
-      fontSize="12"
-      fill="var(--accent)"
-    >
-      archive-ready metadata
-    </text>
-  </svg>
+  <ElsaPipelineDiagram />
   <figcaption>
     Pipeline sketch: ELSA sits between scientists&rsquo; datasets and the
-    archive: it turns data that would need hand-written metadata into
-    archive-ready submissions, now including atmospheric models via the Annex.
+    archive, turning data that would need hand-written metadata into
+    submission-ready PDS4 labels, now including atmospheric models via the
+    Annex. A completed bundle is routed to node staff for review rather than
+    written to the archive directly. Access is protected by two-factor
+    authentication; public forms use reCAPTCHA.
   </figcaption>
 </figure>
 
 ## Impact
 
-ELSA lets scientists produce archive-ready metadata for large datasets that
-would otherwise be prohibitively tedious to prepare, and the Atmospheric
+ELSA lets scientists produce submission-ready PDS4 metadata for large datasets
+that would otherwise be prohibitively tedious to prepare, and the Atmospheric
 Modeling Annex extends the node's archive to a new data type.
