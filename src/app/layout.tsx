@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
-import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
+import { SITE_URL, SITE_DESCRIPTION, HOME_TITLE } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SiteAnimations } from "@/components/SiteAnimations";
@@ -33,8 +33,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  // `default` applies to the home page only; every other route sets its own
+  // title and picks up the template.
   title: {
-    default: "Rupak Dey",
+    default: HOME_TITLE,
     template: "%s · Rupak Dey",
   },
   description: SITE_DESCRIPTION,
@@ -50,12 +52,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Rupak Dey",
     url: SITE_URL,
-    title: "Rupak Dey",
+    title: HOME_TITLE,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rupak Dey",
+    title: HOME_TITLE,
     description: SITE_DESCRIPTION,
   },
 };
