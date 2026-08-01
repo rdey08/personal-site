@@ -17,6 +17,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { NewsList } from "@/components/NewsList";
 import { ObfuscatedEmail } from "@/components/ObfuscatedEmail";
 import { PersonJsonLd } from "@/components/PersonJsonLd";
+import { WebSiteJsonLd } from "@/components/WebSiteJsonLd";
 import {
   FileIcon,
   GitHubIcon,
@@ -39,6 +40,7 @@ export default function Home() {
   return (
     <>
       <PersonJsonLd />
+      <WebSiteJsonLd />
 
       {/* Hero (magazine plate): portrait anchors the left column (rotated
           photo-credit caption on its edge, scroll parallax), serif display
