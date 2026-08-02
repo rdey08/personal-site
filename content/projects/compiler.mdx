@@ -1,16 +1,170 @@
 ---
-title: Compiler Construction
+title: J to RISC-V Compiler
 slug: compiler
-period: { start: "2024-08", end: "2024-12" }
-summary: C-like compiler built with Flex/Bison, AST parsing and a RISC-V code
-  generator handling stack management, recursion, and control flow.
-stack: [C, Flex, Bison, RISC-V Assembly]
-context: Class project
+period: { start: "2024-09", end: "2024-12" }
+summary: Compiler for J, a small imperative language designed for the course,
+  written in C with Flex and Bison. Parses to an AST and emits RV32 assembly
+  with working stack frames, function calls, and recursion.
+stack: [C, Flex, Bison, "RISC-V Assembly", RARS]
+role: Grammar, scanner, and the whole code generator, on an instructor-provided
+  AST and symbol-table scaffold
+context: Individual project across seven graded milestones, CS 370
+detail: true
 tier: project
 order: 4
 featured: true
 ---
 
-Built a C-like compiler with Flex/Bison parsing to an AST and a code
-generator handling stack management, recursion, and control flow in RISC-V
-assembly.
+## Context
+
+The source language is **J**, and it is worth being precise about what that
+means, because the obvious assumption is wrong. J is not a subset of C. It was
+designed by the course instructor specifically so the project could not be
+looked up, and Fall 2024 was its first outing.
+
+What it borrows from C is braces, semicolons, and the word `int`. Everything
+else is closer to Algol. Programs are `program { }` with `function f(int a) { }`
+above them. Calls are statements and never expressions, so `x = f(y)` is not
+expressible: you write `call f(y); x = returnvalue;`. `else` is mandatory,
+because there is no if-without-else production. There is no multiplication,
+division, or modulo. The binary operators are `+ - & | ^` and that is the
+complete list. There are no boolean operators, no pointers, no structs, no
+floats, and no comments.
+
+A narrow language is not a smaller problem, it just moves where the difficulty
+sits. With no arithmetic beyond addition, the interesting work is entirely in
+calling convention and control flow.
+
+The AST node structure and the symbol table came from the instructor as a
+scaffold. The grammar, the scanner, and the entire code generator are mine.
+
+## The pipeline
+
+Four stages: lexer, parser, AST, code generation. There is no intermediate
+representation, no optimiser, and no separate semantic pass. Name resolution
+happens inside the Bison actions during parsing, and amounts to exactly two
+checks: a variable is undeclared, or it is declared twice. Type checking does
+not exist, which is survivable in a language with one real type.
+
+Code generation walks the AST and prints assembly directly. You can see the
+absence of an optimiser in the output: an unconditional jump is followed by a
+branch that can never be reached, because nothing ever goes back to remove it.
+
+## Generating code
+
+The target is RV32 running under RARS, the simulator the course used, so the
+system calls are RARS numbers rather than Linux ones.
+
+There is no register allocation. `t0` is a universal accumulator and `t1` its
+scratch partner, and every binary operation pushes its left operand to the
+stack, evaluates the right, pops, and combines. Every frame is a fixed 128
+bytes regardless of what the function actually needs. That is a real
+simplification rather than a clever one, and it buys a specific thing: because
+the frame size is a compile-time constant, every function in the program can
+share a single epilogue label.
+
+One piece of it I still like. The relational code generator branches to the
+then-label when the condition is true, which means the else block has to be
+emitted first, then the then block. Laying the branches out backwards is what
+lets the comparison be emitted exactly as written, with no inversion step.
+
+<CompilerStackFrame />
+
+## Recursion
+
+Recursion works, and the reason is entirely in the frame discipline: each call
+allocates a fresh 128 bytes before doing anything else, the callee saves the
+caller's return address and frame pointer, every local and parameter is
+addressed relative to `fp` so each activation's variables are private, and
+expression temporaries are always balanced before a `jal` so nothing is live in
+a register across a call.
+
+Worth stating plainly: none of the six test programs I shipped were recursive.
+The property held, but I had not demonstrated it. Writing `fib` afterwards
+confirmed it, correct at `fib(10)` and on a linear recursion eight thousand
+frames deep.
+
+```c
+function fib(int n)
+{
+   int a;
+   int b;
+   if (n <= 1) then {
+      return n;
+   } else {
+      call fib(n + -1);
+      a = returnvalue;
+      call fib(n + -2);
+      b = returnvalue;
+      return a + b;
+   }
+}
+```
+
+The `n + -1` is not a stylistic choice. `n - 1` does not compile, and that is
+the next section.
+
+```asm
+fib:
+        addi    sp, sp, -128    # fixed frame, every function
+        sw      fp, 4(sp)       # save caller's frame pointer
+        sw      ra, 0(sp)       # save return address
+        mv      fp, sp
+        sw      a0, 8(sp)       # spill a0 through a5, always
+        ...
+func_exit:                      # one epilogue, shared by every function
+        mv      sp, fp
+        lw      fp, 4(sp)
+        lw      ra, 0(sp)
+        addi    sp, sp, 128
+        ret
+```
+
+## The bug worth writing about
+
+The final milestone added unary operators, and the obvious way to do that is a
+scanner rule matching `-` and `~`. The rule for binary operators, matching
+`+ - & | ^`, was already there. Both match `-`, both at length one, and Flex
+breaks ties by rule order. So `-` became unary everywhere and binary
+subtraction quietly stopped existing. Two test programs that had passed for
+weeks no longer compiled, and nobody noticed, because there was no harness to
+notice with: the tests were run by hand, and after that milestone they were not
+run again.
+
+The instructive part is what happens when you reach for the obvious fix.
+Reordering the two rules restores subtraction and breaks unary negation
+instead. The rules are mutually exclusive by construction, and no ordering of
+them can work, because whether `-` is unary or binary is not a lexical property
+at all. It depends on whether the previous token was an operand, and a scanner
+that looks at one token cannot know that.
+
+The fix is to stop asking the scanner. Emit one token for `-` and let the
+parser disambiguate from context, with two productions and a precedence
+override so unary binds tighter than binary. What makes this satisfying is
+where it leads: my grammar had exactly one shift/reduce conflict, which I had
+been treating as background noise, and it was this same ambiguity surfacing a
+phase later. The parser had been telling me about the scanner's bug the whole
+time. Fixing it properly also corrects a third symptom I had not connected,
+that `-z + 3` evaluated to `-8` rather than `-2`, because the unary operator
+was binding too loosely.
+
+One misplaced rule, one warning I ignored, three wrong behaviours, and the fix
+was never in the file I kept opening.
+
+## What this shows
+
+The compiler compiles and the output genuinely runs; I have watched it produce
+correct results under the simulator. What it does not have is any way of
+knowing that automatically. Six test programs, no expected outputs, no
+assertions, nothing to run them. That is precisely why a regression in the last
+milestone survived to the end, and it is a more useful thing to have learned
+than another language feature would have been.
+
+Some of what remains is deliberate simplification: fixed frames, no register
+allocation, no optimiser. The rest is not. Declared array sizes are ignored and
+every array gets the same fixed allocation, a seventh parameter reads garbage
+because only six argument registers are spilled, and duplicate declarations are
+accepted in silence because the error path turned out to be unreachable. There
+are a few others. On a course project the honest summary is that I built a
+working back end and never built the thing that would have told me when it
+stopped working.
