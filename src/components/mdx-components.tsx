@@ -13,6 +13,7 @@ import { ScreenshotFigure } from "./figures/ScreenshotFigure";
 import { AirbnbFeatureImportance } from "./figures/AirbnbFeatureImportance";
 import { AirbnbModelTable } from "./figures/AirbnbModelTable";
 import { CompilerStackFrame } from "./figures/CompilerStackFrame";
+import { CompilerMilestones } from "./figures/CompilerMilestones";
 
 // Plain-text extraction + slug for heading anchor ids (no client JS, no deps).
 function textOf(node: ReactNode): string {
@@ -142,4 +143,5 @@ export const mdxComponents: MDXComponents = {
   AirbnbFeatureImportance,
   AirbnbModelTable,
   CompilerStackFrame,
+  CompilerMilestones,
 };
