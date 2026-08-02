@@ -40,11 +40,19 @@ scaffold. The grammar, the scanner, and the entire code generator are mine.
 
 ## The pipeline
 
-Four stages: lexer, parser, AST, code generation. There is no intermediate
-representation, no optimiser, and no separate semantic pass. Name resolution
-happens inside the Bison actions during parsing, and amounts to exactly two
-checks: a variable is undeclared, or it is declared twice. Type checking does
-not exist, which is survivable in a language with one real type.
+Four stages: lexer, parser, AST, code generation. About 1,700 lines in total,
+of which the scanner is 217, the grammar 663 across 48 productions, and the AST
+and code generation 467, with the generator proper accounting for roughly 230
+of those.
+
+There is no intermediate representation, no optimiser, and no separate semantic
+pass. Name resolution happens inside the Bison actions during parsing, and
+amounts to one working check: that a variable is not used before it is
+declared. There is a second check for duplicate declarations whose error path,
+it turns out, can never be reached. Type checking does not exist at all, which
+is survivable in a language with one real type: `string` exists in the grammar
+but is registered as an integer, so string variables are a fiction and only
+literals work.
 
 Code generation walks the AST and prints assembly directly. You can see the
 absence of an optimiser in the output: an unconditional jump is followed by a
@@ -162,9 +170,12 @@ than another language feature would have been.
 
 Some of what remains is deliberate simplification: fixed frames, no register
 allocation, no optimiser. The rest is not. Declared array sizes are ignored and
-every array gets the same fixed allocation, a seventh parameter reads garbage
-because only six argument registers are spilled, and duplicate declarations are
-accepted in silence because the error path turned out to be unreachable. There
-are a few others. On a course project the honest summary is that I built a
-working back end and never built the thing that would have told me when it
-stopped working.
+every array gets the same fixed allocation, so a large one silently corrupts
+whatever follows it. A seventh parameter reads garbage, because only six
+argument registers are ever spilled. Assigning to an array element leaks eight
+bytes of stack each time, which a function's epilogue quietly absorbs but the
+program block does not, so a long enough loop walks the stack pointer into an
+alignment fault. There are a few others.
+
+The honest summary is that I built a working back end and never built the thing
+that would have told me when it stopped working.
