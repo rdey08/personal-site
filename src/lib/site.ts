@@ -9,13 +9,17 @@ export const SITE_URL = "https://rupakdey.com";
 export const SITE_NAME = "Rupak Dey";
 
 /**
- * Home page <title>, deliberately not just SITE_NAME. Google prints the site
+ * Home page <title>. Deliberately carries no name: Google prints the site
  * name (from the WebSite JSON-LD, which resolves from SITE_NAME) on the line
- * above the title, so a bare-name title made the result say "Rupak Dey" twice
- * in a row. The role carries the second line instead. Kept under ~60
- * characters, past which Google truncates.
+ * directly above the title, so putting it here too made the result read
+ * "Rupak Dey" on two consecutive lines. The split mirrors how a large site
+ * reads in results, identity on one line and the specific page on the next.
+ *
+ * Also drives og:title and twitter:title. A social card loses the site-name
+ * line, but the name still reaches it three ways: the OG image renders it,
+ * og:site_name carries it, and SITE_DESCRIPTION opens with it.
  */
-export const HOME_TITLE = `${SITE_NAME} · Applied ML Research and Software Engineering`;
+export const HOME_TITLE = "Applied ML Research and Software Engineering";
 
 export const SITE_DESCRIPTION =
   "Rupak Dey: applied machine learning research (NMSU KDD Lab) and research-data software engineering (NASA Planetary Data System).";
