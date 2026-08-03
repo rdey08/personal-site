@@ -26,6 +26,14 @@ problem and once collapsed to tumor against no tumor. The data is Masoud
 Nickparvar's Brain Tumor MRI Dataset on Kaggle, itself a merge of three
 upstream collections.
 
+<ScreenshotFigure
+  src="brain-tumor-mri/dataset-classes"
+  alt="Four brain scans side by side, labelled glioma, meningioma, notumor and pituitary. The glioma is an axial slice with a small bright ring near the centre and dark ventricles. The meningioma is a coronal slice with a rounded bright mass low on the left near the skull base. The notumor slice is symmetric with clear grey and white matter and no lesion. The pituitary is a coronal slice with a small bright mass at the centre of the skull base, eye sockets and sinuses visible."
+  caption="One image per class, each chosen as the closest to its class mean rather than the most dramatic example. Note that the four are not all the same view: two are axial and two coronal, and the dataset mixes planes freely inside a single class."
+  width="1280"
+  height="349"
+/>
+
 Five model families, deliberately spread apart so the comparison would mean
 something: a Random Forest over HOG and LBP features, a custom CNN with
 squeeze-and-excitation blocks at 6.6M parameters, a fine-tuned ResNet-50 at
@@ -58,6 +66,14 @@ bytes and every image in the repo is unique, which is what you would check
 first and what makes the problem invisible. Hash the decoded pixel array
 instead and 114 test images, 7.125% of the split, are byte-identical to an
 image the model trained on. The containers differ; the pictures do not.
+
+<ScreenshotFigure
+  src="brain-tumor-mri/leakage-pair"
+  alt="Two identical coronal brain scans side by side. Each shows a head in cross section with a large bright irregular mass in the upper left of the brain, about a third the width of the skull, with a darker cavity at its lower edge. The filename beneath the left panel reads Tr-me_1289.jpg and beneath the right, Te-me_285.jpg."
+  caption="One of the 114. The same picture, in training on the left and in test on the right, down to the last pixel: both decode to md5 f273fd56f2f765fa32bf7c4161784e47. Their JPEG files do not match, which is the entire reason a file-level sweep reports the split as clean."
+  width="1280"
+  height="598"
+/>
 
 ```
 file-level md5 over 7,200 JPEGs        0 duplicates
@@ -110,6 +126,14 @@ mean pairwise cosine similarity between samples of **0.9999**, in all four
 classes. The generator ignores the latent code completely. It is a lookup
 table with four entries.
 
+<ScreenshotFigure
+  src="brain-tumor-mri/gan-collapse"
+  alt="Two rows of eight greyscale panels. The top row is eight outputs from the trained generator: soft blurred grey ovals on dark backgrounds, faintly suggesting a skull outline, with no internal anatomy and no visible lesion, and all eight are indistinguishable from one another. The bottom row is eight real pituitary training scans, sharply detailed and all different: three axial views through the skull base showing eye sockets and sinuses, three sagittal mid-line views showing the corpus callosum and brain stem in profile, and two coronal views, several with a bright lesion at the pituitary fossa."
+  caption="Top row: eight draws from the generator, from eight near-orthogonal latent vectors with mean pairwise similarity 0.0158. Their outputs have mean pairwise similarity 0.9999. Bottom row: eight real images of the same class, at 0.6774. Identical greyscale mapping on both rows, no per-image normalization. The class is pituitary, which has the most visually diverse real images of the four."
+  width="1280"
+  height="323"
+/>
+
 So `--gen-per-class 500` did not add 2,000 samples. It added four distinct
 images, each duplicated 500 times. In binary mode it added 1,000 copies of a
 single image labelled no_tumor. The saved sample grid from epoch 80 agrees
@@ -125,6 +149,21 @@ information. They do not, and this generator never produced any. The gain is
 a single-run difference produced by pasting four blurry blobs into the
 training set several hundred times each, and it is well inside the noise of
 an experiment nobody ran twice.
+
+The inference app makes the same point from the other end. Hand it one of the
+generator's own images and the five classifiers split three to two on whether
+there is a tumor, at confidences running from 63% to 94%, on a picture that
+contains no anatomy at all. Confident disagreement is exactly what an
+out-of-distribution input should produce, so this is not a scandal on its own.
+It is a preview of the next section.
+
+<ScreenshotFigure
+  src="brain-tumor-mri/gui"
+  alt="A two-column inference app. The left sidebar holds a classification mode selector set to binary, checkboxes for Grad-CAM heatmaps and test-time augmentation, the binary and multiclass label sets, and a list of eleven loaded checkpoints. The main panel shows an uploaded input image, a blurred grey oval, beside five model cards: Custom CNN says tumor at 72.1%, ResNet-50 says no_tumor at 94.2%, ViT-B/16 says no_tumor at 68.4%, ResNet-50 plus GAN says no_tumor at 92.3%, and Random Forest says tumor at 63.0%. Three cards carry a blue-to-red Grad-CAM heatmap beneath them."
+  caption="The input is the collapsed generator's own output, so there is nothing in it to find. The heatmaps are Grad-CAM and are illustrative only: the dataset ships no segmentation masks, so there was never any ground truth to score attention against. The ViT panel, asserting that three attribution methods fail to localize, is the app repeating a claim from our report that no code in the project supports."
+  width="1280"
+  height="978"
+/>
 
 A plausible method, a metric that seemed to confirm it, and a saved artifact
 that disproves both. The artifact was in the repo the whole time.
@@ -143,19 +182,68 @@ notumor            0       0      400       0     1.0000
 pituitary          0       2        0     398     0.9950
 ```
 
-Three classes are effectively solved and glioma is not, and no amount of
-capacity moves it. Random Forest over hand-crafted HOG features gets 0.6675
-on glioma. The best model, the GAN-augmented ResNet-50, gets 0.8375. ViT-B/16
-carries thirteen times the custom CNN's parameters and lands _below_ it, at
-0.8125. Five unrelated model families, one of which does no representation
-learning at all, converge on the same failure in the same direction: glioma
-leaks into meningioma and into no-tumor, and nothing leaks back the other
-way.
+Three classes are effectively solved and glioma is not, and capacity does not
+move it. Per-class recall on the four-way problem, every model, test split:
 
-When a hand-crafted feature pipeline and an 86M-parameter transformer fail
-identically, the limit is not in the architecture. It is in the labels or the
-images, and this project never looked. The twenty-one gliomas classified as
-having no tumor at all are the ones I would open first.
+```
+                 glioma  mening  notumor  pituit
+resnet50_aug     0.8375  0.9975   1.0000  0.9950
+resnet50         0.8150  0.9925   0.9925  0.9950
+vit              0.8125  0.9875   1.0000  0.9950
+custom_cnn       0.8075  0.9725   1.0000  1.0000
+baseline_rf      0.6675  0.8800   1.0000  0.9750
+```
+
+Every model is worst on glioma and at or near perfect on no-tumor. Across the
+five families the spread is 0.1700 on glioma and 0.0075 on no-tumor. ViT-B/16
+carries thirteen times the custom CNN's parameters and buys 0.005 of glioma
+recall with them. A Random Forest over hand-crafted HOG features, doing no
+representation learning whatsoever, fails in the same direction as everything
+above it.
+
+So the limit is not in the architecture, and the images are worth opening.
+
+<ScreenshotFigure
+  src="brain-tumor-mri/glioma-errors"
+  alt="Twelve brain scans in two rows of six, all gliomas the best model classified as having no tumor. Every panel carries a large obvious lesion. They vary widely in appearance: bright grainy scans, dark scans with bright tissue at the skull base, pale flat-background scans, one with a thick solid white skull ring around a smooth grey brain and a large dark cavity, several bright images with pale masses, and one coronal view with a mass in the upper left frontal region. One panel has faint illegible text burned into the bottom edge and another shows a small mouse cursor near the mid-line."
+  caption="Twelve of the 21 gliomas the best model called no-tumor. The lesions are not subtle; the images are not consistent. The fourth panel on the top row is the clearest case of the pattern below."
+  width="1280"
+  height="428"
+/>
+
+The obvious guess is that these are the subtle tumors, the small or
+low-contrast ones. The picture refutes that immediately. Nearly every one
+carries a large, unmistakable lesion, and several are among the most dramatic
+tumors in the test set. Whatever is failing here, it is not conspicuity.
+
+What the failures share is that they do not look like the training
+distribution as images, independent of the tumor in them. Set against the 335
+gliomas the same model got right, they are roughly twice as bright on average,
+carry five times the bright-area fraction, and hold 57.8 times the fraction of
+near-saturated white pixels. Seven of the 21 are more than 2% saturated, where
+1 of the 335 correct ones is.
+
+The fourth panel on the top row shows what that means concretely: a thick
+uniformly bright skull ring around a granular brain, which is what a CT looks
+like and is not what an MRI looks like. At least three of the 21 have that
+appearance. Worth being careful about how hard to push it, since the dataset
+ships no DICOM headers and states no modality anywhere, so this is a reading
+of pixels rather than an established fact. The rest divide into
+bright-lesion-on-dark images in a collection whose dominant appearance is the
+reverse, and a couple of slices in a plane most of the others are not.
+
+The honest summary is that the model does not fail on hard tumors. It fails on
+unfamiliar image types, and no-tumor is what it emits when an image resembles
+nothing it was trained on. That is a more interesting failure than subtlety,
+and the one that would actually matter in use, where scanner and protocol
+drift is the normal condition rather than the exception. These are also not
+clustered in any filename range, so they are not one contaminated batch from a
+single upstream source.
+
+One last thing about those 21. They are only 19 distinct images: two pairs
+among them are pixel-identical to each other, and both pairs sit inside the
+test set. Two of the model's worst failures are the same picture counted
+twice, in a test split that already shares 114 images with training.
 
 ## What this shows
 
