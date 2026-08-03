@@ -1,0 +1,185 @@
+---
+title: Brain Tumor MRI Classification
+slug: brain-tumor-mri
+period: { start: "2026-02", end: "2026-05" }
+summary: >-
+  Five model families compared on 4-class brain tumor MRI, for a graduate deep
+  learning course. Mostly a write-up about auditing our own result. Seven
+  percent of the test set turned out to be verbatim training data, and the GAN
+  that appeared to improve accuracy had collapsed to four fixed images.
+stack: [Python, PyTorch, "ResNet-50", "ViT-B/16", Scikit-learn, Streamlit]
+role: The Vision Transformer, the evaluation harness, and the GAN augmentation
+context: Team of four, graduate deep learning course
+detail: true
+tier: project
+order: 2
+featured: true
+---
+
+## Context
+
+The task is four-way classification of 2D brain MRI slices: glioma,
+meningioma, pituitary, and no tumor. It ran twice, once as the four-way
+problem and once collapsed to tumor against no tumor. The data is Masoud
+Nickparvar's Brain Tumor MRI Dataset on Kaggle, itself a merge of three
+upstream collections.
+
+Five model families, deliberately spread apart so the comparison would mean
+something: a Random Forest over HOG and LBP features, a custom CNN with
+squeeze-and-excitation blocks at 6.6M parameters, a fine-tuned ResNet-50 at
+24M, a fine-tuned ViT-B/16 at 86M, and a class-conditional GAN generating
+extra training data. Eleven runs, about a hundred minutes total on one H100.
+
+The best result was 0.9575 accuracy on the held-out test split. That is the
+number on the report we submitted, and it does not survive contact with the
+artifacts behind it. Everything below comes from going back through those
+artifacts afterwards, which is the only part of this project worth writing
+down.
+
+Worth being precise about my share before making any claims on it. This was a
+four-person team, and the final tree landed in three bulk commits from my
+account, so `git blame` credits me with 98.7% of the source and is measuring
+packaging rather than authorship. By commit count a teammate contributed more
+than I did, and the preprocessing module is a descendant of his file, not
+mine. What is actually mine is the ViT work, the evaluation harness, the GAN
+augmentation pipeline, and the inference GUI.
+
+## Seven percent of the test set was already in training
+
+The dataset in the repo is not the stock download. It had been rebalanced by
+hand to exactly 1400 training and 400 test images per class, against a
+canonical 7,023, and no script in any of the 35 commits performs that
+rebalancing. Somebody copied files until the classes came out even.
+
+The tell is that a file-level checksum finds nothing wrong. Hash the JPEG
+bytes and every image in the repo is unique, which is what you would check
+first and what makes the problem invisible. Hash the decoded pixel array
+instead and 114 test images, 7.125% of the split, are byte-identical to an
+image the model trained on. The containers differ; the pictures do not.
+
+```
+file-level md5 over 7,200 JPEGs        0 duplicates
+pixel-level md5 over decoded arrays    114 test images already in train
+  meningioma 100, notumor 9, glioma 5
+cosine >= 0.99 against any train image 455 of 1,600  (28.4%)
+  same threshold, different class        2 of 1,600  ( 0.1%)
+```
+
+That last line is the one that makes the rest of it hold up. Brain MRIs all
+look broadly alike, so a near-duplicate threshold could easily be measuring
+nothing but generic head shape. Running the same query against training
+images of a _different_ class returns 2 hits out of 1,600. The threshold
+discriminates.
+
+Every model scores at or near 1.0000 on the leaked images, which is what
+memorization looks like from the outside. Recomputing the headline over the
+1,145 test images with no near-duplicate:
+
+```
+                 reported   on leaked   clean subset    delta
+resnet50_aug      0.9575      1.0000       0.9424      -0.0151
+resnet50          0.9487      1.0000       0.9319      -0.0168
+vit               0.9487      0.9912       0.9310      -0.0177
+custom_cnn        0.9450      0.9737       0.9275      -0.0175
+baseline_rf       0.8806      1.0000       0.8358      -0.0448
+```
+
+The clean-subset column is indicative rather than a drop-in replacement,
+since removing duplicates guts the per-class support unevenly: notumor falls
+from 400 test images to 58. But the direction and the rough size of the
+correction are not in doubt.
+
+The part I find genuinely instructive is where the contamination came from.
+Perfect class balance is the feature of this dataset that looks most
+professional in a summary table, and it is exactly what caused the problem.
+Balance was bought by duplicating images, and the duplicates crossed the
+split.
+
+## The GAN that generated four images
+
+The augmentation model is a class-conditional DCGAN with spectral
+normalization on the discriminator, hinge loss, two-timescale updates, and an
+EMA generator. Trained 80 epochs. Run with `--gen-per-class 500`, it was
+supposed to contribute 2,000 synthetic training images, and the run that used
+it posted the best score in the project.
+
+Loading the saved generator and sampling 64 latent vectors per class gives a
+mean pairwise cosine similarity between samples of **0.9999**, in all four
+classes. The generator ignores the latent code completely. It is a lookup
+table with four entries.
+
+So `--gen-per-class 500` did not add 2,000 samples. It added four distinct
+images, each duplicated 500 times. In binary mode it added 1,000 copies of a
+single image labelled no_tumor. The saved sample grid from epoch 80 agrees
+with the arithmetic: blurred grey ovals, no visible tumor, nothing
+distinguishing one row from another. The loss trace agrees too, with the
+discriminator winning decisively by the end.
+
+What makes this worth publishing rather than quietly deleting is that the
+experiment appeared to work. GAN augmentation improved multiclass accuracy by
+0.88 points and binary by 0.31, and those are the numbers in our report,
+under a section arguing that synthetic samples preserve class-specific
+information. They do not, and this generator never produced any. The gain is
+a single-run difference produced by pasting four blurry blobs into the
+training set several hundred times each, and it is well inside the noise of
+an experiment nobody ran twice.
+
+A plausible method, a metric that seemed to confirm it, and a saved artifact
+that disproves both. The artifact was in the repo the whole time.
+
+## Glioma, and the limit that was never the model
+
+Set the leakage aside and one result stays interesting. Here is the best
+model's confusion matrix on the four-way problem, rows true and columns
+predicted:
+
+```
+              glioma  mening  notumor  pituit     recall
+glioma           335      44       21       0     0.8375
+meningioma         0     399        0       1     0.9975
+notumor            0       0      400       0     1.0000
+pituitary          0       2        0     398     0.9950
+```
+
+Three classes are effectively solved and glioma is not, and no amount of
+capacity moves it. Random Forest over hand-crafted HOG features gets 0.6675
+on glioma. The best model, the GAN-augmented ResNet-50, gets 0.8375. ViT-B/16
+carries thirteen times the custom CNN's parameters and lands _below_ it, at
+0.8125. Five unrelated model families, one of which does no representation
+learning at all, converge on the same failure in the same direction: glioma
+leaks into
+meningioma and into no-tumor, and nothing leaks back the other way.
+
+When a hand-crafted feature pipeline and an 86M-parameter transformer fail
+identically, the limit is not in the architecture. It is in the labels or the
+images, and this project never looked. The twenty-one gliomas classified as
+having no tumor at all are the ones I would open first.
+
+## What this shows
+
+The spread across the four deep architectures is 0.0125, from 0.9450 to
+0.9575. The leakage correction moves any single one of them by 0.0151. The
+contamination in the data had a larger effect on the reported number than the
+entire choice of architecture did, which is a reasonable summary of where the
+effort in this project should have gone and did not.
+
+Three caveats travel with every number above and cannot be dropped:
+
+Everything is a single run. `SEED = 42` is set, cuDNN determinism is not, and
+each configuration was trained exactly once. Quoting four decimal places
+implies a precision that no part of this experiment established, and the
+GAN's 0.88-point "improvement" is unfalsifiable for the same reason.
+
+The binary results need their floor. 0.9831 reads as near-perfect skill until
+you notice the binary split is 1,200 tumor against 400 no-tumor, so always
+guessing tumor scores 0.7500. The real gain is 13.31 points, not 98.
+
+The Random Forest baseline is not a fair comparison, twice over. It was
+selected by looking at test accuracy, and it trained on 5,600 images where
+the deep models trained on 4,480.
+
+And the thing that should be obvious but is worth writing anyway: this is
+coursework on 2D slices from a public dataset, never evaluated against
+radiologist reads and never run on clinical data. It is not a diagnostic
+tool, and no number on this page should be read as evidence that it could
+become one.
