@@ -3,7 +3,12 @@
 // ThemeToggle, MobileNav, CommandMenu (data built here, server-side).
 
 import Link from "next/link";
-import { getProjects, getResearchThreads, getSite } from "@/lib/content";
+import {
+  getNews,
+  getProjectsWithPages,
+  getResearchThreads,
+  getSite,
+} from "@/lib/content";
 import { NAV_LINKS } from "@/lib/nav";
 import { NavLinks } from "./NavLinks";
 import { MobileNav } from "./MobileNav";
@@ -24,13 +29,21 @@ function buildCommands(): Command[] {
       label: t.meta.title,
       href: `/research/${t.meta.slug}`,
     })),
-    ...getProjects()
-      .filter((p) => p.meta.tier === "flagship")
-      .map((p) => ({
-        group: "Work",
-        label: p.meta.title,
-        href: `/projects/${p.meta.slug}`,
-      })),
+    // Every project that has a page, not just the flagship. This filtered on
+    // tier === "flagship" back when ELSA was the only write-up that existed,
+    // and never grew with the content: by the time there were six project
+    // pages the palette could still only reach one of them. Deriving from the
+    // same helper the route and the sitemap use means it cannot drift again.
+    ...getProjectsWithPages().map((p) => ({
+      group: "Work",
+      label: p.meta.title,
+      href: `/projects/${p.meta.slug}`,
+    })),
+    ...getNews().map((n) => ({
+      group: "News",
+      label: n.meta.text,
+      href: `/news/${n.meta.slug}`,
+    })),
     // Email is deliberately absent: it is entity-obfuscated in the DOM
     // (PLAN §2.5) and would ship as plain text in client props here.
     { group: "Links", label: "GitHub", href: site.links.github },
