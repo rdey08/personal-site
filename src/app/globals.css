@@ -281,47 +281,44 @@ h4 {
   }
 }
 
-/* Two-column card grids with an odd number of cards leave a hole on the last
- * row, which reads as a layout bug rather than as breathing room. The FIRST
- * card takes the full row instead, and the even remainder fills the rows
- * below it: the hole disappears and the weight lands on the lead item rather
- * than on whatever happened to sort last. Cards are ordered by the `order`
- * field, so the spotlight is editorial, not accidental.
+/* A card in a two-column grid can take the full row, so a section with an odd
+ * count does not leave a hole on the last row and a section of one does not
+ * render as a half-width card beside empty space.
  *
- * nth-last-child(odd) on the first child is the parity test: it matches only
- * when the total count is odd, which is exactly when a hole would appear. At
- * an even count nothing spans, because nothing needs to.
+ * This is opt-in: the caller passes spotlight to ProjectCard, which adds
+ * .card-spotlight. It used to be `*:first-child:nth-last-child(odd)`, a parity
+ * test on the card count, which meant whether a section had a spotlight
+ * depended on whether it happened to hold an odd number of projects. Adding
+ * one project silently restyled a section nobody had edited. Since /projects
+ * now renders several independent grids, that rule would fire differently in
+ * each one for reasons no one could see from the page source.
  *
  * A wide card gets a 2fr/3fr internal split (the FlagshipCard rhythm) so the
  * extra width carries a layout instead of stretching one column of text. */
 @media (min-width: 640px) {
-  .card-grid > *:first-child:nth-last-child(odd) {
+  .card-grid > .card-spotlight {
     grid-column: 1 / -1;
-    /* Two columns halve the card's height, which would leave the spotlight as
+    /* Full width halves the card's height, which would leave the spotlight as
      * the SHORTEST card in the section and invert the hierarchy it exists to
      * create. These projects carry a two-line summary, so the height has to
      * come from type and spacing rather than from content. */
     padding: 2.25rem;
   }
-  .card-grid > *:first-child:nth-last-child(odd) h3 {
+  .card-grid > .card-spotlight h3 {
     font-size: var(--text-3xl);
   }
-  .card-grid > *:first-child:nth-last-child(odd) .card-split {
+  .card-grid > .card-spotlight .card-split {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     gap: 2.5rem;
     align-items: center;
   }
-  .card-grid
-    > *:first-child:nth-last-child(odd)
-    .card-split
-    > *
-    > :first-child {
+  .card-grid > .card-spotlight .card-split > * > :first-child {
     margin-top: 0;
   }
 }
 @media (min-width: 1024px) {
-  .card-grid > *:first-child:nth-last-child(odd) {
+  .card-grid > .card-spotlight {
     padding: 2.75rem;
   }
 }

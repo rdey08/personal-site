@@ -67,34 +67,52 @@ export type Publication = z.infer<typeof publicationSchema>;
 
 // content/projects/*.mdx, body required for flagship tier (deep write-up,
 // rendered at /projects/[slug]); optional short paragraphs otherwise.
-export const projectSchema = z.object({
-  title: z.string().min(1),
-  slug,
-  role: z.string().min(1).optional(), // mainly for leadership entries
-  period: z.object({
-    start: yearMonth,
-    end: z.union([yearMonth, z.literal("present")]).optional(),
-  }),
-  summary: z.string().min(1),
-  stack: z.array(z.string().min(1)).default([]),
-  award: z.string().min(1).optional(),
-  context: z.string().min(1).optional(), // e.g. "Built at a hackathon"
-  links: z
-    .object({
-      github: z.url().optional(),
-      demo: z.url().optional(),
-    })
-    .optional(),
-  tier: z.enum(["flagship", "project", "leadership"]),
-  order: z.number().int().nonnegative(),
-  featured: z.boolean(),
-  // Opt a project into its own page at /projects/<slug>. Flagship work always
-  // has one; every other project gets one as soon as its body is worth the
-  // click. Left false while the body is still a couple of sentences, because
-  // a page that says less than the card is worse than no link at all. Set it
-  // in the same change that writes the real body.
-  detail: z.boolean().default(false),
-});
+export const projectSchema = z
+  .object({
+    title: z.string().min(1),
+    slug,
+    role: z.string().min(1).optional(), // mainly for leadership entries
+    period: z.object({
+      start: yearMonth,
+      end: z.union([yearMonth, z.literal("present")]).optional(),
+    }),
+    summary: z.string().min(1),
+    stack: z.array(z.string().min(1)).default([]),
+    award: z.string().min(1).optional(),
+    context: z.string().min(1).optional(), // e.g. "Built at a hackathon"
+    links: z
+      .object({
+        github: z.url().optional(),
+        demo: z.url().optional(),
+      })
+      .optional(),
+    tier: z.enum(["flagship", "project", "leadership"]),
+    order: z.number().int().nonnegative(),
+    featured: z.boolean(),
+    // Opt a project into its own page at /projects/<slug>. Flagship work always
+    // has one; every other project gets one as soon as its body is worth the
+    // click. Left false while the body is still a couple of sentences, because
+    // a page that says less than the card is worse than no link at all. Set it
+    // in the same change that writes the real body.
+    detail: z.boolean().default(false),
+    // Where the work came from. /projects groups the cards by this, so it is
+    // the field that decides which section a project appears under. Only
+    // meaningful for tier "project": flagship work renders in its own block
+    // above the groups, and leadership entries render as rows on /leadership.
+    origin: z
+      .enum(["course", "hackathon", "independent", "professional"])
+      .optional(),
+  })
+  .refine((p) => p.tier !== "project" || p.origin !== undefined, {
+    // Without this the failure is silent and nasty: a project missing an origin
+    // matches no group on /projects and simply does not render, with nothing
+    // anywhere saying so. Fail the build instead.
+    path: ["origin"],
+    message:
+      'tier "project" requires an origin ("course", "hackathon", "independent" ' +
+      'or "professional"), because /projects groups cards by it and an ' +
+      "unmatched project renders in no section at all",
+  });
 export type Project = z.infer<typeof projectSchema>;
 
 // content/cv.mdx, singleton. Body: the HTML CV facts (education, summary).

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Project } from "@/content/schema";
 import { projectHasPage } from "@/lib/content";
+import { formatPeriod } from "@/lib/format";
 import { MetaChips } from "./MetaChips";
 import { ArrowRightIcon } from "./icons";
 
@@ -10,9 +11,19 @@ import { ArrowRightIcon } from "./icons";
 export function ProjectCard({
   project,
   eyebrow,
+  spotlight = false,
 }: {
   project: Project;
   eyebrow?: string;
+  /**
+   * Render full-width with larger type (see .card-spotlight in globals.css).
+   * Passed explicitly by the caller rather than inferred from the card's
+   * position: this used to be a :first-child:nth-last-child(odd) rule, so
+   * whether a section had a spotlight depended on whether its project count
+   * happened to be odd, and adding one project silently changed the layout of
+   * a section nobody had touched.
+   */
+  spotlight?: boolean;
 }) {
   // A card links to its own page only once that page exists. The link is on
   // the title and stretches over the whole card via ::after, rather than
@@ -23,6 +34,8 @@ export function ProjectCard({
   return (
     <div
       className={`relative flex flex-col rounded-md border border-line bg-paper-raised p-6 transition-all duration-[--duration-base] ease-[--ease-out-expo] sm:p-7 ${
+        spotlight ? "card-spotlight" : ""
+      } ${
         href
           ? "group hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] hover:bg-paper-raised-hover hover:shadow-[var(--shadow-card-hover)]"
           : ""
@@ -66,9 +79,15 @@ export function ProjectCard({
           {project.role && (
             <p className="mt-2 text-sm text-ink-muted">{project.role}</p>
           )}
-          {project.context && (
-            <p className="mt-1 text-sm text-ink-faint">{project.context}</p>
-          )}
+          {/* The period lives here rather than on its own line because it is
+              part of the same "circumstances" statement as the context, and a
+              third meta line above the summary crowds the card. Cards carried
+              no date at all before this, so a reader could not tell recent
+              work from work three years old. */}
+          <p className="mt-1 text-sm text-ink-faint">
+            {project.context && `${project.context} · `}
+            {formatPeriod(project.period)}
+          </p>
         </div>
         <div className="flex flex-1 flex-col">
           {/* Capped so a wide card keeps a readable line length instead of
