@@ -9,7 +9,9 @@ summary: >-
   that appeared to improve accuracy had collapsed to four fixed images.
 stack: [Python, PyTorch, "ResNet-50", "ViT-B/16", Scikit-learn, Streamlit]
 role: The Vision Transformer, the evaluation harness, and the GAN augmentation
-context: Team of four, graduate deep learning course
+context: Course project, CSCI 4425, with Mario Saenz, Asim Upreti, and Demetrius
+  Billey
+links: { github: "https://github.com/rdey08/brain-tumor-mri-classification" }
 detail: true
 tier: project
 order: 2
@@ -39,8 +41,8 @@ down.
 Worth being precise about my share before making any claims on it. This was a
 four-person team, and the final tree landed in three bulk commits from my
 account, so `git blame` credits me with 98.7% of the source and is measuring
-packaging rather than authorship. By commit count a teammate contributed more
-than I did, and the preprocessing module is a descendant of his file, not
+packaging rather than authorship. By commit count Mario Saenz contributed more
+than I did, and the preprocessing module is a descendant of Mario's file, not
 mine. What is actually mine is the ViT work, the evaluation harness, the GAN
 augmentation pipeline, and the inference GUI.
 
@@ -147,8 +149,8 @@ on glioma. The best model, the GAN-augmented ResNet-50, gets 0.8375. ViT-B/16
 carries thirteen times the custom CNN's parameters and lands _below_ it, at
 0.8125. Five unrelated model families, one of which does no representation
 learning at all, converge on the same failure in the same direction: glioma
-leaks into
-meningioma and into no-tumor, and nothing leaks back the other way.
+leaks into meningioma and into no-tumor, and nothing leaks back the other
+way.
 
 When a hand-crafted feature pipeline and an 86M-parameter transformer fail
 identically, the limit is not in the architecture. It is in the labels or the
