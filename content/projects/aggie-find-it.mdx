@@ -4,12 +4,12 @@ slug: aggie-find-it
 period: { start: "2024-09", end: "2024-12" }
 summary: >-
   JavaFX desktop application for reporting and recovering lost items on campus,
-  built by five students over ten weeks. Students file requests and browse a
+  built by four students over ten weeks. Students file requests and browse a
   recent-items feed; building administrators log found items and search them.
   The client talks to MongoDB directly, with no server in between.
 stack: [Java, JavaFX, FXML, MongoDB]
-role: The front end. The routing shell and nine of the eleven views
-context: Team of five, CS 371, Fall 2024
+role: The requirements documentation, and the front end views and routing
+context: Team of four, CS 371, Fall 2024
 links: { github: "https://github.com/rdey08/aggie-find-it" }
 detail: true
 tier: project
@@ -20,11 +20,14 @@ featured: false
 ## Context
 
 Students file a lost-item request; building administrators log what turns up
-and search it by name, description, building and category. Five of us built it
+and search it by name, description, building and category. Four of us built it
 over ten weeks in the autumn of 2024, ending at 2,235 hand-written lines across
-30 files.
+30 files. Five of us started: the fifth wrote the problem statement and the
+value proposition, then took their name off the team page on the day the first
+code commit landed.
 
-My share is the front end: the page-routing shell, nine of the eleven FXML
+My share is the requirements documentation and the front end: eleven of the
+project wiki's thirty commits, the page-routing shell, nine of the eleven FXML
 views, and about a third of the surviving lines. The MongoDB data access layer
 is a teammate's work, and so is most of the admin dashboard. That division
 matters for reading the rest of this page, because nearly everything
@@ -121,6 +124,46 @@ the repository contains a build file, a Maven wrapper and a generated
 dependency-reduced POM, none of which build anything: the declared main class
 refers to a `HelloApplication` that does not exist in the tree.
 
+## What we specified, and what we shipped
+
+The team kept a project wiki, and I wrote most of it: twenty user stories with
+effort estimates and acceptance tests, and a nonfunctional requirements page
+dated 2 October 2024. That date is what makes this section something other than
+hindsight.
+
+The requirements page asks for hashing **and salting** for password storage.
+What shipped is a single unsalted round of SHA-256, a fast general-purpose
+digest rather than a password function, with each user's role encoded by
+prefixing that hash with a digit.
+
+It asks for role-based access control restricting admin and user permissions.
+What shipped has no session object and no authorization check anywhere past the
+login screen. The admin dashboard is protected by not being linked to, and
+anyone can register as an administrator by ticking a checkbox on the sign-up
+form.
+
+It asks for input validation to prevent injection attacks. Search interpolates
+the user's text straight into an unanchored regular expression, against an
+unindexed collection, on the interface thread, with no pagination.
+
+It asks for smooth performance at more than a hundred concurrent users. Every
+query opens its own database connection and blocks the interface until it
+returns.
+
+Two of the user stories carry acceptance tests the code fails outright. One
+requires an `@nmsu.edu` address, and email is never validated anywhere. One
+requires that a user can contact the authority through the Contact Us form,
+which is the form that sends nothing.
+
+The wiki's own index links three pages nobody ever wrote: a domain model, a
+software design, and "Verification and Validation: how we tested and verified
+the software." The page that would have documented the testing does not exist,
+and neither do the tests. Sprint 01 is the only sprint written up, out of ten
+weeks.
+
+None of this is a story about not knowing better. The gap between the document
+and the code is six weeks wide, and both ends of it are in version control.
+
 ## What this shows
 
 I would not write this the same way now, and the specific lesson is not "use
@@ -131,15 +174,12 @@ get parsed two different ways in the same controller, and the reason any
 description containing a comma and a space corrupts a table row. Cheap at the
 point of writing, expensive everywhere it was read.
 
-The security posture deserves stating plainly rather than being left for
-someone to find. Passwords are hashed with a single unsalted round of SHA-256,
-which is a fast general-purpose digest and not a password function. The user's
-role is stored by prefixing that hash with a digit. Anyone can register
-themselves as an administrator by ticking a checkbox on the sign-up form, and
-past the login screen there is no session and no authorization check at all:
-the admin dashboard is protected by not being linked to. Search interpolates
-user input into an unanchored regex against an unindexed collection, on the UI
-thread, with no pagination.
+The requirements page is the more uncomfortable lesson, and the more useful
+one. Writing the security requirements down did not produce them. Nothing in
+the process turned "hashing and salting" from a line in a document into a line
+of code, because nothing ever checked, and the page that was supposed to
+describe how we verified the software was never written either. A specification
+nobody tests against is a wish with a date on it.
 
 Two things in here I still think are simply correct. The building lookup
 handles scroll-wheel zoom with sensible bounds, and the request form's
