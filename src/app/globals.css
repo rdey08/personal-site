@@ -51,6 +51,12 @@
 
   /* Layout */
   --measure: 68ch;
+  /* Height of the sticky header, so anything else that pins can sit flush
+   * beneath it (see .section-sticky). 36px controls + py-4 + the 1px border.
+   * The controls are h-9 at every breakpoint, so this does not change with
+   * viewport width; it does change if the header's padding or control size
+   * ever does. */
+  --header-h: 69px;
   /* Lead blocks (hero tagline, homepage statement): one shared cap so their
    * left-aligned text edges actually align. */
   --measure-lead: 38rem;
@@ -278,6 +284,36 @@ h4 {
   .link-arrow {
     transform: none;
     transition: opacity var(--duration-fast) linear;
+  }
+}
+
+/* Section labels pin beneath the site header while their section is on screen,
+ * then hand over to the next one. Orientation on a long page without adding a
+ * rail or a tab bar: the label is already there, it just stops scrolling away.
+ *
+ * Sticky is scoped by the parent, and each SectionHeading sits directly inside
+ * its own <Section>, so a label pins only for the length of its own section.
+ * That is what makes the handover work with no scroll-spy and no JavaScript.
+ *
+ * The translucent fill and blur are the header's, so a pinned label reads as
+ * the same chrome rather than as a second, different bar. Without a fill,
+ * cards would scroll through the text.
+ *
+ * z-20 keeps it above cards (which are position:relative at auto z-index and
+ * come later in the DOM) and below the header at z-40. */
+.section-sticky {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 20;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(12px);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Pinning is motion the reader did not ask for: the label tracks the
+   * viewport instead of the page. Leave it in the flow. */
+  .section-sticky {
+    position: static;
+    backdrop-filter: none;
   }
 }
 

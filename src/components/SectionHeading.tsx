@@ -1,5 +1,12 @@
 // Editorial section heading: hairline rule, serif index numeral, small-caps
 // label, optional trailing action. Replaces bare uppercase h2s.
+//
+// Pins beneath the site header while its section is on screen (.section-sticky
+// in globals.css), so a reader always knows which section they are in without
+// the page growing a rail or a tab bar. Padding moved from the outer margin
+// into the box itself: mb-8 sat outside the sticky element, so content would
+// have scrolled flush against the label once pinned. pb-3 + mb-5 keeps the
+// same eight units of space below the label when it is not pinned.
 
 import type { ReactNode } from "react";
 
@@ -15,7 +22,7 @@ export function SectionHeading({
   rule?: boolean;
 }) {
   return (
-    <div className="relative mb-8 flex items-baseline gap-4 pt-5">
+    <div className="section-sticky relative mb-5 flex items-baseline gap-4 pt-5 pb-3">
       {/* Hairline that draws across on scroll (static line when the browser
           lacks scroll-driven animations, see globals.css). */}
       {rule && (
