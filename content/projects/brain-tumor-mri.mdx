@@ -107,6 +107,22 @@ since removing duplicates guts the per-class support unevenly: notumor falls
 from 400 test images to 58. But the direction and the rough size of the
 correction are not in doubt.
 
+The same pattern shows up one step earlier, in the splits the models trained
+against:
+
+```
+train accuracy, final epoch          0.9971
+validation accuracy, final epoch     0.9902
+test accuracy, as reported           0.9575
+test accuracy, near-duplicate free   0.9424
+```
+
+Training and validation are both carved out of the vendor's training directory
+by a file-level split, so whatever duplication sits in that pool is spread
+across both sides of it. Test comes from a separate directory. The number falls
+at every step away from the training pool, in exactly the order you would
+predict if duplication were doing the work.
+
 The part I find genuinely instructive is where the contamination came from.
 Perfect class balance is the feature of this dataset that looks most
 professional in a summary table, and it is exactly what caused the problem.
@@ -149,6 +165,12 @@ information. They do not, and this generator never produced any. The gain is
 a single-run difference produced by pasting four blurry blobs into the
 training set several hundred times each, and it is well inside the noise of
 an experiment nobody ran twice.
+
+There is a second confound underneath the first. The GAN-augmented run is the
+only one of the four whose best validation loss lands on its final epoch, so it
+stopped because it ran out of epochs while still improving. The plain ResNet-50
+peaked at epoch 10 and was stopped by patience eight epochs later. Whatever
+separates those two scores, it is not cleanly the synthetic data.
 
 The inference app makes the same point from the other end. Hand it one of the
 generator's own images and the five classifiers split three to two on whether
