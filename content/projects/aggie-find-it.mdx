@@ -1,15 +1,151 @@
 ---
-title: "Aggie Find-It: Lost & Found Management System"
+title: "Aggie Find-It: Campus Lost and Found"
 slug: aggie-find-it
-period: { start: "2024-08", end: "2024-12" }
-summary: Full-stack lost-and-found management system with a JavaFX frontend and
-  MongoDB for real-time item reporting and search.
-stack: [Java, JavaFX, MongoDB]
-context: Class project
+period: { start: "2024-09", end: "2024-12" }
+summary: >-
+  JavaFX desktop application for reporting and recovering lost items on campus,
+  built by five students over ten weeks. Students file requests and browse a
+  recent-items feed; building administrators log found items and search them.
+  The client talks to MongoDB directly, with no server in between.
+stack: [Java, JavaFX, FXML, MongoDB]
+role: The front end. The routing shell and nine of the eleven views
+context: Team of five, CS 371, Fall 2024
+links: { github: "https://github.com/rdey08/aggie-find-it" }
+detail: true
 tier: project
 order: 4
 featured: false
 ---
 
-Developed a full-stack MVC application with a JavaFX frontend integrated with
-MongoDB for real-time item reporting and search.
+## Context
+
+Students file a lost-item request; building administrators log what turns up
+and search it by name, description, building and category. Five of us built it
+over ten weeks in the autumn of 2024, ending at 2,235 hand-written lines across
+30 files.
+
+My share is the front end: the page-routing shell, nine of the eleven FXML
+views, and about a third of the surviving lines. The MongoDB data access layer
+is a teammate's work, and so is most of the admin dashboard. That division
+matters for reading the rest of this page, because nearly everything
+interesting here went wrong on the other side of it.
+
+The work came in bursts rather than steadily. Two calendar weeks have no
+commits at all, and three of them carry 70% of the 147 commits in the
+repository. The first commit is called "Sprint 1" and the last lands on what
+was almost certainly the due date.
+
+## Three words that do not survive the code
+
+The description I carried on this project for a year said "full-stack MVC
+application with a JavaFX frontend integrated with MongoDB for real-time item
+reporting and search." Going back through the source, three of those words are
+wrong, and they are the three a reader in the field would test first.
+
+<AggieArchitecture />
+
+**Full-stack** implies a tier I never wrote. There is no server, no HTTP, no
+API. The desktop client embeds the MongoDB driver and opens a connection
+straight to Atlas, which is why the database credential had to ship inside the
+application in the first place. The accurate description is two-tier.
+
+**Real-time** is not a thing this application does. There is no change stream,
+no websocket, no listener, no polling timer. Every read is one query fired by a
+user action, and the admin dashboard refreshes because someone clicked Reload.
+Two people running it against the same database never see each other's writes
+until a human asks. The only time-aware behaviour is a `$gte` filter on a
+stored date, which is a predicate, not live data.
+
+**MVC** is the interesting one, because the M is genuinely absent. There are
+views and there are controllers, but no domain object exists anywhere in the
+tree. The data layer returns rows as comma-joined text and the controller
+splits them back apart with `split(", ")`. The honest label is FXML views with
+per-view controllers over a single static data-access class.
+
+That last one is not pedantry, and the next section is why.
+
+## Everything reports success
+
+`sql_link` hands back strings, so an item's database ID never reaches the
+interface. When an admin selects a row and clicks Delete, the controller
+therefore cannot delete by ID. It re-queries the database using the four values
+visible in the table, and deletes the first thing that comes back:
+
+```java
+String item = sql_link.itemSearch(currentRowSelected.get(0), currentRowSelected.get(1),
+                                  currentRowSelected.get(2), currentRowSelected.get(3));
+sql_link.removeItem(item.strip().split(", ")[0].strip());
+```
+
+Two items sharing a name, description, building and category is not a corner
+case in a lost and found. It is Tuesday. A black umbrella from Zuhl Library
+deletes a different black umbrella from Zuhl Library, and nothing anywhere
+reports a problem. A choice about how to pass data between two layers produced
+a correctness bug three layers away.
+
+It has company. `addRequest` and `getRequests` write to and read from a
+collection called `Request`. The method that marks a request resolved writes to
+`Requests`. MongoDB creates collections implicitly on first write, and an
+update that matches zero documents is not an error, so the call returns true,
+the interface clears the selection, and nothing complains. Marking a lost-item
+request found or not found has never once worked, in any version, and the
+difference is one character.
+
+Then there is an edit method with no call sites that filters on a field the
+insert path never writes, so it would match nothing if anything did call it. It
+returns true. And the Contact Us form, which is mine, validates its inputs,
+sends nothing anywhere, and tells the user "Message sent successfully!"
+
+Four defects, one shape. Every layer in this application reports success. There
+are no tests: JUnit is declared in the build file, `src/test/` exists, and it is
+empty. Any one of these would have been caught by a single assertion on a
+return value, which is precisely the thing nobody wrote.
+
+## The migration that stopped halfway
+
+The largest single change in the project is one commit six weeks in, titled
+"database upadate", which replaced the entire persistence layer: out went
+`java.sql`, `DriverManager` and `ResultSet`, in came the MongoDB driver, 118
+lines added and 193 deleted in one file.
+
+It worked. It was also never finished. Five weeks later, at the final commit,
+the build file still declares the MySQL connector, the connector jar is still
+vendored in `lib/`, the README still instructs you to install MySQL, and the
+class is still called `sql_link`, imported under that name by every controller
+in the project.
+
+On the last day someone tried to clean this up, moving the tree into the
+standard Maven layout across 38 files. It never merged. The commit is reachable
+only from a side branch, and `main` has nothing under `src/main/`. That is why
+the repository contains a build file, a Maven wrapper and a generated
+dependency-reduced POM, none of which build anything: the declared main class
+refers to a `HelloApplication` that does not exist in the tree.
+
+## What this shows
+
+I would not write this the same way now, and the specific lesson is not "use
+MVC properly." It is narrower than that. The decision to pass rows between
+layers as formatted text looked like a shortcut in a data-access method, and it
+was the direct cause of the delete bug, the reason two different output formats
+get parsed two different ways in the same controller, and the reason any
+description containing a comma and a space corrupts a table row. Cheap at the
+point of writing, expensive everywhere it was read.
+
+The security posture deserves stating plainly rather than being left for
+someone to find. Passwords are hashed with a single unsalted round of SHA-256,
+which is a fast general-purpose digest and not a password function. The user's
+role is stored by prefixing that hash with a digit. Anyone can register
+themselves as an administrator by ticking a checkbox on the sign-up form, and
+past the login screen there is no session and no authorization check at all:
+the admin dashboard is protected by not being linked to. Search interpolates
+user input into an unanchored regex against an unindexed collection, on the UI
+thread, with no pagination.
+
+Two things in here I still think are simply correct. The building lookup
+handles scroll-wheel zoom with sensible bounds, and the request form's
+twelve-hour clock conversion gets both the noon and midnight cases right before
+handing off a date. Neither is clever. On a page this candid about defects,
+"correct" is worth something.
+
+The code is public, with credentials purged from the history. It builds; it
+does not run without a JavaFX SDK and a database to point at.

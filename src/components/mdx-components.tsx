@@ -14,6 +14,7 @@ import { AirbnbFeatureImportance } from "./figures/AirbnbFeatureImportance";
 import { AirbnbModelTable } from "./figures/AirbnbModelTable";
 import { CompilerStackFrame } from "./figures/CompilerStackFrame";
 import { CompilerMilestones } from "./figures/CompilerMilestones";
+import { AggieArchitecture } from "./figures/AggieArchitecture";
 
 // Plain-text extraction + slug for heading anchor ids (no client JS, no deps).
 function textOf(node: ReactNode): string {
@@ -144,4 +145,5 @@ export const mdxComponents: MDXComponents = {
   AirbnbModelTable,
   CompilerStackFrame,
   CompilerMilestones,
+  AggieArchitecture,
 };
