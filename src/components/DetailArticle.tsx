@@ -4,6 +4,7 @@ import { Mdx } from "@/lib/mdx";
 import { Section } from "./Section";
 import { MetaChips } from "./MetaChips";
 import { Prose } from "./Prose";
+import { LinkPending } from "./LinkPending";
 
 // Shared layout for research and flagship-project detail pages: eyebrow,
 // serif display title, a definition-list metadata grid, then measured prose.
@@ -38,6 +39,7 @@ export function DetailArticle({
         className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
       >
         ← {backLabel}
+        <LinkPending />
       </Link>
 
       <header className="mt-8">
@@ -83,6 +85,7 @@ export function DetailArticle({
           className="text-sm font-medium text-ink-muted transition-colors duration-[--duration-fast] hover:text-accent"
         >
           ← Back to {backLabel}
+          <LinkPending />
         </Link>
         {next && (
           <Link href={next.href} className="group sm:text-right">
@@ -91,6 +94,7 @@ export function DetailArticle({
             </p>
             <p className="mt-1 font-serif text-lg font-medium tracking-tight text-ink-strong transition-colors duration-[--duration-fast] group-hover:text-accent">
               {next.title} →
+              <LinkPending />
             </p>
           </Link>
         )}

@@ -68,13 +68,15 @@ export default async function ProjectPage({
 
   const { meta, body } = project;
 
-  // Onward link: the next project that has a page, wrapping at the end, so a
-  // reader can walk the whole set instead of dead-ending. Falls back to the
-  // featured research thread when this is the only project page.
+  // Onward link: the next project that has a page, in display order.
+  // Deliberately does not wrap. It used to cycle with a modulo, so the last
+  // project sent the reader back to the first with nothing signalling they had
+  // come full circle, and projects were the only place the sequence could go.
+  // Running off the end now hands over to the research thread instead, so the
+  // path always moves forward and eventually leaves the section.
   const withPages = getProjectsWithPages();
   const here = withPages.findIndex((p) => p.meta.slug === slug);
-  const following =
-    withPages.length > 1 ? withPages[(here + 1) % withPages.length] : undefined;
+  const following = here >= 0 ? withPages[here + 1] : undefined;
   const featuredThread = getResearchThreads().find((t) => t.meta.featured);
   const next = following
     ? {

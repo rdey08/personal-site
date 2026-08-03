@@ -22,6 +22,7 @@
 //   - JS + reduced motion: matchMedia never fires, CSS reduce rules apply;
 //   - JS + motion OK: GSAP owns every page's motion.
 
+import { useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -39,9 +40,60 @@ declare global {
 
 export function SiteAnimations() {
   const pathname = usePathname();
+  // False for every run after the first. useGSAP re-runs this whole callback
+  // per pathname with revertOnUpdate, and a ref is the only state that
+  // survives that teardown.
+  const firstLoad = useRef(true);
 
   useGSAP(
     () => {
+      const initial = firstLoad.current;
+      firstLoad.current = false;
+
+      // The arrival choreography is authored for the moment someone lands on
+      // the site. Replaying it in full on every client-side navigation makes
+      // clicking through six project pages six separate waits for text to
+      // fade in, because .stagger holds the whole article at autoAlpha 0 for
+      // about a second. In-site navigation gets a short fade instead: the
+      // page still resolves rather than snapping, but it stops feeling
+      // ceremonial on the fourth click. Scrubbed motion (.rule-draw, .sd-num)
+      // is untouched, since it follows scroll position rather than arrival.
+      const ENTER = initial
+        ? {
+            ease: "power4.out",
+            dur: 0.8,
+            stagger: 0.09,
+            y: 18,
+            underlineDelay: 0.35,
+            riseY: 44,
+            riseDur: 1.1,
+            cardX: 80,
+            cardY: 36,
+            cardScale: 0.97,
+            cardDur: 1.2,
+            cardDelay: 0.12,
+            rowY: 28,
+            rowDur: 0.9,
+            rowStagger: 0.08,
+          }
+        : {
+            ease: "power2.out",
+            dur: 0.25,
+            stagger: 0,
+            y: 8,
+            underlineDelay: 0.08,
+            riseY: 12,
+            riseDur: 0.3,
+            cardX: 0,
+            cardY: 10,
+            cardScale: 1,
+            cardDur: 0.3,
+            cardDelay: 0,
+            rowY: 10,
+            rowDur: 0.3,
+            rowStagger: 0.02,
+          };
+
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", (ctx) => {
@@ -64,10 +116,10 @@ export function SiteAnimations() {
           if (group.querySelector('[data-gsap="name"]')) return;
           gsap.from(group.children, {
             autoAlpha: 0,
-            y: 18,
-            duration: 0.8,
-            ease: "power4.out",
-            stagger: 0.09,
+            y: ENTER.y,
+            duration: ENTER.dur,
+            ease: ENTER.ease,
+            stagger: ENTER.stagger,
             clearProps: "all",
           });
           const underline = group.querySelector(".draw-underline");
@@ -75,9 +127,9 @@ export function SiteAnimations() {
             gsap.from(underline, {
               scaleX: 0,
               transformOrigin: "left center",
-              duration: 0.8,
+              duration: ENTER.dur,
               ease: "power3.inOut",
-              delay: 0.35,
+              delay: ENTER.underlineDelay,
             });
           }
         });
@@ -87,10 +139,10 @@ export function SiteAnimations() {
         q(".sd-rise").forEach((el) => {
           if (el.querySelector('[data-animate="rows"]')) return;
           gsap.from(el, {
-            y: 44,
+            y: ENTER.riseY,
             autoAlpha: 0,
-            duration: 1.1,
-            ease: "power4.out",
+            duration: ENTER.riseDur,
+            ease: ENTER.ease,
             scrollTrigger: { trigger: el, start: "top 90%", once: true },
           });
         });
@@ -99,13 +151,13 @@ export function SiteAnimations() {
         q(".sd-cards").forEach((grid) => {
           Array.from(grid.children).forEach((card, i) => {
             gsap.from(card, {
-              x: i % 2 ? 80 : -80,
-              y: 36,
+              x: i % 2 ? ENTER.cardX : -ENTER.cardX,
+              y: ENTER.cardY,
               autoAlpha: 0,
-              scale: 0.97,
-              duration: 1.2,
-              delay: (i % 2) * 0.12,
-              ease: "power4.out",
+              scale: ENTER.cardScale,
+              duration: ENTER.cardDur,
+              delay: (i % 2) * ENTER.cardDelay,
+              ease: ENTER.ease,
               clearProps: "all",
               scrollTrigger: { trigger: card, start: "top 88%", once: true },
             });
@@ -143,10 +195,10 @@ export function SiteAnimations() {
         // ---- List rows cascade on enter (news, leadership, publications).
         q('[data-animate="rows"]').forEach((list) => {
           gsap.from(list.children, {
-            y: 28,
+            y: ENTER.rowY,
             autoAlpha: 0,
-            duration: 0.9,
-            stagger: 0.08,
+            duration: ENTER.rowDur,
+            stagger: ENTER.rowStagger,
             ease: "power3.out",
             scrollTrigger: { trigger: list, start: "top 88%", once: true },
           });
