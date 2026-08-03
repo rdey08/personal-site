@@ -7,26 +7,26 @@
 // Still a disclosure rather than a modal: the panel is a dropdown under the
 // header, not a full-screen sheet, so it takes no focus trap and no inert on
 // the rest of the page. Tab order continues into the content below, which is
-// what a reader expects from a menu they can see past. The scrim below dims
-// and catches taps; it does not make this a dialog.
+// what a reader expects from a menu they can see past. The scrim dims and
+// catches taps; it does not make this a dialog.
 //
-// Dismissal has two paths on purpose. The scrim is the one that matters,
-// because it is a real element receiving a real tap. The document-level
-// pointerdown listener is the fallback for the strip the scrim deliberately
-// does not cover, the header itself.
+// The scrim MUST be portalled to <body>. The header sets backdrop-blur, and
+// backdrop-filter makes an element a containing block for position: fixed
+// descendants, so a scrim rendered in place covered the header's own 69px box
+// instead of the viewport. That put it on top of the toggle: tapping the close
+// icon hit the scrim, which dismissed on pointerdown and unmounted, so the
+// click that followed landed on the newly exposed button and reopened the
+// menu. Portalling it out of the header is what makes inset-0 mean the screen.
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NAV_LINKS } from "@/lib/nav";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  // Wraps both the toggle and the panel, so one outside test covers both. A
-  // ref on the panel alone would treat a click on the toggle as "outside" and
-  // close the menu the same tick the button reopened it.
-  const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Dismissal that the user drove (Escape, tapping away). Focus goes back to
@@ -37,24 +37,17 @@ export function MobileNav() {
     buttonRef.current?.focus();
   }, []);
 
+  // Escape only. Outside-tap dismissal belongs to the scrim, which is a real
+  // element receiving a real tap; a second document-level listener doing the
+  // same job raced it, closing on pointerdown so the following click fell
+  // through to whatever was underneath.
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") dismiss();
     }
-    // Tapping the page behind an open menu is the ordinary way to dismiss it
-    // on a phone, and it did nothing here: the panel carried a ref that was
-    // never read by any handler. pointerdown rather than click so it lands on
-    // the first touch instead of waiting for the release.
-    function onPointerDown(e: PointerEvent) {
-      if (!wrapRef.current?.contains(e.target as Node)) dismiss();
-    }
     document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPointerDown);
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, [open, dismiss]);
 
   // Close on any route change, not just on a tap inside this panel. The
@@ -73,7 +66,7 @@ export function MobileNav() {
   }
 
   return (
-    <div ref={wrapRef} className="sm:hidden">
+    <div className="sm:hidden">
       <button
         ref={buttonRef}
         type="button"
@@ -102,22 +95,23 @@ export function MobileNav() {
 
       {open && (
         <>
-          {/* Backdrop over the page, under the header (header is z-40, this is
-              z-30), so the header and the panel stay tappable while every
-              other tap lands on a real element with a real handler.
+          {/* Portalled to <body>: see the note at the top of this file. z-30
+              keeps it under the header and panel (both z-40), so the toggle
+              stays tappable and closing works, while every tap on the page
+              lands here.
 
-              The document-level pointerdown listener above should already
-              cover this, and on desktop it does. It proved unreliable on a
-              phone, and a dismissal that works "in theory" is worth nothing
-              when the menu will not close in someone's hand. An element that
-              receives the tap directly cannot be defeated by event delegation
-              quirks, and the dim is the affordance other sites use to say the
-              menu is a layer you can tap away. */}
-          <div
-            aria-hidden="true"
-            onPointerDown={dismiss}
-            className="fixed inset-0 z-30 bg-black/25"
-          />
+              onClick, not onPointerDown. The scrim unmounts the moment it
+              dismisses, so closing on pointerdown left the click to land on
+              whatever was underneath, which on this site is usually a project
+              card. Waiting for the click means the scrim consumes it. */}
+          {createPortal(
+            <div
+              aria-hidden="true"
+              onClick={dismiss}
+              className="fixed inset-0 z-30 bg-black/25"
+            />,
+            document.body,
+          )}
           <div
             id="mobile-nav-panel"
             className="panel-rise absolute inset-x-0 top-full z-40 border-b border-line bg-paper-raised"
