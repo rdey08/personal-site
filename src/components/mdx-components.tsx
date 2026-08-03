@@ -13,7 +13,6 @@ import { ScreenshotFigure } from "./figures/ScreenshotFigure";
 import { AirbnbFeatureImportance } from "./figures/AirbnbFeatureImportance";
 import { AirbnbModelTable } from "./figures/AirbnbModelTable";
 import { CompilerStackFrame } from "./figures/CompilerStackFrame";
-import { CompilerMilestones } from "./figures/CompilerMilestones";
 import { AggieArchitecture } from "./figures/AggieArchitecture";
 
 // Plain-text extraction + slug for heading anchor ids (no client JS, no deps).
@@ -144,6 +143,5 @@ export const mdxComponents: MDXComponents = {
   AirbnbFeatureImportance,
   AirbnbModelTable,
   CompilerStackFrame,
-  CompilerMilestones,
   AggieArchitecture,
 };

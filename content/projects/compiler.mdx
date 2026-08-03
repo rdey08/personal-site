@@ -17,53 +17,58 @@ featured: true
 
 ## Context
 
-The source language is **J**, and the obvious assumption about it is wrong. J is
-not a subset of C. It was designed by Jonathan Cook, who teaches the course, so
-the project would not be a standard one, and Fall 2024 was its first outing.
+The source language is **J**, and it is not a subset of C. Jonathan Cook
+designed it for the course so the project would not be a standard one, and Fall
+2024 was its first outing.
 
-What it borrows from C is braces, semicolons, and the word `int`. Everything
-else is closer to Algol: `program { }` with `function f(int a) { }` above it,
-mandatory `else`, and calls that are statements rather than expressions, so
-`x = f(y)` is inexpressible and you write `call f(y); x = returnvalue;` instead.
-There is no multiplication, division, or modulo. The binary operators are
-`+ - & | ^` and that is the whole list. No boolean operators, no pointers, no
-structs, no comments.
+What J borrows from C is braces, semicolons, and the word `int`. Everything
+else is closer to Algol, and calls are statements rather than expressions, so
+`x = f(y)` is inexpressible:
 
-A narrow language is not a smaller problem, it just moves where the difficulty
-sits. With no arithmetic beyond addition, the interesting work is all in calling
-convention and control flow.
+```c
+function fib(int n)
+{
+   int a;
+   int b;
+   if (n <= 1) then {
+      return n;
+   } else {
+      call fib(n + -1);
+      a = returnvalue;
+      call fib(n + -2);
+      b = returnvalue;
+      return a + b;
+   }
+}
+```
 
-The grammar, the scanner, and the code generator are mine; the AST node
-structure and the symbol table came from the instructor as a scaffold. About
-1,700 lines in all.
+`else` is mandatory. There is no multiplication, division or modulo; the binary
+operators are `+ - & | ^` and that is the whole list. No boolean operators, no
+pointers, no structs, no comments. The `n + -1` is not stylistic either, and
+the last section explains it.
 
-## Seven milestones
+With no arithmetic beyond addition, the difficulty sits in the calling
+convention and the control flow rather than in expressions. Built in C with
+Flex and Bison across seven milestones, about 1,700 lines. The grammar, the
+scanner and the code generator are mine; the AST node structure and the symbol
+table came from the instructor as a scaffold.
 
-<CompilerMilestones />
+## Stack frames and recursion
 
-The fourth is the one I would point at. It added no syntax whatsoever, 28
-productions in and 28 out, and was by a distance the largest change in the
-project: everything before it read J and printed what it had understood, and
-everything after it emitted assembly. The sixth is the other jump, and the more
-interesting failure of my original design.
+Through the fifth milestone there were no local variables. Every variable,
+including every parameter, compiled to a single static cell addressed by name.
+Nested calls still worked, because each callee saved the caller's return
+address on entry and restored it on exit.
 
-## Storage, and why the frame was rebuilt
+Recursion at that stage was structurally sound and useless. Control flow
+returned to exactly the right place, but every activation shared one cell per
+variable, so the first assignment inside a recursive call overwrote its
+caller's state.
 
-Through milestone five there were no local variables. Every variable, including
-every parameter, compiled to a single static cell addressed by name. Nested
-calls worked, because each callee saved the caller's return address on entry and
-restored it on exit.
-
-Recursion at that stage was structurally sound and semantically useless. Control
-flow would have returned to exactly the right place, and every activation would
-have shared one cell per variable, so the first assignment inside a recursive
-call would have overwritten its caller's state.
-
-Locals are what broke it. Per-activation storage needs a frame, and a frame
-needs a base register that does not move during expression evaluation. So
-milestone six introduced `fp`, and the seven-line prologue and epilogue became
-sixteen. The frame size is 128 bytes and has always been arbitrary: there is no
-frame-size computation anywhere, just a number large enough not to matter.
+Local variables are what broke it. Per-activation storage needs a frame, and a
+frame needs a base register that does not move during expression evaluation.
+Milestone six introduced `fp`, and the prologue and epilogue roughly doubled in
+size. The frame is a fixed 128 bytes, with no frame-size computation anywhere.
 
 <CompilerStackFrame />
 
@@ -83,94 +88,54 @@ func_exit:                      # one epilogue, shared by every function
         ret
 ```
 
-One line of that epilogue is an admission. `mv sp, fp` is only there because
-expression evaluation does not reliably balance its own pushes against its pops,
-and I chose to paper over that at the exit rather than find out why. It also
-conceals a real bug: assigning to an array element leaks eight bytes of stack
-each time, which a function's epilogue absorbs on the way out, leaving the
-`program` block, which has no epilogue, as the one place it can run away into an
-alignment fault.
+The `mv sp, fp` exists because expression evaluation does not reliably balance
+its pushes against its pops. It also conceals a bug: assigning to an array
+element leaks eight bytes of stack each time, which a function's epilogue
+absorbs on the way out, leaving the `program` block, which has no epilogue, as
+the one place it can run away into an alignment fault.
 
-Milestone seven then added `return`, and an early return from inside an `if`
-needs somewhere to jump to. So every epilogue was hoisted into one shared
-`func_exit`. That solved returns and locked the design: a single exit can only
-restore the stack by a constant, so computing a real frame size stopped being
-possible without undoing it. The simplification that made returns easy is the
-one that made the obvious next improvement unreachable.
+Milestone seven added `return`, and an early return from inside an `if` needs
+somewhere to jump to, so every epilogue was hoisted into one shared
+`func_exit`. That solved returns and locked the design, since a single exit can
+only restore the stack by a constant.
 
 ## Generating code
 
 The target is RV32 under RARS, the simulator the course used, so the system
-calls are RARS numbers rather than Linux ones.
+calls are RARS numbers rather than Linux ones. There is no intermediate
+representation and no optimiser: the generator walks the AST and prints. The
+absence is visible in the output, where an unconditional jump is followed by a
+branch that can never be reached.
 
-There is no register allocation: `t0` is a universal accumulator, and every
-binary operation pushes its left operand, evaluates the right, pops, and
-combines. There is no intermediate representation and no optimiser, so the
-generator walks the AST and prints. You can see the absence in the output, where
-an unconditional jump is followed by a branch that can never be reached.
+There is no register allocation either. `t0` is a universal accumulator, and
+every binary operation pushes its left operand, evaluates the right, pops and
+combines. Nor is there a semantic pass. Name resolution lives in the Bison
+actions and amounts to one working check, that a variable is not used before it
+is declared. Type checking does not exist, which is survivable in a language
+with one real type.
 
-Nor is there a semantic pass. Name resolution lives in the Bison actions and
-amounts to one working check, that a variable is not used before it is declared.
-A second check for duplicate declarations has an error path that can never be
-reached. Type checking does not exist, which is survivable in a language with
-one real type: `string` is in the grammar but registered as an integer.
-
-One piece I still like. The relational generator branches to the then-label when
-the condition is true, so the else block is emitted first and the then block
-second. Laying the branches out backwards is what lets the comparison be emitted
+One piece I still like: the relational generator branches to the then-label
+when the condition is true, so the else block is emitted first and the then
+block second. Laying the branches out backwards lets the comparison be emitted
 exactly as written, with no inversion step.
 
-```c
-function fib(int n)
-{
-   int a;
-   int b;
-   if (n <= 1) then {
-      return n;
-   } else {
-      call fib(n + -1);
-      a = returnvalue;
-      call fib(n + -2);
-      b = returnvalue;
-      return a + b;
-   }
-}
-```
+## The subtraction bug
 
-Correct at `fib(10)`, and on a linear recursion eight thousand frames deep,
-though no test in the suite was ever recursive and none of that was
-demonstrated at the time. The `n + -1` is not stylistic either. In the compiler
-as submitted, `n - 1` does not compile, and that is the next section.
+Milestone seven added unary operators as a scanner rule matching `-` and `~`,
+placed above the existing rule matching `+ - & | ^`. Both match `-` at length
+one, and Flex breaks ties by rule order, so `-` became unary everywhere and
+binary subtraction quietly stopped existing. Two tests that had been passing
+stopped compiling.
 
-## Subtraction, twice
+Reordering the rules restores subtraction and breaks negation instead. The two
+are mutually exclusive by construction, and no ordering can work, because
+whether `-` is unary or binary is not a lexical property. It depends on whether
+the previous token was an operand, and a scanner looking at one token cannot
+know that.
 
-Both times this compiler broke, it broke on subtraction, and neither break was
-visible until a case arrived that could tell the difference.
-
-The first was in milestone four, where binary operations emitted their operands
-backwards. The convention is push-left, evaluate-right, so the left operand ends
-up in `t1` and the right in `t0`, and the generated instruction had them the
-other way round. Addition is commutative, so while `+` was the only operator the
-bug was invisible. It was corrected in milestone five, which is exactly the
-milestone that introduced subtraction.
-
-The second one shipped. Milestone seven was six features in a single commit, six
-days after the previous one, and one of them was unary operators: a scanner rule
-matching `-` and `~`, added alongside the existing rule matching `+ - & | ^`.
-Both match `-` at length one, and Flex breaks ties by rule order, so `-` became
-unary everywhere and binary subtraction quietly stopped existing. Nobody caught
-it, not me and not the grader, who marked the unary-operator work full credit
-while the operator it displaced no longer existed.
-
-The instructive part is what happens when you reach for the obvious fix.
-Reordering the rules restores subtraction and breaks negation instead. They are
-mutually exclusive by construction and no ordering can work, because whether `-`
-is unary or binary is not a lexical property. It depends on whether the previous
-token was an operand, and a scanner looking at one token cannot know that.
-
-The fix is to stop asking the scanner. Emit one token for `-` and let the parser
-disambiguate from context, with a precedence override so unary binds tighter
-than binary:
+The fix is to stop asking the scanner. Emit one token for `-` and let the
+parser disambiguate from context, with a precedence override so unary binds
+tighter than binary:
 
 ```
 /* scanner.l */          /* parser.y */
@@ -181,53 +146,27 @@ than binary:
                                    | MINUS expression %prec UMINUS
 ```
 
-What makes it satisfying is where it leads. My grammar had been conflict-free
-for six milestones, and milestone seven introduced exactly one shift/reduce
-conflict, which I had been treating as noise. It was the same ambiguity
-surfacing a phase later. The parser had been telling me about the scanner's bug
-the whole time.
+That cleared two other things I had not connected to it. The grammar had been
+conflict-free for six milestones, and milestone seven introduced exactly one
+shift/reduce conflict, which was this same ambiguity surfacing a phase later.
+And the precedence line those rules replaced, `%right ADDOP`, had made every
+binary operator right-associative since milestone five, so `10 - 3 - 2`
+evaluated to 9.
 
-It was telling me about a third thing too. The precedence line those rules
-replaced was `%right ADDOP`, which had made every binary operator
-right-associative since milestone five, so `10 - 3 - 2` evaluated to 9. Unary
-minus bound too loosely for the same reason, making `-z + 3` come out as -8
-rather than -2. One misplaced scanner rule, one warning I ignored, and three
-wrong behaviours, all of them in the place I was not looking.
-
-That fix is real but it is not coursework. It went in as a single dated commit
-in August 2026, long after the grade, and it is why the public repo now reports
-zero conflicts and compiles its whole test suite while the paragraphs above
-describe a compiler that did neither.
-
-None of this is really about subtraction. Argument passing hard-coded the first
-argument register, so calls were correct until one took two arguments.
-Relational operators were keyed on the ASCII value of their first character,
-which cannot distinguish `<` from `<=`, so they were correct until `<=` existed;
-the repair left four of the six alone, which is why the switch that emits
-comparisons still has `case 1:` sitting beside `case '<':`. Each was right up to
-the moment the language grew the one case that could tell the difference, and
-nothing was watching when it did.
-
-Worth being honest about something I did not solve. J never presented the
-dangling-else problem, and not because `else` is mandatory. Every block is
-brace-delimited, so the closing brace pins the attachment structurally. That is
-a property of the language I was handed, not something I noticed.
+That fix went in long after the course, so the public repository reports zero
+conflicts and compiles its whole test suite, while everything above describes a
+compiler that did neither.
 
 ## What this shows
 
-The compiler works and its output genuinely runs. What it never had was any way
-of knowing that automatically: no expected outputs, no assertions, nothing to
-run a regression with.
-
-I did write a test suite eventually, six programs covering loops, functions,
-return values, bitwise and unary operators, and do-while. I committed it the day
-after the final submission. Two of the six did not compile, because of the
-subtraction bug from the milestone before. The suite would have caught the
-regression that shipped, had it existed one day earlier. All six compile and run
-today, which is a fact about the repository rather than about the coursework.
+The compiler works and its output runs: `fib(10)` is correct, and so is a
+linear recursion eight thousand frames deep. What it never had was any way of
+knowing that automatically, with no expected outputs, no assertions and nothing
+to run a regression against. I wrote a six-program test suite the day after the
+final submission, and two of the six did not compile, because of the
+subtraction bug from the milestone before.
 
 Some of what remains is deliberate simplification: fixed frames, no register
 allocation, no optimiser. The rest is not. Declared array sizes are ignored, so
 a large array silently corrupts whatever follows it, and a seventh parameter
-reads garbage because only six argument registers are ever spilled. There are a
-few others.
+reads garbage because only six argument registers are ever spilled.

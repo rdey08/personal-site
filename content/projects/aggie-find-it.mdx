@@ -19,60 +19,48 @@ featured: false
 
 ## Context
 
-Students file a lost-item request; building administrators log what turns up
-and search it by name, description, building and category. Four of us built it
-over ten weeks in the autumn of 2024, ending at 2,235 hand-written lines across
-30 files. Five of us started: the fifth wrote the problem statement and the
-value proposition, then took their name off the team page on the day the first
-code commit landed.
+Students report a lost item; building administrators log what turns up and
+search it by name, description, building and category. Four of us built it over
+ten weeks in the autumn of 2024, ending at 2,235 hand-written lines across 30
+files. Five started: the fifth wrote the problem statement and the value
+proposition, then took their name off the team page on the day the first code
+commit landed.
 
-My share is the requirements documentation and the front end: eleven of the
-project wiki's thirty commits, the page-routing shell, nine of the eleven FXML
-views, and about a third of the surviving lines. The MongoDB data access layer
-is a teammate's work, and so is most of the admin dashboard. That division
-matters for reading the rest of this page, because nearly everything
-interesting here went wrong on the other side of it.
+I wrote most of the requirements documentation, including twenty user stories
+with effort estimates and acceptance tests, and built the front end: the
+page-routing shell and nine of the eleven FXML views. A teammate wrote the
+MongoDB data access layer and most of the admin dashboard.
 
-The work came in bursts rather than steadily. Two calendar weeks have no
-commits at all, and three of them carry 70% of the 147 commits in the
-repository. The first commit is called "Sprint 1" and the last lands on what
-was almost certainly the due date.
+## What we built
 
-## Three words that do not survive the code
-
-The description I carried on this project for a year said "full-stack MVC
-application with a JavaFX frontend integrated with MongoDB for real-time item
-reporting and search." Going back through the source, three of those words are
-wrong, and they are the three a reader in the field would test first.
+A JavaFX desktop client connecting straight to MongoDB Atlas. There is no
+server tier, no API and no service layer.
 
 <AggieArchitecture />
 
-**Full-stack** implies a tier I never wrote. There is no server, no HTTP, no
-API. The desktop client embeds the MongoDB driver and opens a connection
-straight to Atlas, which is why the database credential had to ship inside the
-application in the first place. The accurate description is two-tier.
+That shape has one direct consequence: every installed copy of the application
+carries the database credential, because there is nothing else to hold it.
 
-**Real-time** is not a thing this application does. There is no change stream,
-no websocket, no listener, no polling timer. Every read is one query fired by a
-user action, and the admin dashboard refreshes because someone clicked Reload.
-Two people running it against the same database never see each other's writes
-until a human asks. The only time-aware behaviour is a `$gte` filter on a
-stored date, which is a predicate, not live data.
+Eleven FXML views sit over eleven controllers, with one class, `sql_link`,
+holding all fourteen data-access methods. Four collections get created
+implicitly on first write, with no indexes and no schema validation. Search is
+a case-insensitive regex over name and description, with exact matching on
+building and category, and every read is one query fired by a user action:
+there is no change stream, listener or polling, so two clients never see each
+other's writes until somebody clicks Reload.
 
-**MVC** is the interesting one, because the M is genuinely absent. There are
-views and there are controllers, but no domain object exists anywhere in the
-tree. The data layer returns rows as comma-joined text and the controller
-splits them back apart with `split(", ")`. The honest label is FXML views with
-per-view controllers over a single static data-access class.
+## The cost of passing rows as text
 
-That last one is not pedantry, and the next section is why.
+`sql_link` returns query results as comma-joined strings, and the controllers
+split them apart again. No domain object exists anywhere in the codebase.
 
-## Everything reports success
+That looks like a shortcut inside a data-access method. Its consequences are
+all somewhere else.
 
-`sql_link` hands back strings, so an item's database ID never reaches the
-interface. When an admin selects a row and clicks Delete, the controller
-therefore cannot delete by ID. It re-queries the database using the four values
-visible in the table, and deletes the first thing that comes back:
+Because rows arrive as text, an item's database ID never reaches the interface.
+So when an administrator selects a row and clicks Delete, the controller cannot
+delete by ID. It re-queries using the four values visible in the table and
+removes the first match:
 
 ```java
 String item = sql_link.itemSearch(currentRowSelected.get(0), currentRowSelected.get(1),
@@ -80,112 +68,47 @@ String item = sql_link.itemSearch(currentRowSelected.get(0), currentRowSelected.
 sql_link.removeItem(item.strip().split(", ")[0].strip());
 ```
 
-Two items sharing a name, description, building and category is not a corner
-case in a lost and found. It is Tuesday. A black umbrella from Zuhl Library
-deletes a different black umbrella from Zuhl Library, and nothing anywhere
-reports a problem. A choice about how to pass data between two layers produced
-a correctness bug three layers away.
+Two items sharing a name, description, building and category is ordinary in a
+lost and found. The wrong one gets deleted, and nothing reports a problem.
 
-It has company. `addRequest` and `getRequests` write to and read from a
-collection called `Request`. The method that marks a request resolved writes to
-`Requests`. MongoDB creates collections implicitly on first write, and an
-update that matches zero documents is not an error, so the call returns true,
-the interface clears the selection, and nothing complains. Marking a lost-item
-request found or not found has never once worked, in any version, and the
-difference is one character.
-
-Then there is an edit method with no call sites that filters on a field the
-insert path never writes, so it would match nothing if anything did call it. It
-returns true. And the Contact Us form, which is mine, validates its inputs,
-sends nothing anywhere, and tells the user "Message sent successfully!"
-
-Four defects, one shape. Every layer in this application reports success. There
-are no tests: JUnit is declared in the build file, `src/test/` exists, and it is
-empty. Any one of these would have been caught by a single assertion on a
-return value, which is precisely the thing nobody wrote.
-
-## The migration that stopped halfway
-
-The largest single change in the project is one commit six weeks in, titled
-"database upadate", which replaced the entire persistence layer: out went
-`java.sql`, `DriverManager` and `ResultSet`, in came the MongoDB driver, 118
-lines added and 193 deleted in one file.
-
-It worked. It was also never finished. Five weeks later, at the final commit,
-the build file still declares the MySQL connector, the connector jar is still
-vendored in `lib/`, the README still instructs you to install MySQL, and the
-class is still called `sql_link`, imported under that name by every controller
-in the project.
-
-On the last day someone tried to clean this up, moving the tree into the
-standard Maven layout across 38 files. It never merged. The commit is reachable
-only from a side branch, and `main` has nothing under `src/main/`. That is why
-the repository contains a build file, a Maven wrapper and a generated
-dependency-reduced POM, none of which build anything: the declared main class
-refers to a `HelloApplication` that does not exist in the tree.
+The same decision surfaces twice more. Two methods emit two different text
+formats, parsed two different ways in the same controller, so a change to
+either silently breaks a caller. And any description containing a comma
+followed by a space corrupts the row it belongs to.
 
 ## What we specified, and what we shipped
 
-The team kept a project wiki, and I wrote most of it: twenty user stories with
-effort estimates and acceptance tests, and a nonfunctional requirements page
-dated 2 October 2024. That date is what makes this section something other than
-hindsight.
+The team kept a project wiki. Its nonfunctional requirements page, dated 2
+October 2024, asks for hashing **and salting** for password storage,
+role-based access control, input validation against injection, and smooth
+performance beyond a hundred concurrent users.
 
-The requirements page asks for hashing **and salting** for password storage.
-What shipped is a single unsalted round of SHA-256, a fast general-purpose
-digest rather than a password function, with each user's role encoded by
-prefixing that hash with a digit.
+What shipped was a single unsalted round of SHA-256, with each user's role
+encoded by prefixing that hash with a digit. There is no session object and no
+authorization check past the login screen, so the admin dashboard is protected
+by not being linked to, and anyone can register as an administrator by ticking
+a checkbox on the sign-up form. Search interpolates user input into an
+unanchored regular expression against an unindexed collection, on the interface
+thread. Every query opens its own database connection.
 
-It asks for role-based access control restricting admin and user permissions.
-What shipped has no session object and no authorization check anywhere past the
-login screen. The admin dashboard is protected by not being linked to, and
-anyone can register as an administrator by ticking a checkbox on the sign-up
-form.
-
-It asks for input validation to prevent injection attacks. Search interpolates
-the user's text straight into an unanchored regular expression, against an
-unindexed collection, on the interface thread, with no pagination.
-
-It asks for smooth performance at more than a hundred concurrent users. Every
-query opens its own database connection and blocks the interface until it
-returns.
-
-Two of the user stories carry acceptance tests the code fails outright. One
-requires an `@nmsu.edu` address, and email is never validated anywhere. One
-requires that a user can contact the authority through the Contact Us form,
-which is the form that sends nothing.
-
-The wiki's own index links three pages nobody ever wrote: a domain model, a
-software design, and "Verification and Validation: how we tested and verified
-the software." The page that would have documented the testing does not exist,
-and neither do the tests. Sprint 01 is the only sprint written up, out of ten
-weeks.
-
-None of this is a story about not knowing better. The gap between the document
-and the code is six weeks wide, and both ends of it are in version control.
+Two of the user stories carry acceptance tests the code fails outright. The
+wiki's index also links a page called "Verification and Validation: how we
+tested and verified the software" that nobody ever wrote, alongside tests that
+nobody ever wrote either. JUnit is declared in the build file and `src/test/`
+is empty.
 
 ## What this shows
 
-I would not write this the same way now, and the specific lesson is not "use
-MVC properly." It is narrower than that. The decision to pass rows between
-layers as formatted text looked like a shortcut in a data-access method, and it
-was the direct cause of the delete bug, the reason two different output formats
-get parsed two different ways in the same controller, and the reason any
-description containing a comma and a space corrupts a table row. Cheap at the
-point of writing, expensive everywhere it was read.
+Writing the security requirements down did not produce them, because nothing in
+the process ever checked. The requirements page and the code sit in version
+control six weeks apart, and the page that was meant to document verification
+is one of three the team never got to.
 
-The requirements page is the more uncomfortable lesson, and the more useful
-one. Writing the security requirements down did not produce them. Nothing in
-the process turned "hashing and salting" from a line in a document into a line
-of code, because nothing ever checked, and the page that was supposed to
-describe how we verified the software was never written either. A specification
-nobody tests against is a wish with a date on it.
+The narrower lesson is about the text-passing decision. It was made inside one
+method and caused a correctness bug in a different layer, one that no amount of
+care in the controller could have prevented. Returning typed objects carrying
+an ID would have made the delete bug impossible to write.
 
-Two things in here I still think are simply correct. The building lookup
-handles scroll-wheel zoom with sensible bounds, and the request form's
-twelve-hour clock conversion gets both the noon and midnight cases right before
-handing off a date. Neither is clever. On a page this candid about defects,
-"correct" is worth something.
-
-The code is public, with credentials purged from the history. It builds; it
-does not run without a JavaFX SDK and a database to point at.
+Two things here I would still defend. The building lookup handles scroll-wheel
+zoom with sensible bounds, and the request form's twelve-hour clock conversion
+gets both the noon and midnight cases right before handing off a date.
