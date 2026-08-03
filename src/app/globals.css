@@ -305,8 +305,25 @@ h4 {
   position: sticky;
   top: var(--header-h);
   z-index: 20;
-  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  background: var(
+    --section-sticky-bg,
+    color-mix(in srgb, var(--paper) 86%, transparent)
+  );
   backdrop-filter: blur(12px);
+}
+
+/* A section sitting on a tinted band has to tint its pinned label to match.
+ * The default above is page paper, so on the recessed news band the label
+ * painted a lighter, page-coloured rectangle inside the darker band, which
+ * read as a floating card rather than as chrome. Opaque rather than
+ * translucent here: matching the band exactly matters more than letting rows
+ * blur through, and an exact match makes the label invisible until it pins. */
+.band-sunken {
+  --section-sticky-bg: color-mix(
+    in srgb,
+    var(--paper-sunken) 60%,
+    var(--paper)
+  );
 }
 @media (prefers-reduced-motion: reduce) {
   /* Pinning is motion the reader did not ask for: the label tracks the

@@ -226,7 +226,10 @@ export default function Home() {
           {/* -mb-28 cancels the footer's global mt-28 so the recessed band
               runs flush into the footer hairline; the footer's border-t is
               the band's bottom edge (no empty paper strip between them). */}
-          <div className="mt-14 -mb-28 border-t border-line bg-paper-sunken/60">
+          {/* band-sunken retints the pinned section label to match this band
+              (globals.css); without it the label keeps the page background and
+              reads as a pale card sitting inside the recess. */}
+          <div className="band-sunken mt-14 -mb-28 border-t border-line bg-paper-sunken/60">
             <Section className="py-12">
               <SectionHeading
                 index="03"
