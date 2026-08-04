@@ -4,6 +4,7 @@ import {
   getNews,
   getProject,
   getProjects,
+  getPublications,
   getResearchThreads,
   getSite,
 } from "@/lib/content";
@@ -15,6 +16,7 @@ import { Reveal } from "@/components/Reveal";
 import { FlagshipCard } from "@/components/FlagshipCard";
 import { ProjectCard } from "@/components/ProjectCard";
 import { NewsList } from "@/components/NewsList";
+import { PublicationList } from "@/components/PublicationList";
 import { ObfuscatedEmail } from "@/components/ObfuscatedEmail";
 import { PersonJsonLd } from "@/components/PersonJsonLd";
 import { WebSiteJsonLd } from "@/components/WebSiteJsonLd";
@@ -35,6 +37,7 @@ export default function Home() {
   const featuredProjects = getProjects().filter(
     (p) => p.meta.featured && p.meta.tier === "project",
   );
+  const publications = getPublications();
   const news = getNews();
 
   return (
@@ -191,12 +194,40 @@ export default function Home() {
         </Section>
       </Reveal>
 
+      {/* Publications, directly under Selected work. Two conference posters
+          are among the strongest signals this site carries for the audience
+          the hero pill names, and they used to be reachable only by opening
+          /research and scrolling past the thread card. Cheap to show: at this
+          count the whole list fits, so the homepage carries the real citations
+          rather than a teaser. */}
+      {publications.length > 0 && (
+        <Reveal>
+          <Section className="py-12">
+            <SectionHeading
+              index="02"
+              title="Publications & Presentations"
+              action={
+                <Link
+                  href="/research#publications"
+                  className="text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
+                >
+                  Research &amp; publications →
+                </Link>
+              }
+            />
+            <div className="sd-rise">
+              <PublicationList publications={publications} />
+            </div>
+          </Section>
+        </Reveal>
+      )}
+
       {/* Featured projects strip, same grammar as Selected work. */}
       {featuredProjects.length > 0 && (
         <Reveal>
           <Section className="py-12">
             <SectionHeading
-              index="02"
+              index="03"
               title="Projects"
               action={
                 <Link
@@ -232,7 +263,7 @@ export default function Home() {
           <div className="band-sunken mt-14 -mb-28 border-t border-line bg-paper-sunken/60">
             <Section className="py-12">
               <SectionHeading
-                index="03"
+                index="04"
                 title="News"
                 rule={false}
                 action={

@@ -29,13 +29,24 @@ export default function ResearchPage() {
         lead="Applied machine learning for scientific problems: fusing messy, multi-modal real-world data into predictions scientists can use."
       />
 
+      {/* Two numbered sections of equal weight. Publications used to sit at
+          the bottom under a small unnumbered heading, below a full-width card,
+          which read as an appendix: for an academic reader the citations are
+          half of what this page is for. Numbering both makes them peers. */}
       <Section className="py-4">
+        <SectionHeading index="01" title="Research" />
         <div className="sd-cards grid gap-5">
           {threads.map((t) => (
             <FlagshipCard
               key={t.meta.slug}
               href={`/research/${t.meta.slug}`}
-              eyebrow="Research"
+              // Not "Research": on this page that word already appears as the
+              // page title and the section heading directly above, so the card
+              // said it a third time and carried no information. The thread's
+              // standing (senior thesis) is what a reader does not already
+              // know. On the homepage the eyebrow stays "Research", where it
+              // is doing real work distinguishing the card from "Engineering".
+              eyebrow="Senior thesis"
               title={t.meta.title}
               metaLine={`${t.meta.org} · ${formatPeriod(t.meta.period)}`}
               summary={t.meta.summary}
@@ -48,8 +59,10 @@ export default function ResearchPage() {
 
       {publications.length > 0 && (
         <Reveal>
-          <Section className="py-12">
-            <SectionHeading title="Publications & Presentations" />
+          {/* id so /research#publications is a stable deep link: the homepage
+              block and any external reference point here. */}
+          <Section id="publications" className="scroll-mt-24 py-12">
+            <SectionHeading index="02" title="Publications & Presentations" />
             <div className="sd-rise">
               <PublicationList publications={publications} />
               {/* The full iD with its mark, per ORCID's display guidelines.

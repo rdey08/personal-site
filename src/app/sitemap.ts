@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import {
+  getLeadershipWithPages,
   getNews,
   getProjectsWithPages,
   getResearchThreads,
@@ -37,11 +38,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
+  const leadershipPages: MetadataRoute.Sitemap = getLeadershipWithPages().map(
+    (p) => ({
+      url: `${SITE_URL}/leadership/${p.meta.slug}`,
+      lastModified: buildDate,
+    }),
+  );
+
   // News permalinks carry their true publication date.
   const newsRoutes: MetadataRoute.Sitemap = news.map((n) => ({
     url: `${SITE_URL}/news/${n.meta.slug}`,
     lastModified: new Date(`${n.meta.date}T12:00:00Z`),
   }));
 
-  return [...staticRoutes, ...research, ...projectPages, ...newsRoutes];
+  return [
+    ...staticRoutes,
+    ...research,
+    ...projectPages,
+    ...leadershipPages,
+    ...newsRoutes,
+  ];
 }

@@ -26,7 +26,15 @@ export function PublicationList({
                   ) : (
                     author
                   )}
-                  {j < meta.authors.length - 1 ? "; " : ". "}
+                  {/* Author names in this format already end in an initial's
+                      period ("Miller, N."), so appending the separator's own
+                      period rendered "Miller, N.. Title". Only supply one when
+                      the name does not carry it. */}
+                  {j < meta.authors.length - 1
+                    ? "; "
+                    : author.endsWith(".")
+                      ? " "
+                      : ". "}
                 </span>
               );
             })}

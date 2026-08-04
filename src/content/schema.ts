@@ -117,7 +117,9 @@ export type Project = z.infer<typeof projectSchema>;
 
 // content/cv.mdx, singleton. Body: the HTML CV facts (education, summary).
 export const cvSchema = z.object({
-  updated: z.string().optional(),
+  // YYYY-MM, not free text: the page runs it through formatMonthLong, and a
+  // string Date cannot parse renders a literal "Invalid Date" on the page.
+  updated: yearMonth.optional(),
 });
 export type Cv = z.infer<typeof cvSchema>;
 

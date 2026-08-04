@@ -136,6 +136,24 @@ export function getProjectsWithPages(): Entry<Project>[] {
   return getProjects().filter((p) => projectHasPage(p.meta));
 }
 
+/**
+ * Whether a leadership entry has its own page at /leadership/<slug>. Same
+ * opt-in as projects use, on a separate route because leadership work is not
+ * a project and should not sit in the /projects sequence.
+ *
+ * Most entries stay as rows on /leadership: a page that says less than the row
+ * already does is worse than no link. Set `detail: true` in the same change
+ * that writes the body.
+ */
+export function leadershipHasPage(meta: Project): boolean {
+  return meta.tier === "leadership" && meta.detail;
+}
+
+/** Leadership entries with their own page, in display order. */
+export function getLeadershipWithPages(): Entry<Project>[] {
+  return getProjects().filter((p) => leadershipHasPage(p.meta));
+}
+
 export function getNews(): Entry<NewsItem>[] {
   const items = loadDir(newsItemSchema, "news").sort((a, b) =>
     b.meta.date.localeCompare(a.meta.date),

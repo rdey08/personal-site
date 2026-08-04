@@ -72,19 +72,19 @@ export function ProjectCard({
               </span>
             )}
           </div>
-          {/* Role sits directly under the title on team projects. Without it
-              a card describing a product reads as a claim to have built all
-              of it, which on a personal site is the failure mode that
-              matters. */}
-          {project.role && (
-            <p className="mt-2 text-sm text-ink-muted">{project.role}</p>
-          )}
-          {/* The period lives here rather than on its own line because it is
-              part of the same "circumstances" statement as the context, and a
-              third meta line above the summary crowds the card. Cards carried
-              no date at all before this, so a reader could not tell recent
-              work from work three years old. */}
-          <p className="mt-1 text-sm text-ink-faint">
+          {/* Circumstances only. The role used to sit above this line in the
+              same size and a near-identical grey, so the card stacked three
+              undifferentiated meta lines and a role like "The requirements
+              documentation, and the front end views and routing" read as a
+              description of the project rather than a statement of what
+              Rupak did. The role now lives in a labelled row above the chips;
+              this line is left as the one "when and in what setting" fact.
+
+              The period lives here rather than on its own line because it is
+              part of the same statement as the context. Cards carried no date
+              at all before this, so a reader could not tell recent work from
+              work three years old. */}
+          <p className="mt-2 text-sm text-ink-faint">
             {project.context && `${project.context} · `}
             {formatPeriod(project.period)}
           </p>
@@ -99,12 +99,34 @@ export function ProjectCard({
           {/* Anchored to the bottom rather than trailing the summary. Cards in
               a row are stretched to the tallest, so a shorter one used to end
               its content early and leave the remainder blank. Sending the
-              slack above the chips instead lines the footers up across the
+              slack above this block instead lines the footers up across the
               row. mt-auto collapses to zero when there is no slack, so pt-5
-              carries the spacing that mt-5 used to. */}
-          <div className="mt-auto pt-5">
-            <MetaChips items={project.stack} label="Stack" />
-          </div>
+              carries the spacing that mt-5 used to.
+
+              A definition list, the same ROLE / STACK grammar the detail page
+              header uses, so a labelled row means the same thing on the card
+              and on the page it links to. Pulling the role down here also
+              fills the gap a short summary used to leave above the chips. */}
+          <dl className="mt-auto grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 pt-5 text-sm">
+            {project.role && (
+              <div className="contents">
+                <dt className="text-[0.6875rem] font-medium tracking-[0.08em] text-ink-faint uppercase">
+                  Role
+                </dt>
+                <dd className="text-ink-muted">{project.role}</dd>
+              </div>
+            )}
+            {project.stack.length > 0 && (
+              <div className="contents">
+                <dt className="text-[0.6875rem] font-medium tracking-[0.08em] text-ink-faint uppercase">
+                  Stack
+                </dt>
+                <dd>
+                  <MetaChips items={project.stack} label="Stack" />
+                </dd>
+              </div>
+            )}
+          </dl>
         </div>
       </div>
       {project.links && (

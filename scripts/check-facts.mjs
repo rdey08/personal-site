@@ -62,6 +62,35 @@ for (const root of ROOTS) {
 
 const ci = Boolean(process.env.CI) || process.argv.includes("--ci");
 
+// CV freshness. content/cv.mdx carries the month the PDF was regenerated, and
+// nothing forces the two to agree, so a replaced PDF can silently keep an old
+// date on the page.
+//
+// Local-only by design. In CI the repo is a fresh clone, so every file's mtime
+// is the checkout time and the PDF would always look newer than any month we
+// claim. Running this on Vercel would fail every deploy for no reason.
+if (!ci) {
+  try {
+    const cv = fs.readFileSync(path.join("content", "cv.mdx"), "utf8");
+    const claimed = cv.match(/^updated:\s*"?(\d{4})-(\d{2})"?\s*$/m);
+    const pdf = path.join("public", "cv", "rupak-dey-cv.pdf");
+    if (claimed && fs.existsSync(pdf)) {
+      const claimedEnd = new Date(Number(claimed[1]), Number(claimed[2]), 1);
+      const built = fs.statSync(pdf).mtime;
+      if (built >= claimedEnd) {
+        console.log(
+          `check:facts note: public/cv/rupak-dey-cv.pdf was modified ` +
+            `${built.toISOString().slice(0, 10)}, after the "updated: ` +
+            `${claimed[1]}-${claimed[2]}" claimed in content/cv.mdx. ` +
+            `Bump that field if you replaced the PDF.\n`,
+        );
+      }
+    }
+  } catch {
+    // Freshness is a convenience check; never let it break the real gate.
+  }
+}
+
 if (findings.length === 0) {
   console.log("check:facts clean: no unverified claims, no PII, no em dashes.");
   process.exit(0);

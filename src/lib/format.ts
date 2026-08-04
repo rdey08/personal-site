@@ -6,6 +6,17 @@ export function formatMonth(ym: string): string {
   });
 }
 
+/**
+ * Full month name, for prose that stands alone rather than sitting in a
+ * period range ("Updated July 2026", not "Updated Jul 2026").
+ */
+export function formatMonthLong(ym: string): string {
+  return new Date(`${ym}-01T00:00:00`).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function formatPeriod(p: {
   start: string;
   end?: string | "present";

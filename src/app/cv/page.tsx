@@ -3,6 +3,7 @@ import path from "node:path";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/site";
 import { getCv, getSite } from "@/lib/content";
+import { formatMonthLong } from "@/lib/format";
 import { Mdx } from "@/lib/mdx";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
@@ -31,7 +32,11 @@ export default function CvPage() {
     <>
       <PageHeader
         title="Curriculum Vitae"
-        lead={cv.meta.updated ? `Updated ${cv.meta.updated}` : undefined}
+        lead={
+          cv.meta.updated
+            ? `Updated ${formatMonthLong(cv.meta.updated)}`
+            : undefined
+        }
       />
 
       {pdfExists ? (

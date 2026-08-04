@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 import {
+  getLeadershipWithPages,
   getNews,
   getProjectsWithPages,
   getResearchThreads,
@@ -38,6 +39,11 @@ function buildCommands(): Command[] {
       group: "Work",
       label: p.meta.title,
       href: `/projects/${p.meta.slug}`,
+    })),
+    ...getLeadershipWithPages().map((p) => ({
+      group: "Work",
+      label: p.meta.title,
+      href: `/leadership/${p.meta.slug}`,
     })),
     ...getNews().map((n) => ({
       group: "News",
