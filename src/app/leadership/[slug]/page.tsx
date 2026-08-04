@@ -9,6 +9,7 @@ import {
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
 import { ArticleJsonLd } from "@/components/ArticleJsonLd";
+import { externalRow } from "@/components/metaRows";
 
 // Leadership write-ups live on their own route rather than under /projects:
 // founding an organization is not a project, and putting it in that sequence
@@ -51,6 +52,11 @@ export default async function LeadershipDetailPage({
       label: "Period",
       value: formatPeriod({ start: meta.period.start, end: meta.period.end }),
     },
+    // The organization's own public account. It is the evidence for this
+    // page's closing claim that the club outlasted the term, which is
+    // otherwise just an assertion by the person making it.
+    ...externalRow("Instagram", meta.links?.instagram),
+    ...externalRow("Site", meta.links?.demo),
   ];
 
   return (

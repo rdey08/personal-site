@@ -10,6 +10,7 @@ import {
 import { formatPeriod } from "@/lib/format";
 import { DetailArticle } from "@/components/DetailArticle";
 import { ArticleJsonLd } from "@/components/ArticleJsonLd";
+import { externalRow } from "@/components/metaRows";
 
 // Detail pages exist for flagship work and for any project that has opted in
 // (see projectHasPage). Gated on the content being worth the click, not on
@@ -32,29 +33,6 @@ export async function generateMetadata({
     path: `/projects/${slug}`,
     publishedTime: `${project.meta.period.start}-01`,
   });
-}
-
-/** A metadata row pointing off-site, or nothing when there is no such link. */
-function externalRow(label: string, url?: string) {
-  if (!url) return [];
-  return [
-    {
-      label,
-      value: (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="link-external text-ink transition-colors duration-[--duration-fast] hover:text-accent"
-        >
-          {url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-          <span aria-hidden="true" className="link-arrow ml-1 text-accent">
-            ↗
-          </span>
-        </a>
-      ),
-    },
-  ];
 }
 
 export default async function ProjectPage({

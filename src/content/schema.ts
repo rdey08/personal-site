@@ -84,6 +84,10 @@ export const projectSchema = z
       .object({
         github: z.url().optional(),
         demo: z.url().optional(),
+        // Public account for an organization, used by leadership entries. Its
+        // own field rather than reusing `demo`, which renders as "Live site"
+        // and would mislabel a social account.
+        instagram: z.url().optional(),
       })
       .optional(),
     tier: z.enum(["flagship", "project", "leadership"]),
