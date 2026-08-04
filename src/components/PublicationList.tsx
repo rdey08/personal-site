@@ -5,14 +5,23 @@ import type { Publication } from "@/content/schema";
 export function PublicationList({
   publications,
   authorSurname = "Dey",
+  limit,
 }: {
   publications: { meta: Publication }[];
   authorSurname?: string;
+  /**
+   * Cap for the home page strip, same contract as NewsList: show the most
+   * recent few and let "All publications" carry the rest. Citations are tall
+   * (three or four wrapped lines each), so an uncapped list would take over
+   * the page as the record grows.
+   */
+  limit?: number;
 }) {
-  if (publications.length === 0) return null;
+  const shown = limit ? publications.slice(0, limit) : publications;
+  if (shown.length === 0) return null;
   return (
     <ol data-animate="rows" className="space-y-6">
-      {publications.map(({ meta }, i) => (
+      {shown.map(({ meta }, i) => (
         // Academic register: hanging indent, first line flush, wrapped
         // lines indented (padding-left + negative text-indent).
         <li key={i} className="pl-6 -indent-6 text-ink">

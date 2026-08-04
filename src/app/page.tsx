@@ -203,16 +203,25 @@ export default function Home() {
       {publications.length > 0 && (
         <Reveal>
           <Section className="py-12">
-            {/* No action link, unlike Projects and News. Theirs say "All X"
-                because those sections are truncated; this one is the complete
-                list, so there is no "more" to point at. The link that was here
-                said "Research & publications", which repeated the heading's
-                own word and sent a reader to a page holding exactly what they
-                were already looking at. Selected work carries no action link
-                for the same reason. */}
-            <SectionHeading index="02" title="Publications & Presentations" />
+            {/* "All publications", matching Projects and News rather than the
+                earlier "Research & publications", which repeated the heading's
+                own word. The label leads the count, exactly as News does (it
+                caps at 5 against 3 items today), so the section reads the same
+                whether or not anything is currently hidden. */}
+            <SectionHeading
+              index="02"
+              title="Publications & Presentations"
+              action={
+                <Link
+                  href="/research#publications"
+                  className="text-sm font-medium text-accent transition-colors duration-[--duration-fast] hover:text-accent-strong"
+                >
+                  All publications →
+                </Link>
+              }
+            />
             <div className="sd-rise">
-              <PublicationList publications={publications} />
+              <PublicationList publications={publications} limit={4} />
             </div>
           </Section>
         </Reveal>
